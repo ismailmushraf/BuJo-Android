@@ -17,6 +17,13 @@ import java.util.Locale;
 
 public class EntryAdapter extends ArrayAdapter<Entry> {
 
+    private boolean showTags = true;
+
+    public EntryAdapter(Context context, List<Entry> entries, boolean showTags) {
+        super(context, 0, entries);
+        this.showTags = showTags;
+    }
+
     public EntryAdapter(Context context, List<Entry> entries) {
         super(context, 0, entries);
     }
@@ -89,6 +96,13 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
             holder.tvDeadline.setText("Deadline: " + sdf.format(new Date(entry.getDeadline())));
         } else {
             holder.tvDeadline.setVisibility(View.GONE);
+        }
+
+        if (showTags && entry.getProjectTag() != null && !entry.getProjectTag().isEmpty()) {
+            holder.tvTag.setVisibility(View.VISIBLE);
+            holder.tvTag.setText("#" + entry.getProjectTag());
+        } else {
+            holder.tvTag.setVisibility(View.GONE);
         }
 
         return convertView;

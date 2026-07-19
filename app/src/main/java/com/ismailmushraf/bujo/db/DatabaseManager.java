@@ -9,6 +9,7 @@ import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class DatabaseManager {
@@ -60,11 +61,6 @@ public class DatabaseManager {
 
     public List<Entry> getEntriesForProject(int projectId) {
         return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId);
-    }
-
-    public List<Entry> getDailyLogEntries() {
-        // Daily Log entries are those that are NOT assigned to a specific project.
-        return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = 0 OR " + DatabaseHelper.COLUMN_PROJECT_ID + " IS NULL");
     }
 
     public List<Entry> getEntriesWithDeadlines() {
@@ -161,5 +157,29 @@ public class DatabaseManager {
         long id = insertProject(newProject);
         newProject.setId((int) id);
         return newProject;
+    }
+
+    public List<Entry> getTodayEntries() {
+        Calendar copy = Calendar.getInstance();
+        // Start of today
+        copy.set(Calendar.HOUR_OF_DAY, 0);
+        copy.set(Calendar.MINUTE, 0);
+        copy.set(Calendar.SECOND, 0);
+        copy.set(Calendar.MILLISECOND, 0);
+        long start = copy.getTimeInMillis();
+
+        // End of today
+        copy.set(Calendar.HOUR_OF_DAY, 23);
+        copy.set(Calendar.MINUTE, 59);
+        copy.set(Calendar.SECOND, 59);
+        copy.set(Calendar.MILLISECOND, 999);
+        long end = copy.getTimeInMillis();
+
+        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " >= " + start + " AND " + DatabaseHelper.COLUMN_DEADLINE + " <= " + end);
+    }
+
+    public List<Entry> getInboxEntries() {
+        // Fetches items with no deadline assigned
+        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " <= 0 OR " + DatabaseHelper.COLUMN_DEADLINE + " IS NULL");
     }
 }

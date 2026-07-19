@@ -19,13 +19,9 @@ import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-public class DailyLogFragment extends Fragment {
+public class InboxFragment extends Fragment {
 
     private EntryAdapter adapter;
     private List<Entry> entries;
@@ -38,9 +34,7 @@ public class DailyLogFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_daily_log, container, false);
 
         if (getActivity() instanceof MainActivity) {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
-            ((MainActivity) getActivity()).setToolbarTitle(sdf.format(new Date()).toUpperCase());
-            ((MainActivity) getActivity()).setToolbarSubtitle("");
+            ((MainActivity) getActivity()).setToolbarTitle("INBOX");
         }
 
         listView = (ListView) root.findViewById(R.id.lv_daily_bullets);
@@ -138,13 +132,6 @@ public class DailyLogFragment extends Fragment {
                 }
             }
 
-            Calendar today = Calendar.getInstance();
-            today.set(Calendar.HOUR_OF_DAY, 12); // Midday for consistency with your Future Log
-            today.set(Calendar.MINUTE, 0);
-            today.set(Calendar.SECOND, 0);
-            today.set(Calendar.MILLISECOND, 0);
-            newEntry.setDeadline(today.getTimeInMillis());
-
             newEntry.setProjectId(projectId);
             newEntry.setCompleted(false);
             newEntry.setMigrated(false);
@@ -160,7 +147,7 @@ public class DailyLogFragment extends Fragment {
     }
 
     private void loadEntries() {
-        entries = dbManager.getTodayEntries();
+        entries = dbManager.getInboxEntries();
         adapter = new EntryAdapter(getActivity(), entries);
         listView.setAdapter(adapter);
     }

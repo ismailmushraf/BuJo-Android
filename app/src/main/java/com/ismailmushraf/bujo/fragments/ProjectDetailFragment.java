@@ -1,7 +1,6 @@
 package com.ismailmushraf.bujo.fragments;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,8 +19,8 @@ import com.ismailmushraf.bujo.adapters.EntryAdapter;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
+import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -38,6 +36,7 @@ public class ProjectDetailFragment extends Fragment {
     private EntryAdapter adapter;
     private List<Entry> entries;
     private DatabaseManager dbManager;
+    private EntryUIHelper uiHelper;
 
     public static ProjectDetailFragment newInstance(int projectId, String projectName) {
         ProjectDetailFragment fragment = new ProjectDetailFragment();
@@ -62,7 +61,7 @@ public class ProjectDetailFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_project_detail, container, false);
 
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).setToolbarTitle(projectName.toUpperCase(Locale.US));
+            ((MainActivity) getActivity()).setToolbarTitle(projectName);
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 
@@ -72,6 +71,13 @@ public class ProjectDetailFragment extends Fragment {
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
+
+        uiHelper = new EntryUIHelper(getActivity(), dbManager, new EntryUIHelper.OnEntryUpdatedListener() {
+            @Override
+            public void onEntryUpdated() {
+                loadEntries();
+            }
+        });
 
         loadEntries();
 
@@ -120,10 +126,19 @@ public class ProjectDetailFragment extends Fragment {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 if (position < entries.size()) {
-                    showContextDialog(entries.get(position));
+                    uiHelper.showContextDialog(entries.get(position));
                     return true;
                 }
                 return false;
+            }
+        });
+
+        // Add this logic right here:
+        TextView btnEmoji = (TextView) root.findViewById(R.id.btn_emoji);
+        btnEmoji.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uiHelper.showEmojiPicker(etNewEntry);
             }
         });
 
@@ -137,19 +152,19 @@ public class ProjectDetailFragment extends Fragment {
 
     private void loadEntries() {
         entries = dbManager.getEntriesForProject(projectId);
-        adapter = new EntryAdapter(getActivity(), entries);
+        adapter = new EntryAdapter(getActivity(), entries, false);
         listView.setAdapter(adapter);
     }
 
     private void addEntry(String content) {
         if (content != null && !content.trim().isEmpty()) {
             com.ismailmushraf.bujo.models.Entry newEntry = com.ismailmushraf.bujo.utils.EntryParser.parse(content);
-            
+
             int targetProjectId = projectId;
             if (newEntry.getProjectTag() != null) {
                 Project p = dbManager.getOrCreateProject(newEntry.getProjectTag());
                 targetProjectId = p.getId();
-                
+
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).refreshDrawer();
                 }
@@ -165,61 +180,6 @@ public class ProjectDetailFragment extends Fragment {
                 loadEntries();
             }
         }
-    }
-
-    private void showContextDialog(final Entry entry) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Options");
-
-        String[] options = {
-                "Set Deadline",
-                entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List",
-                "Delete Item"
-        };
-
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    showDatePicker(entry);
-                } else if (which == 1) {
-                    boolean migrating = !entry.isMigrated();
-                    entry.setMigrated(migrating);
-                    if (migrating) {
-                        entry.setDeadline(0);
-                    }
-                    dbManager.updateEntry(entry);
-                    loadEntries();
-                } else if (which == 2) {
-                    dbManager.deleteEntry(entry.getId());
-                    loadEntries();
-                }
-            }
-        });
-        builder.show();
-    }
-
-    private void showDatePicker(final Entry entry) {
-        final Calendar c = Calendar.getInstance();
-        if (entry.getDeadline() > 0) {
-            c.setTimeInMillis(entry.getDeadline());
-        }
-        int year = c.get(Calendar.YEAR);
-        int month = c.get(Calendar.MONTH);
-        int day = c.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        Calendar selected = Calendar.getInstance();
-                        selected.set(year, monthOfYear, dayOfMonth, 12, 0, 0);
-                        entry.setDeadline(selected.getTimeInMillis());
-                        dbManager.updateEntry(entry);
-                        loadEntries();
-                    }
-                }, year, month, day);
-        datePickerDialog.show();
     }
 
     private void showDeleteProjectConfirmation() {

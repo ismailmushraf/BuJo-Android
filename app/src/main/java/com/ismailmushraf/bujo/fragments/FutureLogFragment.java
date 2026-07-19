@@ -1,10 +1,7 @@
 package com.ismailmushraf.bujo.fragments;
 
 import android.animation.LayoutTransition;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -25,13 +20,13 @@ import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.adapters.EntryAdapter;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
+import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
+import java.util.List;
 
 /** Calendar view with a full-month overview and a compact, actionable day agenda. */
 public class FutureLogFragment extends Fragment {
@@ -41,7 +36,6 @@ public class FutureLogFragment extends Fragment {
     private View monthControls;
     private View monthSelectedBar;
     private View agendaContainer;
-    private Button migratedItemsButton;
     private TextView monthTitle;
     private TextView selectedDateTitle;
     private TextView monthSelectedDateTitle;
@@ -49,6 +43,7 @@ public class FutureLogFragment extends Fragment {
     private ListView agendaList;
 
     private DatabaseManager dbManager;
+    private EntryUIHelper uiHelper;
     private Calendar currentMonth;
     private Calendar selectedDate;
     private List<Entry> deadlineEntries;
@@ -56,7 +51,6 @@ public class FutureLogFragment extends Fragment {
     private EntryAdapter agendaAdapter;
     private MonthAdapter monthAdapter;
     private WeekAdapter weekAdapter;
-    private boolean showingMigratedItems;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -66,7 +60,6 @@ public class FutureLogFragment extends Fragment {
         monthControls = root.findViewById(R.id.month_controls);
         monthSelectedBar = root.findViewById(R.id.month_selected_bar);
         agendaContainer = root.findViewById(R.id.agenda_container);
-        migratedItemsButton = (Button) root.findViewById(R.id.btn_migrated_items);
         monthTitle = (TextView) root.findViewById(R.id.tv_calendar_month);
         selectedDateTitle = (TextView) root.findViewById(R.id.tv_selected_date);
         monthSelectedDateTitle = (TextView) root.findViewById(R.id.tv_month_selected_date);
@@ -75,13 +68,26 @@ public class FutureLogFragment extends Fragment {
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
+
+        uiHelper = new EntryUIHelper(getActivity(), dbManager, new EntryUIHelper.OnEntryUpdatedListener() {
+            @Override
+            public void onEntryUpdated() {
+                // If a date is changed, reload the entries to reflect accurately on the UI
+                if (agendaContainer.getVisibility() == View.VISIBLE) {
+                    reloadVisibleEntries();
+                } else {
+                    showMonth();
+                }
+            }
+        });
+
         currentMonth = Calendar.getInstance();
         selectedDate = Calendar.getInstance();
         agendaAdapter = new EntryAdapter(getActivity(), displayedEntries);
         agendaList.setAdapter(agendaAdapter);
 
         // Speed up the automatic animations
-        LinearLayout rootLayout = (LinearLayout) root; // Or cast to root.findViewById(R.id.root_future_log)
+        LinearLayout rootLayout = (LinearLayout) root;
         LayoutTransition transition = rootLayout.getLayoutTransition();
         if (transition != null) {
             transition.setDuration(150); // 150ms is incredibly snappy and clean
@@ -111,10 +117,6 @@ public class FutureLogFragment extends Fragment {
             @Override public void onClick(View v) { showMonth(); }
         });
 
-        migratedItemsButton.setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { showMigratedItems(); }
-        });
-
         monthGrid.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedDate = (Calendar) monthAdapter.getItem(position);
@@ -138,7 +140,7 @@ public class FutureLogFragment extends Fragment {
         });
         agendaList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                showEntryOptions(displayedEntries.get(position));
+                uiHelper.showContextDialog(displayedEntries.get(position));
                 return true;
             }
         });
@@ -148,13 +150,11 @@ public class FutureLogFragment extends Fragment {
     }
 
     private void showMonth() {
-        showingMigratedItems = false;
         deadlineEntries = dbManager.getEntriesWithDeadlines();
         monthControls.setVisibility(View.VISIBLE);
         monthSelectedBar.setVisibility(View.VISIBLE);
         monthGrid.setVisibility(View.VISIBLE);
         agendaContainer.setVisibility(View.GONE);
-        migratedItemsButton.setVisibility(View.VISIBLE);
         monthTitle.setText(new SimpleDateFormat("MMMM yyyy", Locale.US)
                 .format(currentMonth.getTime()).toUpperCase(Locale.US));
         monthSelectedDateTitle.setText(new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US)
@@ -165,32 +165,16 @@ public class FutureLogFragment extends Fragment {
     }
 
     private void showAgendaForSelectedDate() {
-        showingMigratedItems = false;
         deadlineEntries = dbManager.getEntriesWithDeadlines();
         monthControls.setVisibility(View.GONE);
         monthSelectedBar.setVisibility(View.GONE);
         monthGrid.setVisibility(View.GONE);
-        migratedItemsButton.setVisibility(View.GONE);
         agendaContainer.setVisibility(View.VISIBLE);
         weekAdapter = new WeekAdapter(getActivity(), selectedDate);
         weekGrid.setAdapter(weekAdapter);
         selectedDateTitle.setText(new SimpleDateFormat("EEEE, MMMM d", Locale.US)
                 .format(selectedDate.getTime()).toUpperCase(Locale.US));
         loadEntriesForSelectedDate();
-    }
-
-    private void showMigratedItems() {
-        showingMigratedItems = true;
-        monthControls.setVisibility(View.GONE);
-        monthSelectedBar.setVisibility(View.GONE);
-        monthGrid.setVisibility(View.GONE);
-        migratedItemsButton.setVisibility(View.GONE);
-        agendaContainer.setVisibility(View.VISIBLE);
-        weekGrid.setVisibility(View.GONE);
-        selectedDateTitle.setText("MIGRATED ITEMS");
-        displayedEntries.clear();
-        displayedEntries.addAll(dbManager.getMigratedEntries());
-        agendaAdapter.notifyDataSetChanged();
     }
 
     private void loadEntriesForSelectedDate() {
@@ -206,72 +190,7 @@ public class FutureLogFragment extends Fragment {
     }
 
     private void reloadVisibleEntries() {
-        if (showingMigratedItems) {
-            showMigratedItems();
-        } else {
-            showAgendaForSelectedDate();
-        }
-    }
-
-    private void showEntryOptions(final Entry entry) {
-        String[] options = {"Edit item", "Set Deadline",
-                entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List", "Delete Item"};
-        new AlertDialog.Builder(getActivity()).setTitle("Item options").setItems(options,
-                new DialogInterface.OnClickListener() {
-                    @Override public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            showEditDialog(entry);
-                        } else if (which == 1) {
-                            showDatePicker(entry);
-                        } else if (which == 2) {
-                            boolean migrating = !entry.isMigrated();
-                            entry.setMigrated(migrating);
-                            if (migrating) {
-                                entry.setDeadline(0);
-                            }
-                            dbManager.updateEntry(entry);
-                            reloadVisibleEntries();
-                        } else {
-                            dbManager.deleteEntry(entry.getId());
-                            reloadVisibleEntries();
-                        }
-                    }
-                }).show();
-    }
-
-    private void showEditDialog(final Entry entry) {
-        final EditText input = new EditText(getActivity());
-        input.setSingleLine(false);
-        input.setText(entry.getContent());
-        input.setSelection(input.length());
-        new AlertDialog.Builder(getActivity()).setTitle("Edit item").setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override public void onClick(DialogInterface dialog, int which) {
-                        String content = input.getText().toString().trim();
-                        if (!content.isEmpty()) {
-                            entry.setContent(content);
-                            dbManager.updateEntry(entry);
-                            reloadVisibleEntries();
-                        }
-                    }
-                }).show();
-    }
-
-    private void showDatePicker(final Entry entry) {
-        final Calendar date = Calendar.getInstance();
-        if (entry.getDeadline() > 0) date.setTimeInMillis(entry.getDeadline());
-        new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override public void onDateSet(DatePicker view, int year, int month, int day) {
-                Calendar selected = Calendar.getInstance();
-                selected.set(year, month, day, 12, 0, 0);
-                entry.setDeadline(selected.getTimeInMillis());
-                dbManager.updateEntry(entry);
-                currentMonth = (Calendar) selected.clone();
-                selectedDate = (Calendar) selected.clone();
-                showAgendaForSelectedDate();
-            }
-        }, date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)).show();
+        showAgendaForSelectedDate();
     }
 
     private long startOfDay(Calendar calendar) {

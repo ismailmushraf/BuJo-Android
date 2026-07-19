@@ -15,6 +15,8 @@ import com.ismailmushraf.bujo.adapters.DrawerAdapter;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.fragments.DailyLogFragment;
 import com.ismailmushraf.bujo.fragments.FutureLogFragment;
+import com.ismailmushraf.bujo.fragments.InboxFragment;
+import com.ismailmushraf.bujo.fragments.MigratedItemsFragment;
 import com.ismailmushraf.bujo.fragments.ProjectDetailFragment;
 import com.ismailmushraf.bujo.fragments.ProjectsFragment;
 import com.ismailmushraf.bujo.models.DrawerItem;
@@ -97,22 +99,22 @@ public class MainActivity extends AppCompatActivity {
         refreshDrawer();
 
         if (savedInstanceState == null) {
-            // Default select Daily Log (index 1 in drawer list after section title)
-            selectItem(1);
+            // Default select Today (index 2 in drawer list after section title)
+            selectItem(2);
         }
     }
 
     public void refreshDrawer() {
         drawerItemsList.clear();
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "JOURNAL INDEX", null));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Daily Log", "⌂"));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", "\uD83D\uDCE5")); // 📥 icon
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", "\uD83D\uDCDD"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", "📅"));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">")); // Changed name
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Projects", "+"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "PROJECTS", null));
-
         List<Project> projects = dbManager.getAllProjects();
         for (Project p : projects) {
-            drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_PROJECT, p.getName(), "•", p.getId()));
+            drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_PROJECT, p.getName(), "#", p.getId()));
         }
         drawerAdapter.notifyDataSetChanged();
     }
@@ -122,10 +124,14 @@ public class MainActivity extends AppCompatActivity {
         DrawerItem item = drawerItemsList.get(position);
 
         if (item.getType() == DrawerItem.TYPE_ITEM) {
-            if ("Daily Log".equals(item.title)) {
+            if ("Inbox".equals(item.title)) {
+                fragment = new InboxFragment();
+            } else if ("Today".equals(item.title)) {
                 fragment = new DailyLogFragment();
             } else if ("Calendar".equals(item.title)) {
                 fragment = new FutureLogFragment();
+            } else if ("Logbook".equals(item.title)) {
+                fragment = new MigratedItemsFragment(); // Connects the new Logbook string to the fragment
             } else if ("Projects".equals(item.title)) {
                 fragment = new ProjectsFragment();
             }

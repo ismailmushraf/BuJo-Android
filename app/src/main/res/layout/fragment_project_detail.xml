@@ -57,6 +57,20 @@
         android:layout_marginRight="16dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/shape_bujo_box">
+
+        <!-- Added Emoji Button with rock-solid compatibility symbol -->
+        <TextView
+            android:id="@+id/btn_emoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="📝"
+            android:textSize="22sp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"/>
+
         <EditText
             android:id="@+id/et_new_entry"
             android:layout_width="match_parent"
