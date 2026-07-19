@@ -5,19 +5,43 @@
     android:orientation="vertical"
     android:background="@color/bujo_background">
 
-    <!-- Top Screen Header Area Removed, moved to AppBar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="PROJECT ENTRIES"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_delete_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:text="DELETE PROJECT"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
     <View
-        android:id="@+id/header_line"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
-        android:layout_marginTop="16dp"
         android:background="@color/bujo_divider"/>
 
-    <!-- Main Active List Window -->
     <ListView
-        android:id="@+id/lv_daily_bullets"
+        android:id="@+id/lv_project_entries"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"

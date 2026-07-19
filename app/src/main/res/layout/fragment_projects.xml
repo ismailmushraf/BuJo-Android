@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bujo_background">
+
+    <!-- Header Area -->
+    <LinearLayout
+        android:id="@+id/layout_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+        <TextView
+            android:id="@+id/tv_projects_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="PROJECTS"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/bujo_text"/>
+
+        <Button
+            android:id="@+id/btn_add_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Project" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <ListView
+        android:id="@+id/lv_projects"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/bujo_divider"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

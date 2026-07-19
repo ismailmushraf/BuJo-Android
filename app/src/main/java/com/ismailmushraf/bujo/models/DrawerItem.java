@@ -1,13 +1,29 @@
 package com.ismailmushraf.bujo.models;
 
 public class DrawerItem {
-    public String title;
-    public int iconResId; // 0 if no icon
-    public boolean isHeader;
+    public static final int TYPE_SECTION = 0;
+    public static final int TYPE_ITEM = 1;
+    public static final int TYPE_PROJECT = 2;
 
-    public DrawerItem(String title, int iconResId, boolean isHeader) {
+    private int type;
+    public String title;
+    public String icon;
+    public int projectId; // for project items
+
+    public DrawerItem(int type, String title, String icon) {
+        this.type = type;
         this.title = title;
-        this.iconResId = iconResId;
-        this.isHeader = isHeader;
+        this.icon = icon;
+    }
+
+    public DrawerItem(int type, String title, String icon, int projectId) {
+        this.type = type;
+        this.title = title;
+        this.icon = icon;
+        this.projectId = projectId;
+    }
+
+    public int getType() {
+        return type;
     }
 }
