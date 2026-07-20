@@ -16,6 +16,7 @@ import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
 import java.util.List;
+import java.util.Locale;
 
 public class MigratedItemsFragment extends Fragment {
 
@@ -32,7 +33,7 @@ public class MigratedItemsFragment extends Fragment {
         listView = (ListView) root.findViewById(R.id.lv_migrated_items);
 
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).setToolbarTitle("Logbook");
+            ((MainActivity) getActivity()).setToolbarTitle("Logbook".toUpperCase(Locale.US));
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 

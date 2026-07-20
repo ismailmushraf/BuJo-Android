@@ -20,6 +20,7 @@ import com.ismailmushraf.bujo.fragments.MigratedItemsFragment;
 import com.ismailmushraf.bujo.fragments.ProjectDetailFragment;
 import com.ismailmushraf.bujo.fragments.ProjectsFragment;
 import com.ismailmushraf.bujo.fragments.SettingsFragment;
+import com.ismailmushraf.bujo.fragments.WorkoutFragment;
 import com.ismailmushraf.bujo.models.DrawerItem;
 import com.ismailmushraf.bujo.models.Project;
 
@@ -134,10 +135,11 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", "\uD83D\uDCDD"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", "📅"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">")); // Changed name
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Workouts", "\uD83D\uDCAA")); // Add Workout module
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Projects", "+"));
         List<Project> projects = dbManager.getAllProjects();
         for (Project p : projects) {
-            drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_PROJECT, p.getName(), "#", p.getId()));
+            drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_PROJECT, p.getName(), "-", p.getId()));
         }
         drawerAdapter.notifyDataSetChanged();
     }
@@ -155,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new FutureLogFragment();
             } else if ("Logbook".equals(item.title)) {
                 fragment = new MigratedItemsFragment(); // Connects the new Logbook string to the fragment
+            }else if ("Workouts".equals(item.title)) {
+                fragment = new WorkoutFragment(); // Handle Workout click
             } else if ("Projects".equals(item.title)) {
                 fragment = new ProjectsFragment();
             }
