@@ -9,6 +9,7 @@ public class Entry {
     private boolean isMigrated;
     private long deadline;
     private int projectId;
+    private boolean hasTime;
 
     public Entry(int id, String signifier, String content, String projectTag, boolean isCompleted) {
         this.id = id;
@@ -16,6 +17,7 @@ public class Entry {
         this.content = content;
         this.projectTag = projectTag;
         this.isCompleted = isCompleted;
+        this.hasTime = false;
     }
 
     public Entry() {
@@ -45,4 +47,7 @@ public class Entry {
     
     public int getProjectId() { return projectId; }
     public void setProjectId(int projectId) { this.projectId = projectId; }
+
+    public boolean hasTime() { return hasTime; }
+    public void setHasTime(boolean hasTime) { this.hasTime = hasTime; }
 }

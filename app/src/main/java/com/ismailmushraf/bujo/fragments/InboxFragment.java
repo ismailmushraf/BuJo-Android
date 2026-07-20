@@ -148,7 +148,7 @@ public class InboxFragment extends Fragment {
 
     private void loadEntries() {
         entries = dbManager.getInboxEntries();
-        adapter = new EntryAdapter(getActivity(), entries);
+        adapter = new EntryAdapter(getActivity(), entries, true);
         listView.setAdapter(adapter);
     }
 

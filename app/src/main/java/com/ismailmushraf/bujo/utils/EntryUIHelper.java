@@ -1,9 +1,13 @@
 package com.ismailmushraf.bujo.utils;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
@@ -21,7 +26,6 @@ import java.util.Calendar;
 
 public class EntryUIHelper {
 
-    // Callback interface so the fragment can reload data when the database changes
     public interface OnEntryUpdatedListener {
         void onEntryUpdated();
     }
@@ -40,9 +44,11 @@ public class EntryUIHelper {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Options");
 
+        // Separated the Date and Time into distinct actions
         String[] options = {
                 "Edit Item",
-                "Set Deadline",
+                "Set Date",
+                "Set Reminder Time",
                 entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List",
                 "Delete Item"
         };
@@ -55,14 +61,18 @@ public class EntryUIHelper {
                 } else if (which == 1) {
                     showDatePicker(entry);
                 } else if (which == 2) {
+                    showTimePicker(entry);
+                } else if (which == 3) {
                     boolean migrating = !entry.isMigrated();
                     entry.setMigrated(migrating);
                     if (migrating) {
                         entry.setDeadline(0);
+                        // Cancel any pending alarms if we migrate this away from a specific date
+                        scheduleNotification(entry);
                     }
                     dbManager.updateEntry(entry);
                     listener.onEntryUpdated();
-                } else if (which == 3) {
+                } else if (which == 4) {
                     dbManager.deleteEntry(entry.getId());
                     listener.onEntryUpdated();
                 }
@@ -104,13 +114,85 @@ public class EntryUIHelper {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                         Calendar selected = Calendar.getInstance();
-                        selected.set(year, monthOfYear, dayOfMonth, 12, 0, 0);
+
+                        if (entry.getDeadline() > 0) {
+                            selected.setTimeInMillis(entry.getDeadline());
+                        } else {
+                            // Default to midday for sorting purposes
+                            selected.set(Calendar.HOUR_OF_DAY, 12);
+                            selected.set(Calendar.MINUTE, 0);
+                            selected.set(Calendar.SECOND, 0);
+                        }
+
+                        selected.set(Calendar.YEAR, year);
+                        selected.set(Calendar.MONTH, monthOfYear);
+                        selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
                         entry.setDeadline(selected.getTimeInMillis());
+                        entry.setHasTime(false); // Explicitly set Date-Only
+
                         dbManager.updateEntry(entry);
+                        scheduleNotification(entry); // Evaluates to cancel any existing alarms
                         listener.onEntryUpdated();
                     }
                 }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
+
         datePickerDialog.show();
+    }
+
+    private void showTimePicker(final Entry entry) {
+        final Calendar c = Calendar.getInstance();
+        if (entry.getDeadline() > 0) {
+            c.setTimeInMillis(entry.getDeadline());
+        }
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(context,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar selected = Calendar.getInstance();
+
+                        if (entry.getDeadline() > 0) {
+                            selected.setTimeInMillis(entry.getDeadline());
+                        }
+
+                        selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        selected.set(Calendar.MINUTE, minute);
+                        selected.set(Calendar.SECOND, 0);
+
+                        entry.setDeadline(selected.getTimeInMillis());
+                        entry.setHasTime(true); // Explicitly set Time/Reminder
+
+                        dbManager.updateEntry(entry);
+                        scheduleNotification(entry); // Evaluates to set alarm
+                        listener.onEntryUpdated();
+                    }
+                }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
+
+        timePickerDialog.show();
+    }
+
+    private void scheduleNotification(Entry entry) {
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("TASK_CONTENT", entry.getContent());
+        intent.putExtra("TASK_ID", entry.getId());
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                context,
+                entry.getId(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        if (alarmManager != null) {
+            // ONLY set the background alarm if a specific time has been assigned
+            if (entry.getDeadline() > 0 && entry.hasTime()) {
+                alarmManager.set(AlarmManager.RTC_WAKEUP, entry.getDeadline(), pendingIntent);
+            } else {
+                alarmManager.cancel(pendingIntent);
+            }
+        }
     }
 
     public void showEmojiPicker(final EditText targetEditText) {

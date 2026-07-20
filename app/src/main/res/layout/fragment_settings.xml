@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bujo_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Theme Selection -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="THEME PREFERENCE"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingBottom="8dp" />
+
+        <RadioGroup
+            android:id="@+id/rg_theme"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/shape_bujo_box"
+            android:padding="8dp">
+            <RadioButton
+                android:id="@+id/rb_theme_light"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Light Theme"
+                android:textColor="@color/bujo_text" />
+            <RadioButton
+                android:id="@+id/rb_theme_dark"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Dark Theme"
+                android:textColor="@color/bujo_text" />
+            <RadioButton
+                android:id="@+id/rb_theme_auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Auto (Matches Time of Day)"
+                android:textColor="@color/bujo_text" />
+        </RadioGroup>
+
+        <!-- Startup Screen Selection -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DEFAULT STARTUP SCREEN"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp" />
+
+        <Spinner
+            android:id="@+id/spinner_startup"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/shape_bujo_box" />
+
+        <!-- Data Management -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DATA MANAGEMENT"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp" />
+
+        <Button
+            android:id="@+id/btn_export_backup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="EXPORT BACKUP TO DEVICE" />
+
+        <Button
+            android:id="@+id/btn_import_backup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="24dp"
+            android:text="RESTORE BACKUP FROM DEVICE" />
+
+        <Button
+            android:id="@+id/btn_clear_completed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="DELETE ALL COMPLETED TASKS"
+            android:textColor="#D32F2F" />
+
+    </LinearLayout>
+</ScrollView>

@@ -19,6 +19,7 @@ import com.ismailmushraf.bujo.fragments.InboxFragment;
 import com.ismailmushraf.bujo.fragments.MigratedItemsFragment;
 import com.ismailmushraf.bujo.fragments.ProjectDetailFragment;
 import com.ismailmushraf.bujo.fragments.ProjectsFragment;
+import com.ismailmushraf.bujo.fragments.SettingsFragment;
 import com.ismailmushraf.bujo.models.DrawerItem;
 import com.ismailmushraf.bujo.models.Project;
 
@@ -62,6 +63,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        View btnSettings = headerView.findViewById(R.id.header_settings);
+        btnSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container, new SettingsFragment());
+                ft.commit();
+
+                drawerAdapter.setSelectedPosition(-1); // Removes highlight from the main list
+                drawerLayout.closeDrawer(drawerList);
+            }
+        });
+
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -99,8 +113,17 @@ public class MainActivity extends AppCompatActivity {
         refreshDrawer();
 
         if (savedInstanceState == null) {
-            // Default select Today (index 2 in drawer list after section title)
-            selectItem(2);
+            android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+            String startup = prefs.getString("startup_screen", "Today");
+
+            int startupIndex = 2; // Default to Today
+            if ("Inbox".equals(startup)) {
+                startupIndex = 1;
+            } else if ("Calendar".equals(startup)) {
+                startupIndex = 3;
+            }
+
+            selectItem(startupIndex);
         }
     }
 

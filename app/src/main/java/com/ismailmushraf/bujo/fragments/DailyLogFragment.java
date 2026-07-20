@@ -144,6 +144,7 @@ public class DailyLogFragment extends Fragment {
             today.set(Calendar.SECOND, 0);
             today.set(Calendar.MILLISECOND, 0);
             newEntry.setDeadline(today.getTimeInMillis());
+            newEntry.setHasTime(false);
 
             newEntry.setProjectId(projectId);
             newEntry.setCompleted(false);
@@ -161,7 +162,7 @@ public class DailyLogFragment extends Fragment {
 
     private void loadEntries() {
         entries = dbManager.getTodayEntries();
-        adapter = new EntryAdapter(getActivity(), entries);
+        adapter = new EntryAdapter(getActivity(), entries, true);
         listView.setAdapter(adapter);
     }
 

@@ -73,31 +73,33 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
 
         if (entry.isCompleted()) {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.tvContent.setTextColor(0xFF888888);
+            // Fetch the dynamic secondary text color (adapts to light/dark)
+            holder.tvContent.setTextColor(getContext().getResources().getColor(R.color.bujo_text_secondary));
         } else {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-            holder.tvContent.setTextColor(0xFF111111);
+            // Fetch the dynamic primary text color (adapts to light/dark)
+            holder.tvContent.setTextColor(getContext().getResources().getColor(R.color.bujo_text));
         }
 
         holder.tvContent.setText(entry.getContent());
 
-        // Render tag if present
-        if (entry.getProjectTag() != null && !entry.getProjectTag().isEmpty()) {
-            holder.tvTag.setVisibility(View.VISIBLE);
-            holder.tvTag.setText("#" + entry.getProjectTag());
-        } else {
-            holder.tvTag.setVisibility(View.GONE);
-        }
-
         // Render Deadline if present
         if (entry.getDeadline() > 0) {
             holder.tvDeadline.setVisibility(View.VISIBLE);
-            SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy", Locale.US);
-            holder.tvDeadline.setText("Deadline: " + sdf.format(new Date(entry.getDeadline())));
+            if (entry.hasTime()) {
+                // Time was explicitly set, show the clock
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.US);
+                holder.tvDeadline.setText("Reminder: " + sdf.format(new Date(entry.getDeadline())));
+            } else {
+                // No time was set, just show the date
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM d, yyyy", Locale.US);
+                holder.tvDeadline.setText("Date: " + sdf.format(new Date(entry.getDeadline())));
+            }
         } else {
             holder.tvDeadline.setVisibility(View.GONE);
         }
 
+        // Render tag properly using the showTags boolean
         if (showTags && entry.getProjectTag() != null && !entry.getProjectTag().isEmpty()) {
             holder.tvTag.setVisibility(View.VISIBLE);
             holder.tvTag.setText("#" + entry.getProjectTag());

@@ -18,6 +18,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_MIGRATED = "migrated";
     public static final String COLUMN_DEADLINE = "deadline";
     public static final String COLUMN_PROJECT_ID = "project_id";
+    public static final String COLUMN_HAS_TIME = "has_time"; // FIX 2: Add column name
 
     public static final String TABLE_PROJECTS = "projects";
     public static final String COLUMN_PROJECT_NAME = "name";
@@ -31,7 +32,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             COLUMN_COMPLETED + " INTEGER DEFAULT 0, " +
             COLUMN_MIGRATED + " INTEGER DEFAULT 0, " +
             COLUMN_DEADLINE + " INTEGER, " +
-            COLUMN_PROJECT_ID + " INTEGER" +
+            COLUMN_PROJECT_ID + " INTEGER, " +
+            COLUMN_HAS_TIME + " INTEGER DEFAULT 0 " +
             ");";
 
     private static final String TABLE_CREATE_PROJECTS =

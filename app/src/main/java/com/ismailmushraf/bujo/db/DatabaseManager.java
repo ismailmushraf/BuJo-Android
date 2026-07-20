@@ -37,6 +37,7 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_COMPLETED, entry.isCompleted() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_MIGRATED, entry.isMigrated() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_DEADLINE, entry.getDeadline());
+        values.put(DatabaseHelper.COLUMN_HAS_TIME, entry.hasTime() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_PROJECT_ID, entry.getProjectId());
         return database.insert(DatabaseHelper.TABLE_ENTRIES, null, values);
     }
@@ -49,6 +50,7 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_COMPLETED, entry.isCompleted() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_MIGRATED, entry.isMigrated() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_DEADLINE, entry.getDeadline());
+        values.put(DatabaseHelper.COLUMN_HAS_TIME, entry.hasTime() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_PROJECT_ID, entry.getProjectId());
 
         return database.update(DatabaseHelper.TABLE_ENTRIES, values, DatabaseHelper.COLUMN_ID + " = ?",
@@ -85,6 +87,13 @@ public class DatabaseManager {
                 entry.setMigrated(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MIGRATED)) == 1);
                 entry.setDeadline(cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE)));
                 entry.setProjectId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID)));
+
+                // ADDED: Retrieve the hasTime flag from the database
+                int hasTimeIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_HAS_TIME);
+                if (hasTimeIndex >= 0) {
+                    entry.setHasTime(cursor.getInt(hasTimeIndex) == 1);
+                }
+
                 entries.add(entry);
             } while (cursor.moveToNext());
             cursor.close();
@@ -181,5 +190,9 @@ public class DatabaseManager {
     public List<Entry> getInboxEntries() {
         // Fetches items with no deadline assigned
         return getEntries(DatabaseHelper.COLUMN_DEADLINE + " <= 0 OR " + DatabaseHelper.COLUMN_DEADLINE + " IS NULL");
+    }
+
+    public int clearCompletedTasks() {
+        return database.delete(DatabaseHelper.TABLE_ENTRIES, DatabaseHelper.COLUMN_COMPLETED + " = 1", null);
     }
 }

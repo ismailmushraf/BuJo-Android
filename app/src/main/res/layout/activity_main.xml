@@ -16,7 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/bujo_background"
-            android:theme="@style/ThemeOverlay.AppCompat.Light"
+            app:titleTextColor="@color/bujo_text"
+            app:subtitleTextColor="@color/bujo_text_secondary"
             app:contentInsetStartWithNavigation="72dp" />
 
         <FrameLayout

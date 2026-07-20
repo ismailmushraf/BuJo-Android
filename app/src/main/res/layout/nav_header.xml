@@ -16,11 +16,23 @@
         android:paddingRight="16dp"
         android:paddingBottom="8dp"/>
 
+    <!-- Set width to 0dp and weight to 1 so it pushes the next item to the right edge -->
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:text="Index"
         android:textSize="24sp"
         android:textColor="@color/bujo_text" />
 
+    <!-- Replace the TextView with an ImageView -->
+    <ImageView
+        android:id="@+id/header_settings"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Settings" />
 </LinearLayout>

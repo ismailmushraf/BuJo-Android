@@ -168,6 +168,9 @@ public class ProjectDetailFragment extends Fragment {
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).refreshDrawer();
                 }
+            } else {
+                // FIX: Automatically assign the current project's name as the tag!
+                newEntry.setProjectTag(projectName);
             }
 
             newEntry.setProjectId(targetProjectId);

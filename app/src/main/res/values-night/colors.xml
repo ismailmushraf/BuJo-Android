@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bujo_background">#121212</color> <!-- Very dark grey/black -->
+    <color name="bujo_text">#E0E0E0</color> <!-- Off-white text -->
+    <color name="bujo_text_secondary">#999999</color> <!-- Medium grey -->
+    <color name="bujo_divider">#333333</color> <!-- Dark divider line -->
+    <color name="bujo_box_border">#AAAAAA</color> <!-- Lighter border so it shows up -->
+
+    <color name="black">#FFFFFFFF</color> <!-- Invert black and white -->
+    <color name="white">#FF000000</color>
+    <color name="blue_selection">#2C3E50</color> <!-- Darker selection highlight -->
+</resources>
