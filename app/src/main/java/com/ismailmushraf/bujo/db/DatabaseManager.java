@@ -28,7 +28,9 @@ public class DatabaseManager {
     }
 
     public void close() {
-        dbHelper.close();
+        if (dbHelper != null) {
+            dbHelper.close();
+        }
     }
 
     public long insertEntry(Entry entry) {
@@ -79,18 +81,28 @@ public class DatabaseManager {
         List<Entry> entries = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, null, selection, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
+            // Cache column indices ONCE before entering the iteration loop
+            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+            int typeIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE);
+            int contentIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTENT);
+            int contextIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTEXT);
+            int completedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED);
+            int migratedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MIGRATED);
+            int deadlineIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE);
+            int projectIdIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID);
+            int hasTimeIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_HAS_TIME);
+
             do {
                 Entry entry = new Entry();
-                entry.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
-                entry.setSignifier(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE)));
-                entry.setContent(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTENT)));
-                entry.setProjectTag(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTEXT)));
-                entry.setCompleted(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED)) == 1);
-                entry.setMigrated(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MIGRATED)) == 1);
-                entry.setDeadline(cursor.getLong(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE)));
-                entry.setProjectId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID)));
+                entry.setId(cursor.getInt(idIndex));
+                entry.setSignifier(cursor.getString(typeIndex));
+                entry.setContent(cursor.getString(contentIndex));
+                entry.setProjectTag(cursor.getString(contextIndex));
+                entry.setCompleted(cursor.getInt(completedIndex) == 1);
+                entry.setMigrated(cursor.getInt(migratedIndex) == 1);
+                entry.setDeadline(cursor.getLong(deadlineIndex));
+                entry.setProjectId(cursor.getInt(projectIdIndex));
 
-                int hasTimeIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_HAS_TIME);
                 if (hasTimeIndex >= 0) {
                     entry.setHasTime(cursor.getInt(hasTimeIndex) == 1);
                 }
@@ -128,14 +140,35 @@ public class DatabaseManager {
         }
     }
 
+    public void deleteProjectAndAllEntries(int projectId) {
+        database.beginTransaction();
+        try {
+            database.delete(DatabaseHelper.TABLE_ENTRIES,
+                    DatabaseHelper.COLUMN_PROJECT_ID + " = ?",
+                    new String[]{String.valueOf(projectId)});
+
+            database.delete(DatabaseHelper.TABLE_PROJECTS,
+                    DatabaseHelper.COLUMN_ID + " = ?",
+                    new String[]{String.valueOf(projectId)});
+
+            database.setTransactionSuccessful();
+        } finally {
+            database.endTransaction();
+        }
+    }
+
     public List<Project> getAllProjects() {
         List<Project> projects = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROJECTS, null, null, null, null, null, null);
         if (cursor != null && cursor.moveToFirst()) {
+            // Cache column indices ONCE before loop
+            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+            int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
+
             do {
                 Project project = new Project();
-                project.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
-                project.setName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME)));
+                project.setId(cursor.getInt(idIndex));
+                project.setName(cursor.getString(nameIndex));
                 projects.add(project);
             } while (cursor.moveToNext());
             cursor.close();
@@ -146,14 +179,17 @@ public class DatabaseManager {
     public Project getOrCreateProject(String name) {
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROJECTS, null,
                 DatabaseHelper.COLUMN_PROJECT_NAME + " = ?", new String[]{name}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            Project project = new Project();
-            project.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
-            project.setName(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME)));
-            cursor.close();
-            return project;
-        }
         if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
+
+                Project project = new Project();
+                project.setId(cursor.getInt(idIndex));
+                project.setName(cursor.getString(nameIndex));
+                cursor.close();
+                return project;
+            }
             cursor.close();
         }
 
@@ -204,7 +240,6 @@ public class DatabaseManager {
         database.delete(DatabaseHelper.TABLE_WORKOUT_SETS, DatabaseHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
     }
 
-    // Calculates the PR using the Epley 1RM formula or Max Reps for bodyweight
     public double getPersonalRecord(String exercise) {
         double maxPR = 0;
         Cursor cursor = database.query(DatabaseHelper.TABLE_WORKOUT_SETS,
@@ -224,7 +259,6 @@ public class DatabaseManager {
         return maxPR;
     }
 
-    // Retrieves today's sets, grouped into UI elements
     public List<Object> getGroupedDailyWorkouts(String dateStr) {
         List<Object> list = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_WORKOUT_SETS, null,
@@ -232,16 +266,24 @@ public class DatabaseManager {
                 null, null, DatabaseHelper.COLUMN_EXERCISE + " ASC, " + DatabaseHelper.COLUMN_ID + " ASC");
 
         if (cursor != null && cursor.moveToFirst()) {
+            // Cache column indices ONCE before loop
+            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+            int dateIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DATE_STR);
+            int exerciseIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_EXERCISE);
+            int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_WEIGHT);
+            int repsIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_REPS);
+            int noteIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTE);
+
             String currentEx = "";
             int setNum = 1;
             do {
                 WorkoutSet ws = new WorkoutSet();
-                ws.setId(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID)));
-                ws.setDateStr(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DATE_STR)));
-                ws.setExercise(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_EXERCISE)));
-                ws.setWeight(cursor.getDouble(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_WEIGHT)));
-                ws.setReps(cursor.getInt(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_REPS)));
-                ws.setNote(cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTE)));
+                ws.setId(cursor.getInt(idIndex));
+                ws.setDateStr(cursor.getString(dateIndex));
+                ws.setExercise(cursor.getString(exerciseIndex));
+                ws.setWeight(cursor.getDouble(weightIndex));
+                ws.setReps(cursor.getInt(repsIndex));
+                ws.setNote(cursor.getString(noteIndex));
 
                 if (!ws.getExercise().equalsIgnoreCase(currentEx)) {
                     currentEx = ws.getExercise();

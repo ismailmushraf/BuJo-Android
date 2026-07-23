@@ -57,6 +57,10 @@ public class WorkoutFragment extends Fragment {
     private List<Object> todayItems = new ArrayList<>();
     private WorkoutAdapter listAdapter;
 
+    // Reusable adapter to prevent GC pressure
+    private ArrayAdapter<String> autoAdapter;
+    private List<String> suggestionsList = new ArrayList<>();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,22 +96,31 @@ public class WorkoutFragment extends Fragment {
         accumulatedTime = dbManager.getSessionDuration(todayStr);
         chronometer.setBase(SystemClock.elapsedRealtime() - accumulatedTime);
 
+        // --- FOCUS FIX FOR BB10 RUNTIME ---
         autoExercise.setFocusable(false);
         autoExercise.setFocusableInTouchMode(false);
-
         autoExercise.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, android.view.MotionEvent event) {
                 autoExercise.setFocusable(true);
                 autoExercise.setFocusableInTouchMode(true);
-                return false; // Return false so the touch is still processed
+                return false;
             }
         });
 
-        etWeight.setFocusable(true);
-        etWeight.setFocusableInTouchMode(true);
-        etReps.setFocusable(true);
-        etReps.setFocusableInTouchMode(true);
+        // --- AUTOCOMPLETE SELECTION FIX ---
+        autoAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, suggestionsList);
+        autoExercise.setAdapter(autoAdapter);
+
+        autoExercise.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedText = (String) parent.getItemAtPosition(position);
+                autoExercise.setText(selectedText);
+                autoExercise.setSelection(selectedText.length()); // Move cursor to end
+                etWeight.requestFocus(); // Move focus to Weight input automatically
+            }
+        });
 
         btnToggle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +150,6 @@ public class WorkoutFragment extends Fragment {
                 int r = etReps.getText().toString().isEmpty() ? 0 : Integer.parseInt(etReps.getText().toString());
                 String n = etNote.getText().toString().trim();
 
-                // Check for PR before inserting
                 double oldPR = dbManager.getPersonalRecord(ex);
                 double newScore = (w <= 0) ? r : (w * (1.0 + (r / 30.0)));
 
@@ -146,7 +158,6 @@ public class WorkoutFragment extends Fragment {
 
                 etReps.setText("");
                 etNote.setText("");
-                // Kept weight and exercise filled in case they are doing another set
 
                 InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (imm != null) imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
@@ -165,7 +176,6 @@ public class WorkoutFragment extends Fragment {
         lvToday.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Adjust for header
                 int adjPos = position - lvToday.getHeaderViewsCount();
                 if (adjPos >= 0 && adjPos < todayItems.size()) {
                     Object item = todayItems.get(adjPos);
@@ -193,9 +203,10 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void refreshUI() {
-        List<String> suggestions = dbManager.getUniqueExerciseNames();
-        ArrayAdapter<String> autoAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, suggestions);
-        autoExercise.setAdapter(autoAdapter);
+        // Efficient dataset update without re-instantiating adapters
+        suggestionsList.clear();
+        suggestionsList.addAll(dbManager.getUniqueExerciseNames());
+        autoAdapter.notifyDataSetChanged();
 
         todayItems.clear();
         todayItems.addAll(dbManager.getGroupedDailyWorkouts(todayStr));
@@ -209,7 +220,7 @@ public class WorkoutFragment extends Fragment {
         ScaleAnimation scale = new ScaleAnimation(0.2f, 1f, 0.2f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
         scale.setDuration(600);
         AlphaAnimation fadeOut = new AlphaAnimation(1f, 0f);
-        fadeOut.setStartOffset(1500); // Wait 1.5 seconds before fading
+        fadeOut.setStartOffset(1500);
         fadeOut.setDuration(500);
 
         animSet.addAnimation(scale);
@@ -226,6 +237,7 @@ public class WorkoutFragment extends Fragment {
         celebrationLayout.startAnimation(animSet);
     }
 
+    // --- OPTIMIZED ADAPTER WITH VIEWHOLDER PATTERN ---
     private class WorkoutAdapter extends BaseAdapter {
         private static final int TYPE_HEADER = 0;
         private static final int TYPE_ITEM = 1;
@@ -238,59 +250,68 @@ public class WorkoutFragment extends Fragment {
             return (todayItems.get(position) instanceof String) ? TYPE_HEADER : TYPE_ITEM;
         }
 
+        private class ItemViewHolder {
+            TextView tvLine1;
+            TextView tvLine2;
+        }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             int type = getItemViewType(position);
 
-            if (convertView == null) {
-                if (type == TYPE_HEADER) {
-                    TextView tv = new TextView(getActivity());
+            if (type == TYPE_HEADER) {
+                TextView tv;
+                if (convertView == null) {
+                    tv = new TextView(getActivity());
                     tv.setPadding(16, 24, 16, 8);
                     tv.setTextSize(16);
                     tv.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
                     tv.setTypeface(null, android.graphics.Typeface.BOLD);
                     tv.setBackgroundColor(getResources().getColor(R.color.bujo_divider));
-                    convertView = tv;
                 } else {
-                    // Create a simple two-line cell dynamically to match the aesthetic
+                    tv = (TextView) convertView;
+                }
+                tv.setText((String) todayItems.get(position));
+                return tv;
+            } else {
+                ItemViewHolder holder;
+                if (convertView == null) {
                     LinearLayout ll = new LinearLayout(getActivity());
                     ll.setOrientation(LinearLayout.VERTICAL);
                     ll.setPadding(32, 16, 16, 16);
 
-                    TextView tvLine1 = new TextView(getActivity());
-                    tvLine1.setId(android.R.id.text1);
-                    tvLine1.setTextColor(getResources().getColor(R.color.bujo_text));
-                    tvLine1.setTextSize(16);
+                    holder = new ItemViewHolder();
+                    holder.tvLine1 = new TextView(getActivity());
+                    holder.tvLine1.setTextColor(getResources().getColor(R.color.bujo_text));
+                    holder.tvLine1.setTextSize(16);
 
-                    TextView tvLine2 = new TextView(getActivity());
-                    tvLine2.setId(android.R.id.text2);
-                    tvLine2.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
-                    tvLine2.setTextSize(14);
+                    holder.tvLine2 = new TextView(getActivity());
+                    holder.tvLine2.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
+                    holder.tvLine2.setTextSize(14);
 
-                    ll.addView(tvLine1);
-                    ll.addView(tvLine2);
+                    ll.addView(holder.tvLine1);
+                    ll.addView(holder.tvLine2);
+
                     convertView = ll;
+                    convertView.setTag(holder);
+                } else {
+                    holder = (ItemViewHolder) convertView.getTag();
                 }
-            }
 
-            if (type == TYPE_HEADER) {
-                ((TextView) convertView).setText((String) todayItems.get(position));
-            } else {
                 WorkoutSet ws = (WorkoutSet) todayItems.get(position);
                 String line1 = "Round " + ws.getSetNumber() + ": " + ws.getReps() + " reps";
                 if (ws.getWeight() > 0) line1 += " @ " + ws.getWeight() + " kg";
 
-                ((TextView) convertView.findViewById(android.R.id.text1)).setText(line1);
+                holder.tvLine1.setText(line1);
 
-                TextView noteView = convertView.findViewById(android.R.id.text2);
                 if (ws.getNote() != null && !ws.getNote().isEmpty()) {
-                    noteView.setVisibility(View.VISIBLE);
-                    noteView.setText("Note: " + ws.getNote());
+                    holder.tvLine2.setVisibility(View.VISIBLE);
+                    holder.tvLine2.setText("Note: " + ws.getNote());
                 } else {
-                    noteView.setVisibility(View.GONE);
+                    holder.tvLine2.setVisibility(View.GONE);
                 }
+                return convertView;
             }
-            return convertView;
         }
     }
 
@@ -302,7 +323,7 @@ public class WorkoutFragment extends Fragment {
         item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                if (isTracking) btnToggle.performClick(); // Auto-save time before leaving
+                if (isTracking) btnToggle.performClick();
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.fragment_container, new WorkoutHistoryFragment());
                 ft.addToBackStack(null);

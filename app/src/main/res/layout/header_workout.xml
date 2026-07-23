@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:hint="Exercise Name"
             android:inputType="textCapWords"
-            android:completionThreshold="2"
+            android:completionThreshold="1"
             android:background="@android:color/transparent"
             android:paddingBottom="8dp"/>
 

@@ -3,8 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:animateLayoutChanges="true"
-    android:background="@color/bujo_background">
+    android:animateLayoutChanges="true">
 
     <LinearLayout
         android:id="@+id/month_controls"
