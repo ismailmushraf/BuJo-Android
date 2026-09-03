@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -72,9 +74,9 @@ public class SettingsFragment extends Fragment {
 
                 prefs.edit().putInt("theme_mode", mode).apply();
                 AppCompatDelegate.setDefaultNightMode(mode);
-                if (getActivity() != null) {
-                    getActivity().recreate();
-                }
+                // The BlackBerry Android 4.3 runtime does not always recreate an
+                // AppCompat activity for a DayNight change, so request it explicitly.
+                if (getActivity() != null) getActivity().recreate();
             }
         });
 
@@ -106,7 +108,28 @@ public class SettingsFragment extends Fragment {
             public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // --- 3. Backup & Restore Configuration ---
+        // --- 3. Gamification Configuration ---
+        CheckBox cbSound = (CheckBox) root.findViewById(R.id.cb_sound_effects);
+        CheckBox cbAnim = (CheckBox) root.findViewById(R.id.cb_points_animation);
+
+        cbSound.setChecked(prefs.getBoolean("enable_sounds", true));
+        cbAnim.setChecked(prefs.getBoolean("enable_animations", true));
+
+        cbSound.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean("enable_sounds", isChecked).apply();
+            }
+        });
+
+        cbAnim.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.edit().putBoolean("enable_animations", isChecked).apply();
+            }
+        });
+
+        // --- 4. Backup & Restore Configuration ---
         Button btnExport = (Button) root.findViewById(R.id.btn_export_backup);
         btnExport.setOnClickListener(new View.OnClickListener() {
             @Override

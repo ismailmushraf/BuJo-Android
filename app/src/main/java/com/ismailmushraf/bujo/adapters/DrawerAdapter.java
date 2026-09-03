@@ -40,33 +40,45 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
         return getItem(position).getType() != DrawerItem.TYPE_SECTION;
     }
 
+    private static class ViewHolder {
+        TextView tvSection;
+        TextView tvTitle;
+        TextView tvIcon;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         DrawerItem item = getItem(position);
         int viewType = getItemViewType(position);
+        ViewHolder holder;
 
         if (convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
+            holder = new ViewHolder();
             if (viewType == DrawerItem.TYPE_SECTION) {
                 convertView = inflater.inflate(R.layout.item_drawer_section, parent, false);
+                holder.tvSection = (TextView) convertView.findViewById(R.id.drawer_section_title);
             } else {
                 convertView = inflater.inflate(R.layout.item_drawer_row, parent, false);
+                holder.tvTitle = (TextView) convertView.findViewById(R.id.drawer_title);
+                holder.tvIcon = (TextView) convertView.findViewById(R.id.drawer_icon);
             }
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
         if (viewType == DrawerItem.TYPE_SECTION) {
-            TextView tvSection = (TextView) convertView.findViewById(R.id.drawer_section_title);
-            tvSection.setText(item.title);
+            if (holder.tvSection != null) holder.tvSection.setText(item.title);
         } else {
-            TextView tvTitle = (TextView) convertView.findViewById(R.id.drawer_title);
-            TextView tvIcon = (TextView) convertView.findViewById(R.id.drawer_icon);
-
-            tvTitle.setText(item.title);
-            if (item.icon != null) {
-                tvIcon.setVisibility(View.VISIBLE);
-                tvIcon.setText(item.icon);
-            } else {
-                tvIcon.setVisibility(View.GONE);
+            if (holder.tvTitle != null) holder.tvTitle.setText(item.title);
+            if (holder.tvIcon != null) {
+                if (item.icon != null) {
+                    holder.tvIcon.setVisibility(View.VISIBLE);
+                    holder.tvIcon.setText(item.icon);
+                } else {
+                    holder.tvIcon.setVisibility(View.GONE);
+                }
             }
 
             // Highlighting based on selection

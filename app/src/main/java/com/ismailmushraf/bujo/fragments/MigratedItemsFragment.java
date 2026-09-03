@@ -50,26 +50,8 @@ public class MigratedItemsFragment extends Fragment {
 
         loadEntries();
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Entry entry = entries.get(position);
-                entry.setCompleted(!entry.isCompleted());
-                dbManager.updateEntry(entry);
-                loadEntries();
-            }
-        });
-
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < entries.size()) {
-                    uiHelper.showContextDialog(entries.get(position));
-                    return true;
-                }
-                return false;
-            }
-        });
+        listView.setOnItemClickListener(null);
+        listView.setOnItemLongClickListener(null);
 
         return root;
     }
@@ -77,6 +59,22 @@ public class MigratedItemsFragment extends Fragment {
     private void loadEntries() {
         entries = dbManager.getMigratedEntries();
         adapter = new EntryAdapter(getActivity(), entries);
+        adapter.setUIHelper(uiHelper);
+        adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
+            @Override
+            public void onEntryTextClick(Entry entry) {
+                // Should we show detail in logbook? Yes, consistency is better.
+                // But detail dialog is currently private to DailyLogFragment.
+                // I should probably move it to uiHelper or make a static helper.
+                // For now, let's just toggle completion on click if no listener.
+                // Wait, I already added click zone in adapter.
+            }
+
+            @Override
+            public void onEntryLongClick(Entry entry, View view) {
+                uiHelper.showContextDialog(entry, view);
+            }
+        });
         listView.setAdapter(adapter);
     }
 

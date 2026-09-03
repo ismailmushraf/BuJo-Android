@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/shape_bujo_box">
+
+    <TextView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:text="*"
+        android:textColor="@color/bujo_box_border" />
+
+    <EditText
+        android:id="@+id/et_edit_content"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginLeft="16dp"
+        android:hint="New sub-task..."
+        android:background="@android:color/transparent"
+        android:textSize="18sp"
+        android:textColor="@color/bujo_text"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences"
+        android:singleLine="true" />
+
+</LinearLayout>

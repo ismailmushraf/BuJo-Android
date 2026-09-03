@@ -154,7 +154,11 @@ public class WorkoutFragment extends Fragment {
                 double newScore = (w <= 0) ? r : (w * (1.0 + (r / 30.0)));
 
                 WorkoutSet ws = new WorkoutSet(todayStr, ex, w, r, n);
-                dbManager.insertWorkoutSet(ws);
+                long insertedId = dbManager.insertWorkoutSet(ws);
+
+                if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).animatePointsChange(10, v);
+                }
 
                 etReps.setText("");
                 etNote.setText("");
@@ -187,7 +191,11 @@ public class WorkoutFragment extends Fragment {
                                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
-                                        dbManager.deleteWorkoutSet(ws.getId());
+                                        int appliedPoints = dbManager.deleteWorkoutSet(ws.getId());
+                                        if (getActivity() instanceof MainActivity) {
+                                            ((MainActivity) getActivity()).animatePointsChange(appliedPoints, view);
+                                            ((MainActivity) getActivity()).refreshProfileIcon();
+                                        }
                                         refreshUI();
                                     }
                                 })
@@ -258,6 +266,7 @@ public class WorkoutFragment extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             int type = getItemViewType(position);
+            Object data = todayItems.get(position);
 
             if (type == TYPE_HEADER) {
                 TextView tv;
@@ -268,11 +277,11 @@ public class WorkoutFragment extends Fragment {
                     tv.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
                     tv.setTypeface(null, android.graphics.Typeface.BOLD);
                     tv.setBackgroundColor(getResources().getColor(R.color.bujo_divider));
+                    convertView = tv;
                 } else {
                     tv = (TextView) convertView;
                 }
-                tv.setText((String) todayItems.get(position));
-                return tv;
+                tv.setText((String) data);
             } else {
                 ItemViewHolder holder;
                 if (convertView == null) {
@@ -298,11 +307,11 @@ public class WorkoutFragment extends Fragment {
                     holder = (ItemViewHolder) convertView.getTag();
                 }
 
-                WorkoutSet ws = (WorkoutSet) todayItems.get(position);
-                String line1 = "Round " + ws.getSetNumber() + ": " + ws.getReps() + " reps";
-                if (ws.getWeight() > 0) line1 += " @ " + ws.getWeight() + " kg";
+                WorkoutSet ws = (WorkoutSet) data;
+                String textLine1 = "Round " + ws.getSetNumber() + ": " + ws.getReps() + " reps";
+                if (ws.getWeight() > 0) textLine1 += " @ " + ws.getWeight() + " kg";
 
-                holder.tvLine1.setText(line1);
+                holder.tvLine1.setText(textLine1);
 
                 if (ws.getNote() != null && !ws.getNote().isEmpty()) {
                     holder.tvLine2.setVisibility(View.VISIBLE);
@@ -310,8 +319,8 @@ public class WorkoutFragment extends Fragment {
                 } else {
                     holder.tvLine2.setVisibility(View.GONE);
                 }
-                return convertView;
             }
+            return convertView;
         }
     }
 

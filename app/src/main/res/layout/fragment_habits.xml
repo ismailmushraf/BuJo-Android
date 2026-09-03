@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bujo_background">
+
+    <LinearLayout
+        android:id="@+id/habits_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ACTIVE HABITS"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_add_habit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:text="+ NEW HABIT"
+            android:textSize="12sp"
+            android:background="@drawable/shape_bujo_box"
+            android:textColor="@color/bujo_text"
+            android:padding="8dp"/>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/lv_habits"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/habits_header"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="12dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false"/>
+
+    <TextView
+        android:id="@+id/tv_empty_habits"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="No habits tracked yet.\nStart building discipline today."
+        android:gravity="center"
+        android:textColor="@color/bujo_text_secondary"
+        android:visibility="gone"/>
+
+</RelativeLayout>

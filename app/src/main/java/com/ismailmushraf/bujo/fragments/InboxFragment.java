@@ -39,6 +39,7 @@ public class InboxFragment extends Fragment {
 
         listView = (ListView) root.findViewById(R.id.lv_daily_bullets);
         final EditText etNewEntry = (EditText) root.findViewById(R.id.et_new_entry);
+        root.findViewById(R.id.btn_plan_tomorrow).setVisibility(View.GONE);
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
@@ -54,31 +55,8 @@ public class InboxFragment extends Fragment {
         loadEntries();
         updateCompletionRatio();
 
-        // Tap to complete/uncomplete
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < entries.size()) {
-                    Entry clickedEntry = entries.get(position);
-                    clickedEntry.setCompleted(!clickedEntry.isCompleted());
-                    dbManager.updateEntry(clickedEntry);
-                    loadEntries();
-                    updateCompletionRatio();
-                }
-            }
-        });
-
-        // Long press context menu for deadlines, migration and delete
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                if (position < entries.size()) {
-                    uiHelper.showContextDialog(entries.get(position));
-                    return true;
-                }
-                return false;
-            }
-        });
+        listView.setOnItemClickListener(null);
+        listView.setOnItemLongClickListener(null);
 
         etNewEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -138,7 +116,13 @@ public class InboxFragment extends Fragment {
 
             // A project tag on its own creates the project but not an empty note.
             if (!newEntry.getContent().trim().isEmpty()) {
-                dbManager.insertEntry(newEntry);
+                long insertedId = dbManager.insertEntry(newEntry);
+                
+                int commitment = dbManager.calculateCommitmentReward(newEntry);
+                if (insertedId != -1 && commitment > 0 && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
+                }
+
                 loadEntries();
                 updateCompletionRatio();
             }
@@ -149,6 +133,18 @@ public class InboxFragment extends Fragment {
     private void loadEntries() {
         entries = dbManager.getInboxEntries();
         adapter = new EntryAdapter(getActivity(), entries, true);
+        adapter.setUIHelper(uiHelper);
+        adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
+            @Override
+            public void onEntryTextClick(Entry entry) {
+                // Future: show detail modal?
+            }
+
+            @Override
+            public void onEntryLongClick(Entry entry, View view) {
+                uiHelper.showContextDialog(entry, view);
+            }
+        });
         listView.setAdapter(adapter);
     }
 

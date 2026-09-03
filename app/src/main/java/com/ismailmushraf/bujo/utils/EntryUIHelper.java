@@ -19,6 +19,7 @@ import android.widget.GridView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 
@@ -40,8 +41,8 @@ public class EntryUIHelper {
         this.listener = listener;
     }
 
-    public void showContextDialog(final Entry entry) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+    public void showContextDialog(final Entry entry, final View sourceView) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
         builder.setTitle("Options");
 
         // Separated the Date and Time into distinct actions
@@ -59,11 +60,14 @@ public class EntryUIHelper {
                 if (which == 0) {
                     showEditDialog(entry);
                 } else if (which == 1) {
-                    showDatePicker(entry);
+                    showDatePicker(entry, sourceView);
                 } else if (which == 2) {
                     showTimePicker(entry);
                 } else if (which == 3) {
                     boolean migrating = !entry.isMigrated();
+                    long prevDeadline = entry.getDeadline();
+                    boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+
                     entry.setMigrated(migrating);
                     if (migrating) {
                         entry.setDeadline(0);
@@ -71,9 +75,22 @@ public class EntryUIHelper {
                         scheduleNotification(entry);
                     }
                     dbManager.updateEntry(entry);
+
+                    boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+                    if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                        if (wasToday && !isToday) {
+                            ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-5, sourceView);
+                        } else if (!wasToday && isToday) {
+                            ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(5, sourceView);
+                        }
+                    }
+
                     listener.onEntryUpdated();
                 } else if (which == 4) {
-                    dbManager.deleteEntry(entry.getId());
+                    int pointsDeducted = dbManager.deleteEntry(entry.getId());
+                    if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
+                        ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
+                    }
                     listener.onEntryUpdated();
                 }
             }
@@ -85,7 +102,7 @@ public class EntryUIHelper {
         final EditText input = new EditText(context);
         input.setText(entry.getContent());
         input.setSelection(input.length());
-        new AlertDialog.Builder(context)
+        new AlertDialog.Builder(context, R.style.BujoDialog)
                 .setTitle("Edit item")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -103,7 +120,7 @@ public class EntryUIHelper {
                 .show();
     }
 
-    private void showDatePicker(final Entry entry) {
+    private void showDatePicker(final Entry entry, final View sourceView) {
         final Calendar c = Calendar.getInstance();
         if (entry.getDeadline() > 0) {
             c.setTimeInMillis(entry.getDeadline());
@@ -128,11 +145,25 @@ public class EntryUIHelper {
                         selected.set(Calendar.MONTH, monthOfYear);
                         selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
+                        long prevDeadline = entry.getDeadline();
+                        boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+
                         entry.setDeadline(selected.getTimeInMillis());
                         entry.setHasTime(false); // Explicitly set Date-Only
 
+                        boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+
                         dbManager.updateEntry(entry);
                         scheduleNotification(entry); // Evaluates to cancel any existing alarms
+
+                        if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                            if (!wasToday && isToday) {
+                                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(5, sourceView);
+                            } else if (wasToday && !isToday) {
+                                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-5, sourceView);
+                            }
+                        }
+
                         listener.onEntryUpdated();
                     }
                 }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
@@ -266,7 +297,7 @@ public class EntryUIHelper {
 
         gridView.setAdapter(adapter);
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
         builder.setTitle("Select Emoji");
         builder.setView(gridView);
         final AlertDialog dialog = builder.create();
@@ -280,4 +311,29 @@ public class EntryUIHelper {
         });
         dialog.show();
     }
+
+    // Add this method to com.ismailmushraf.bujo.utils.EntryUIHelper
+
+    public void toggleEntryCompletion(Entry entry, View sourceView) {
+        int pointsBefore = dbManager.getUserStats()[0];
+        // 1. Toggle the status
+        entry.setCompleted(!entry.isCompleted());
+
+        // 2. Update the database (This adds/removes points in DB)
+        dbManager.updateEntry(entry);
+        int appliedPoints = dbManager.getUserStats()[0] - pointsBefore;
+
+        // 3. Evaluate Streak (Productivity-based)
+        dbManager.evaluateDailyStreak();
+
+        if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+            ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(appliedPoints, sourceView);
+        }
+
+        // 4. Notify the Fragment to refresh its lists
+        if (listener != null) {
+            listener.onEntryUpdated();
+        }
+    }
+
 }

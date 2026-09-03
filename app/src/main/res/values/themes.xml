@@ -8,4 +8,11 @@
         <!-- Reference a color resource instead of a hardcoded hex code -->
         <item name="android:windowBackground">@color/bujo_background</item>
     </style>
+
+    <style name="BujoDialog" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
 </resources>

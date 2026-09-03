@@ -9,4 +9,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="blue_selection">#B4C6DF</color>
+
+    <color name="points_positive">#4CAF50</color>
+    <color name="points_negative">#F44336</color>
 </resources>

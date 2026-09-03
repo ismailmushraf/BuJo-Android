@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -63,6 +64,7 @@ public class ProjectDetailFragment extends Fragment {
         lvUncompleted = root.findViewById(R.id.lv_uncompleted);
         lvCompleted = root.findViewById(R.id.lv_completed);
         final EditText etNewEntry = root.findViewById(R.id.et_new_entry);
+        View editProject = root.findViewById(R.id.btn_edit_project);
         View deleteProject = root.findViewById(R.id.btn_delete_project);
 
         dbManager = new DatabaseManager(getActivity());
@@ -75,6 +77,7 @@ public class ProjectDetailFragment extends Fragment {
 
         loadEntries();
 
+        editProject.setOnClickListener(v -> showEditProjectDialog());
         deleteProject.setOnClickListener(v -> showDeleteProjectConfirmation());
         setupInputListener(etNewEntry);
 
@@ -86,7 +89,7 @@ public class ProjectDetailFragment extends Fragment {
     private void setupInputListener(final EditText etNewEntry) {
         etNewEntry.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE || actionId == 0) {
-                addEntry(etNewEntry.getText().toString());
+                addEntry(etNewEntry.getText().toString(), etNewEntry);
                 etNewEntry.setText("");
                 return true;
             }
@@ -96,7 +99,7 @@ public class ProjectDetailFragment extends Fragment {
         etNewEntry.setOnKeyListener((v, keyCode, event) -> {
             if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
                     (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_NUMPAD_ENTER || keyCode == KeyEvent.KEYCODE_PLUS)) {
-                addEntry(etNewEntry.getText().toString());
+                addEntry(etNewEntry.getText().toString(), etNewEntry);
                 etNewEntry.setText("");
                 return true;
             }
@@ -116,27 +119,35 @@ public class ProjectDetailFragment extends Fragment {
 
         // Uncompleted List Setup
         EntryAdapter uncompletedAdapter = new EntryAdapter(getActivity(), uncompleted, false);
+        uncompletedAdapter.setUIHelper(uiHelper);
+        uncompletedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
+            @Override
+            public void onEntryTextClick(Entry entry) {
+                // Focus: show detail or toggle? User wants sub-tasks modal.
+            }
+
+            @Override
+            public void onEntryLongClick(Entry entry, View view) {
+                uiHelper.showContextDialog(entry, view);
+            }
+        });
         lvUncompleted.setAdapter(uncompletedAdapter);
-        lvUncompleted.setOnItemClickListener((parent, view, position, id) -> {
-            Entry entry = uncompleted.get(position);
-            entry.setCompleted(true);
-            dbManager.updateEntry(entry);
-            loadEntries();
-        });
-        lvUncompleted.setOnItemLongClickListener((parent, view, position, id) -> {
-            uiHelper.showContextDialog(uncompleted.get(position));
-            return true;
-        });
+        lvUncompleted.setOnItemClickListener(null);
+        lvUncompleted.setOnItemLongClickListener(null);
 
         // Completed List Setup
         EntryAdapter completedAdapter = new EntryAdapter(getActivity(), completed, false);
-        lvCompleted.setAdapter(completedAdapter);
-        lvCompleted.setOnItemClickListener((parent, view, position, id) -> {
-            Entry entry = completed.get(position);
-            entry.setCompleted(false);
-            dbManager.updateEntry(entry);
-            loadEntries();
+        completedAdapter.setUIHelper(uiHelper);
+        completedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
+            @Override
+            public void onEntryTextClick(Entry entry) {}
+            @Override
+            public void onEntryLongClick(Entry entry, View view) {
+                uiHelper.showContextDialog(entry, view);
+            }
         });
+        lvCompleted.setAdapter(completedAdapter);
+        lvCompleted.setOnItemClickListener(null);
 
         // Force height calculation
         setListViewHeightBasedOnChildren(lvUncompleted);
@@ -162,17 +173,77 @@ public class ProjectDetailFragment extends Fragment {
         listView.requestLayout();
     }
 
-    private void addEntry(String content) {
+    private void addEntry(String content, View sourceView) {
         if (content != null && !content.trim().isEmpty()) {
             Entry newEntry = com.ismailmushraf.bujo.utils.EntryParser.parse(content);
             if (newEntry.getProjectTag() == null) newEntry.setProjectTag(projectName);
             newEntry.setProjectId(projectId);
             newEntry.setCompleted(false);
             if (!newEntry.getContent().trim().isEmpty()) {
-                dbManager.insertEntry(newEntry);
+                long insertedId = dbManager.insertEntry(newEntry);
+
+                int commitment = dbManager.calculateCommitmentReward(newEntry);
+                if (insertedId != -1 && commitment > 0 && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).animatePointsChange(commitment, sourceView);
+                }
+
                 loadEntries();
             }
         }
+    }
+
+    private void showEditProjectDialog() {
+        final Project project = dbManager.getOrCreateProject(projectName); // Get fresh object
+        
+        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
+        b.setTitle("Goal Settings");
+
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setPadding(30, 30, 30, 30);
+
+        final EditText etName = new EditText(getActivity());
+        etName.setHint("Goal Name");
+        etName.setText(project.getName());
+        layout.addView(etName);
+
+        final TextView label = new TextView(getActivity());
+        label.setText("Priority Weight (1-5 stars)");
+        label.setPadding(0, 20, 0, 0);
+        layout.addView(label);
+
+        final android.widget.RatingBar rb = new android.widget.RatingBar(getActivity(), null, android.R.attr.ratingBarStyle);
+        rb.setNumStars(5);
+        rb.setStepSize(1.0f);
+        rb.setRating(project.getWeight());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        rb.setLayoutParams(lp);
+        layout.addView(rb);
+
+        b.setView(layout);
+        b.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String newName = etName.getText().toString().trim();
+                int newWeight = (int) rb.getRating();
+                if (newWeight < 1) newWeight = 1;
+
+                if (!newName.isEmpty()) {
+                    project.setName(newName);
+                    project.setWeight(newWeight);
+                    dbManager.updateProject(project);
+                    projectName = newName;
+                    
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).setToolbarTitle(projectName);
+                        ((MainActivity) getActivity()).refreshDrawer();
+                    }
+                    loadEntries();
+                }
+            }
+        });
+        b.setNegativeButton(android.R.string.cancel, null);
+        b.show();
     }
 
     private void showDeleteProjectConfirmation() {
@@ -192,10 +263,11 @@ public class ProjectDetailFragment extends Fragment {
                 .setNeutralButton("Delete Everything", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // New behavior: Delete project + all its entries
-                        dbManager.deleteProjectAndAllEntries(projectId);
-                        ((MainActivity) getActivity()).refreshDrawer();
-                        ((MainActivity) getActivity()).showDailyLog();
+                        int appliedPoints = dbManager.deleteProjectAndAllEntries(projectId);
+                        MainActivity main = (MainActivity) getActivity();
+                        main.animatePointsChange(appliedPoints, main.getWindow().getDecorView());
+                        main.refreshDrawer();
+                        main.showDailyLog();
                     }
                 })
                 .setNegativeButton(android.R.string.cancel, null)

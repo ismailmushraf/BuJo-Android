@@ -84,6 +84,18 @@ public class FutureLogFragment extends Fragment {
         currentMonth = Calendar.getInstance();
         selectedDate = Calendar.getInstance();
         agendaAdapter = new EntryAdapter(getActivity(), displayedEntries);
+        agendaAdapter.setUIHelper(uiHelper);
+        agendaAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
+            @Override
+            public void onEntryTextClick(Entry entry) {
+                // Future consideration: show detail here too.
+            }
+
+            @Override
+            public void onEntryLongClick(Entry entry, View view) {
+                uiHelper.showContextDialog(entry, view);
+            }
+        });
         agendaList.setAdapter(agendaAdapter);
 
         // Speed up the automatic animations
@@ -130,20 +142,8 @@ public class FutureLogFragment extends Fragment {
                 showAgendaForSelectedDate();
             }
         });
-        agendaList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Entry entry = displayedEntries.get(position);
-                entry.setCompleted(!entry.isCompleted());
-                dbManager.updateEntry(entry);
-                reloadVisibleEntries();
-            }
-        });
-        agendaList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                uiHelper.showContextDialog(displayedEntries.get(position));
-                return true;
-            }
-        });
+        agendaList.setOnItemClickListener(null);
+        agendaList.setOnItemLongClickListener(null);
 
         showMonth();
         return root;

@@ -3,6 +3,8 @@ package com.ismailmushraf.bujo.models;
 public class Project {
     private int id;
     private String name;
+    private int weight; // Priority 1-5
+    private long createdAt;
 
     public Project() {
     }
@@ -26,5 +28,21 @@ public class Project {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getWeight() {
+        return weight;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 }

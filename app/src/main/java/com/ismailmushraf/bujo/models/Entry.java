@@ -10,6 +10,10 @@ public class Entry {
     private long deadline;
     private int projectId;
     private boolean hasTime;
+    private long completedAt;
+    private long createdAt;
+    private int parentId;
+    private boolean isAudited;
 
     public Entry(int id, String signifier, String content, String projectTag, boolean isCompleted) {
         this.id = id;
@@ -50,4 +54,16 @@ public class Entry {
 
     public boolean hasTime() { return hasTime; }
     public void setHasTime(boolean hasTime) { this.hasTime = hasTime; }
+
+    public long getCompletedAt() { return completedAt; }
+    public void setCompletedAt(long completedAt) { this.completedAt = completedAt; }
+
+    public long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(long createdAt) { this.createdAt = createdAt; }
+
+    public int getParentId() { return parentId; }
+    public void setParentId(int parentId) { this.parentId = parentId; }
+
+    public boolean isAudited() { return isAudited; }
+    public void setAudited(boolean audited) { isAudited = audited; }
 }

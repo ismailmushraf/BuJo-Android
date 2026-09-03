@@ -1,55 +1,69 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp"
-    android:gravity="center_vertical"
-    android:background="?android:attr/selectableItemBackground">
+    android:padding="4dp"
+    android:gravity="center_vertical">
 
-    <!-- Polished Signifier UI -->
+    <!-- Independent Checkbox Area -->
     <TextView
         android:id="@+id/row_signifier"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_marginLeft="12dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:gravity="center"
         android:textSize="20sp"
-        android:textColor="@color/bujo_box_border" />
+        android:textColor="@color/bujo_box_border"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true" />
 
-    <!-- Content & Optional Deadline -->
+    <!-- Unified Interaction Area for Content -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:id="@+id/row_interaction_area"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_weight="1"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="12dp">
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
 
-        <TextView
-            android:id="@+id/row_content"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
-            android:textColor="@color/bujo_text"/>
+            android:orientation="vertical"
+            android:layout_weight="1">
 
+            <TextView
+                android:id="@+id/row_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="22sp"
+                android:textColor="@color/bujo_text"/>
+
+            <TextView
+                android:id="@+id/row_deadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:textColor="@color/bujo_text_secondary"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+
+        <!-- Tag -->
         <TextView
-            android:id="@+id/row_deadline"
-            android:layout_width="match_parent"
+            android:id="@+id/row_tag"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
-            android:textColor="@color/bujo_text_secondary"
-            android:layout_marginTop="2dp"
+            android:textColor="#0066CC"
+            android:background="#E6F2FF"
+            android:padding="4dp"
+            android:layout_marginLeft="8dp"
             android:visibility="gone"/>
     </LinearLayout>
 
-    <!-- Tag -->
-    <TextView
-        android:id="@+id/row_tag"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="14sp"
-        android:textColor="#0066CC"
-        android:background="#E6F2FF"
-        android:padding="4dp"
-        android:visibility="gone"/>
 </LinearLayout>

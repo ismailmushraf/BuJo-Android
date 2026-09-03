@@ -63,6 +63,38 @@
             android:layout_height="48dp"
             android:background="@drawable/shape_bujo_box" />
 
+        <!-- Gamification Settings -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GAMIFICATION &amp; FEEDBACK"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:paddingTop="24dp"
+            android:paddingBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/shape_bujo_box"
+            android:padding="8dp">
+            <CheckBox
+                android:id="@+id/cb_sound_effects"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable Sound Effects"
+                android:textColor="@color/bujo_text" />
+            <CheckBox
+                android:id="@+id/cb_points_animation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Enable Points Animation"
+                android:textColor="@color/bujo_text"
+                android:checked="true" />
+        </LinearLayout>
+
         <!-- Data Management -->
         <TextView
             android:layout_width="match_parent"

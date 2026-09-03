@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/shape_bujo_page"
+    android:padding="24dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/detail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/bujo_text"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Sub-tasks Section -->
+    <LinearLayout
+        android:id="@+id/detail_subtask_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <!-- Sub-tasks added here -->
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btn_detail_add_subtask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+ Add Sub-task"
+        android:textSize="14sp"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:padding="12dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textColor="@color/bujo_text_secondary"
+        android:layout_gravity="right"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>
