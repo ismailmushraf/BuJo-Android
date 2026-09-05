@@ -315,6 +315,8 @@ public class EntryUIHelper {
     // Add this method to com.ismailmushraf.bujo.utils.EntryUIHelper
 
     public void toggleEntryCompletion(Entry entry, View sourceView) {
+        if ("-".equals(entry.getSignifier())) return; // Notes cannot be completed
+
         int pointsBefore = dbManager.getUserStats()[0];
         // 1. Toggle the status
         entry.setCompleted(!entry.isCompleted());

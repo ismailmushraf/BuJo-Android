@@ -133,12 +133,19 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
         } else if ("*".equals(entry.getSignifier())) {
             holder.tvSignifier.setBackgroundResource(R.drawable.shape_bujo_box);
             holder.tvSignifier.setText(entry.isCompleted() ? "✓" : "");
+        } else if ("-".equals(entry.getSignifier())) {
+            holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
+            holder.tvSignifier.setText("\uD83D\uDCDD"); // 📝 emoji
+        } else if ("o".equals(entry.getSignifier())) {
+            holder.tvSignifier.setBackgroundResource(entry.isCompleted() ? R.drawable.ic_event_completed : R.drawable.ic_calendar);
+            holder.tvSignifier.setText("");
         } else {
             holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
             holder.tvSignifier.setText(entry.getSignifier());
         }
 
-        if (entry.isCompleted()) {
+        boolean shouldStrike = entry.isCompleted() && !"-".equals(entry.getSignifier());
+        if (shouldStrike) {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvContent.setTextColor(colorTextSecondary);
         } else {

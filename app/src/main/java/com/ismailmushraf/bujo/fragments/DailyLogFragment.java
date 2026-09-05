@@ -427,7 +427,9 @@ public class DailyLogFragment extends Fragment {
             adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
                 @Override
                 public void onEntryTextClick(Entry entry) {
-                    showTaskDetailDialog(entry);
+                    if ("*".equals(entry.getSignifier())) {
+                        showTaskDetailDialog(entry);
+                    }
                 }
 
                 @Override
