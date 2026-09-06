@@ -15,6 +15,7 @@ import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -23,7 +24,7 @@ public class MigratedItemsFragment extends Fragment {
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryAdapter adapter;
-    private List<Entry> entries;
+    private List<Object> entries;
     private EntryUIHelper uiHelper;
 
     @Override
@@ -57,7 +58,7 @@ public class MigratedItemsFragment extends Fragment {
     }
 
     private void loadEntries() {
-        entries = dbManager.getMigratedEntries();
+        entries = new ArrayList<>(dbManager.getMigratedEntries());
         adapter = new EntryAdapter(getActivity(), entries);
         adapter.setUIHelper(uiHelper);
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
@@ -85,11 +86,14 @@ public class MigratedItemsFragment extends Fragment {
         } else {
             int completedCount = 0;
             int totalTasks = 0;
-            for (Entry entry : entries) {
-                if ("*".equals(entry.getSignifier())) {
-                    totalTasks++;
-                    if (entry.isCompleted()) {
-                        completedCount++;
+            for (Object item : entries) {
+                if (item instanceof Entry) {
+                    Entry entry = (Entry) item;
+                    if ("*".equals(entry.getSignifier())) {
+                        totalTasks++;
+                        if (entry.isCompleted()) {
+                            completedCount++;
+                        }
                     }
                 }
             }

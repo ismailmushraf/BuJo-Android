@@ -19,12 +19,13 @@ import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InboxFragment extends Fragment {
 
     private EntryAdapter adapter;
-    private List<Entry> entries;
+    private List<Object> entries;
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
@@ -91,6 +92,14 @@ public class InboxFragment extends Fragment {
             }
         });
 
+        View btnAddEvent = root.findViewById(R.id.btn_add_event);
+        btnAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uiHelper.showAddEventDialog(0, null);
+            }
+        });
+
         return root;
     }
 
@@ -118,9 +127,11 @@ public class InboxFragment extends Fragment {
             if (!newEntry.getContent().trim().isEmpty()) {
                 long insertedId = dbManager.insertEntry(newEntry);
                 
-                int commitment = dbManager.calculateCommitmentReward(newEntry);
-                if (insertedId != -1 && commitment > 0 && getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
+                if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                    int commitment = dbManager.calculateCommitmentReward(newEntry);
+                    if (commitment > 0) {
+                        ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
+                    }
                 }
 
                 loadEntries();
@@ -131,7 +142,7 @@ public class InboxFragment extends Fragment {
     }
 
     private void loadEntries() {
-        entries = dbManager.getInboxEntries();
+        entries = new ArrayList<>(dbManager.getInboxEntries());
         adapter = new EntryAdapter(getActivity(), entries, true);
         adapter.setUIHelper(uiHelper);
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
@@ -155,11 +166,14 @@ public class InboxFragment extends Fragment {
         } else {
             int completedCount = 0;
             int totalTasks = 0;
-            for (Entry entry : entries) {
-                if ("*".equals(entry.getSignifier())) {
-                    totalTasks++;
-                    if (entry.isCompleted()) {
-                        completedCount++;
+            for (Object item : entries) {
+                if (item instanceof Entry) {
+                    Entry entry = (Entry) item;
+                    if ("*".equals(entry.getSignifier())) {
+                        totalTasks++;
+                        if (entry.isCompleted()) {
+                            completedCount++;
+                        }
                     }
                 }
             }

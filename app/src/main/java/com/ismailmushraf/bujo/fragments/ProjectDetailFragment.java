@@ -4,8 +4,12 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -34,7 +38,7 @@ public class ProjectDetailFragment extends Fragment {
     private int projectId;
     private String projectName;
 
-    private ListView lvUncompleted, lvCompleted;
+    private ListView lvUncompleted;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
 
@@ -45,6 +49,12 @@ public class ProjectDetailFragment extends Fragment {
         args.putString(ARG_PROJECT_NAME, projectName);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -62,7 +72,6 @@ public class ProjectDetailFragment extends Fragment {
         }
 
         lvUncompleted = root.findViewById(R.id.lv_uncompleted);
-        lvCompleted = root.findViewById(R.id.lv_completed);
         final EditText etNewEntry = root.findViewById(R.id.et_new_entry);
         View editProject = root.findViewById(R.id.btn_edit_project);
         View deleteProject = root.findViewById(R.id.btn_delete_project);
@@ -82,8 +91,29 @@ public class ProjectDetailFragment extends Fragment {
         setupInputListener(etNewEntry);
 
         root.findViewById(R.id.btn_emoji).setOnClickListener(v -> uiHelper.showEmojiPicker(etNewEntry));
+        root.findViewById(R.id.btn_add_event).setOnClickListener(v -> uiHelper.showAddEventDialog(projectId, projectName));
 
         return root;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.project_menu, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_project_history) {
+            if (getFragmentManager() != null) {
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_container, ProjectHistoryFragment.newInstance(projectId, projectName));
+                ft.addToBackStack(null);
+                ft.commit();
+            }
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void setupInputListener(final EditText etNewEntry) {
@@ -109,12 +139,10 @@ public class ProjectDetailFragment extends Fragment {
 
     private void loadEntries() {
         List<Entry> allEntries = dbManager.getEntriesForProject(projectId);
-        List<Entry> uncompleted = new ArrayList<>();
-        List<Entry> completed = new ArrayList<>();
+        List<Object> uncompleted = new ArrayList<>();
 
         for (Entry e : allEntries) {
-            if (e.isCompleted()) completed.add(e);
-            else uncompleted.add(e);
+            if (!e.isCompleted()) uncompleted.add(e);
         }
 
         // Uncompleted List Setup
@@ -123,7 +151,9 @@ public class ProjectDetailFragment extends Fragment {
         uncompletedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                // Focus: show detail or toggle? User wants sub-tasks modal.
+                if ("*".equals(entry.getSignifier())) {
+                    uiHelper.showTaskDetailDialog(entry);
+                }
             }
 
             @Override
@@ -135,23 +165,8 @@ public class ProjectDetailFragment extends Fragment {
         lvUncompleted.setOnItemClickListener(null);
         lvUncompleted.setOnItemLongClickListener(null);
 
-        // Completed List Setup
-        EntryAdapter completedAdapter = new EntryAdapter(getActivity(), completed, false);
-        completedAdapter.setUIHelper(uiHelper);
-        completedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
-            @Override
-            public void onEntryTextClick(Entry entry) {}
-            @Override
-            public void onEntryLongClick(Entry entry, View view) {
-                uiHelper.showContextDialog(entry, view);
-            }
-        });
-        lvCompleted.setAdapter(completedAdapter);
-        lvCompleted.setOnItemClickListener(null);
-
         // Force height calculation
         setListViewHeightBasedOnChildren(lvUncompleted);
-        setListViewHeightBasedOnChildren(lvCompleted);
     }
 
     private void setListViewHeightBasedOnChildren(ListView listView) {
@@ -182,9 +197,11 @@ public class ProjectDetailFragment extends Fragment {
             if (!newEntry.getContent().trim().isEmpty()) {
                 long insertedId = dbManager.insertEntry(newEntry);
 
-                int commitment = dbManager.calculateCommitmentReward(newEntry);
-                if (insertedId != -1 && commitment > 0 && getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).animatePointsChange(commitment, sourceView);
+                if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                    int commitment = dbManager.calculateCommitmentReward(newEntry);
+                    if (commitment > 0) {
+                        ((MainActivity) getActivity()).animatePointsChange(commitment, sourceView);
+                    }
                 }
 
                 loadEntries();

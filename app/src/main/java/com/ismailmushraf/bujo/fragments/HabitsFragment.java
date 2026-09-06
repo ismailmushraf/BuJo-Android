@@ -212,6 +212,7 @@ public class HabitsFragment extends Fragment {
             final Habit h = getItem(position);
             TextView name = (TextView) convertView.findViewById(R.id.tv_habit_name);
             TextView progressText = (TextView) convertView.findViewById(R.id.tv_habit_progress);
+            TextView timeText = (TextView) convertView.findViewById(R.id.tv_habit_time);
             ProgressBar progress = (ProgressBar) convertView.findViewById(R.id.progress_habit);
             CheckBox cbToday = (CheckBox) convertView.findViewById(R.id.cb_habit_today);
             LinearLayout historyGrid = (LinearLayout) convertView.findViewById(R.id.layout_history_grid);
@@ -221,6 +222,14 @@ public class HabitsFragment extends Fragment {
             Integer count = completionCounts.get(h.getId());
             int totalDone = (count == null) ? 0 : count;
             progressText.setText("Day " + totalDone + " of " + h.getCommitmentDays());
+
+            if (h.hasTime()) {
+                timeText.setVisibility(View.VISIBLE);
+                SimpleDateFormat tf = new SimpleDateFormat("h:mm a", Locale.US);
+                timeText.setText("Target: " + tf.format(new Date(h.getDeadlineTime())));
+            } else {
+                timeText.setVisibility(View.GONE);
+            }
             
             int percent = (int)(((float)totalDone / h.getCommitmentDays()) * 100);
             progress.setProgress(Math.min(100, percent));

@@ -157,24 +157,28 @@ public class DatabaseManager {
     }
 
     public List<Entry> getEntriesForProject(int projectId) {
-        return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId);
+        return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0", null);
+    }
+
+    public List<Entry> getCompletedEntriesForProject(int projectId) {
+        return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " + DatabaseHelper.COLUMN_COMPLETED + " = 1", DatabaseHelper.COLUMN_COMPLETED_AT + " DESC");
     }
 
     public List<Entry> getEntriesWithDeadlines() {
-        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " > 0");
+        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " > 0", null);
     }
 
     public List<Entry> getMigratedEntries() {
-        return getEntries(DatabaseHelper.COLUMN_MIGRATED + " = 1");
+        return getEntries(DatabaseHelper.COLUMN_MIGRATED + " = 1", null);
     }
 
     public List<Entry> getChildEntries(int parentId) {
-        return getEntries(DatabaseHelper.COLUMN_PARENT_ID + " = " + parentId);
+        return getEntries(DatabaseHelper.COLUMN_PARENT_ID + " = " + parentId, null);
     }
 
-    private List<Entry> getEntries(String selection) {
+    private List<Entry> getEntries(String selection, String orderBy) {
         List<Entry> entries = new ArrayList<>();
-        Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, null, selection, null, null, null, null);
+        Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, null, selection, null, null, null, orderBy);
         if (cursor != null && cursor.moveToFirst()) {
             int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
             int typeIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE);
@@ -352,12 +356,12 @@ public class DatabaseManager {
         copy.set(Calendar.SECOND, 59); copy.set(Calendar.MILLISECOND, 999);
         long end = copy.getTimeInMillis();
         // Only return top-level entries (parent_id == 0) for the main list
-        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " >= " + start + " AND " + DatabaseHelper.COLUMN_DEADLINE + " <= " + end + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0");
+        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " >= " + start + " AND " + DatabaseHelper.COLUMN_DEADLINE + " <= " + end + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0", null);
     }
 
 
     public List<Entry> getInboxEntries() {
-        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " <= 0 OR " + DatabaseHelper.COLUMN_DEADLINE + " IS NULL");
+        return getEntries(DatabaseHelper.COLUMN_DEADLINE + " <= 0 OR " + DatabaseHelper.COLUMN_DEADLINE + " IS NULL", null);
     }
 
     public int clearCompletedTasks() {
@@ -370,7 +374,7 @@ public class DatabaseManager {
                 " AND " + DatabaseHelper.COLUMN_TYPE + " = '*'" +
                 " AND (" + DatabaseHelper.COLUMN_CREATED_AT + " >= " + sevenDaysAgo + 
                 " OR " + DatabaseHelper.COLUMN_COMPLETED_AT + " >= " + sevenDaysAgo + ")";
-        List<Entry> projectTasks = getEntries(selection);
+        List<Entry> projectTasks = getEntries(selection, null);
         if (projectTasks.isEmpty()) return 1.0f;
         int total = projectTasks.size();
         int completed = 0;

@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-07-18T13:10:15.264341Z">
+        <DropdownSelection timestamp="2026-09-06T18:27:43.819431Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=/Users/ismailmushraf/.android/avd/BB_Passport.avd" />

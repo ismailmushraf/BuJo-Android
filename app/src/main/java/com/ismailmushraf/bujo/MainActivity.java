@@ -444,7 +444,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Get coordinates of the source view
         int[] location = new int[2];
-        sourceView.getLocationInWindow(location);
+        if (sourceView != null) {
+            sourceView.getLocationInWindow(location);
+        } else {
+            // Default to center if no source view
+            location[0] = getWindow().getDecorView().getWidth() / 2;
+            location[1] = getWindow().getDecorView().getHeight() / 2;
+        }
         
         final TextView floatText = new TextView(this);
         floatText.setText((amount > 0 ? "+" : "") + amount);

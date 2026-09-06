@@ -33,6 +33,15 @@
                 android:textColor="@color/bujo_text_secondary"
                 android:textSize="12sp"
                 android:layout_marginTop="2dp" />
+
+            <TextView
+                android:id="@+id/tv_habit_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="12sp"
+                android:layout_marginTop="1dp"
+                android:visibility="gone" />
         </LinearLayout>
 
         <CheckBox

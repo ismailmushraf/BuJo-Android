@@ -47,7 +47,7 @@ public class FutureLogFragment extends Fragment {
     private Calendar currentMonth;
     private Calendar selectedDate;
     private List<Entry> deadlineEntries;
-    private final List<Entry> displayedEntries = new ArrayList<>();
+    private final List<Object> displayedEntries = new ArrayList<>();
     private EntryAdapter agendaAdapter;
     private MonthAdapter monthAdapter;
     private WeekAdapter weekAdapter;

@@ -35,7 +35,7 @@ import java.util.Set;
 public class DailyLogFragment extends Fragment {
 
     private EntryAdapter adapter;
-    private List<Entry> entries;
+    private List<Object> entries;
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
@@ -98,6 +98,14 @@ public class DailyLogFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 uiHelper.showEmojiPicker(etNewEntry);
+            }
+        });
+
+        View btnAddEvent = root.findViewById(R.id.btn_add_event);
+        btnAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uiHelper.showAddEventDialog(0, null);
             }
         });
 
@@ -191,194 +199,6 @@ public class DailyLogFragment extends Fragment {
                .show();
     }
 
-    private void showTaskDetailDialog(final Entry parent) {
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_task_detail, null);
-        final TextView tvTitle = (TextView) view.findViewById(R.id.detail_title);
-        final LinearLayout subtaskContainer = (LinearLayout) view.findViewById(R.id.detail_subtask_container);
-        View btnAddSubtask = view.findViewById(R.id.btn_detail_add_subtask);
-
-        tvTitle.setText(parent.getContent());
-
-        final java.util.Set<Integer> deletingIds = new java.util.HashSet<>();
-        final Runnable[] refreshRef = new Runnable[1];
-
-        refreshRef[0] = new Runnable() {
-            @Override
-            public void run() {
-                if (getActivity() == null) return;
-                subtaskContainer.removeAllViews();
-                List<Entry> children = dbManager.getChildEntries(parent.getId());
-                for (final Entry sub : children) {
-                    if (deletingIds.contains(sub.getId())) continue;
-
-                    View row = LayoutInflater.from(getActivity()).inflate(R.layout.item_subtask_row, subtaskContainer, false);
-                    final TextView sig = (TextView) row.findViewById(R.id.subtask_signifier);
-                    final EditText content = (EditText) row.findViewById(R.id.subtask_content);
-                    final TextView tvTime = (TextView) row.findViewById(R.id.subtask_time);
-                    View btnDelete = row.findViewById(R.id.subtask_delete);
-
-                    sig.setText(sub.isCompleted() ? "✓" : "");
-                    content.setText(sub.getContent());
-                    
-                    if (sub.hasTime()) {
-                        tvTime.setVisibility(View.VISIBLE);
-                        SimpleDateFormat stf = new SimpleDateFormat("h:mm a", Locale.US);
-                        tvTime.setText("Target: " + stf.format(new Date(sub.getDeadline())));
-                    } else {
-                        tvTime.setVisibility(View.GONE);
-                    }
-
-                    if (sub.isCompleted()) content.setPaintFlags(content.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-
-                    sig.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            sub.setCompleted(!sub.isCompleted());
-                            dbManager.updateEntry(sub);
-
-                            sig.setText(sub.isCompleted() ? "✓" : "");
-                            if (sub.isCompleted()) content.setPaintFlags(content.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                            else content.setPaintFlags(content.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-                        }
-                    });
-
-                    sig.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            // Sub-task time picker
-                            new android.app.TimePickerDialog(getActivity(), new android.app.TimePickerDialog.OnTimeSetListener() {
-                                @Override
-                                public void onTimeSet(android.widget.TimePicker view, int hourOfDay, int minute) {
-                                    Calendar c = Calendar.getInstance();
-                                    c.setTimeInMillis(sub.getDeadline());
-                                    c.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                                    c.set(Calendar.MINUTE, minute);
-                                    sub.setDeadline(c.getTimeInMillis());
-                                    sub.setHasTime(true);
-                                    dbManager.updateEntry(sub);
-                                    refreshRef[0].run();
-                                }
-                            }, 12, 0, false).show();
-                            return true;
-                        }
-                    });
-
-                    btnDelete.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            deletingIds.add(sub.getId());
-                            dbManager.deleteEntry(sub.getId());
-                            refreshRef[0].run();
-                        }
-                    });
-
-                    // Use TextWatcher for immediate saving - works better with physical keyboards
-                    content.addTextChangedListener(new android.text.TextWatcher() {
-                        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                        @Override
-                        public void afterTextChanged(android.text.Editable s) {
-                            String val = s.toString();
-                            if (!val.equals(sub.getContent())) {
-                                sub.setContent(val);
-                                dbManager.updateEntry(sub);
-                            }
-                        }
-                    });
-
-                    subtaskContainer.addView(row);
-                }
-            }
-        };
-
-        refreshRef[0].run();
-
-        btnAddSubtask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Check if last one is empty - now querying fresh from DB
-                List<Entry> currentChildren = dbManager.getChildEntries(parent.getId());
-                if (!currentChildren.isEmpty() && currentChildren.get(currentChildren.size() - 1).getContent().trim().isEmpty()) {
-                    return;
-                }
-
-                Entry newSub = new Entry();
-                newSub.setSignifier("*");
-                newSub.setContent("");
-                newSub.setParentId(parent.getId());
-                newSub.setProjectId(parent.getProjectId());
-                newSub.setProjectTag(parent.getProjectTag());
-                newSub.setDeadline(parent.getDeadline());
-                newSub.setCreatedAt(System.currentTimeMillis());
-                dbManager.insertEntry(newSub);
-                refreshRef[0].run();
-
-                View lastRow = subtaskContainer.getChildAt(subtaskContainer.getChildCount() - 1);
-                if (lastRow != null) {
-                    EditText et = (EditText) lastRow.findViewById(R.id.subtask_content);
-                    et.requestFocus();
-                }
-            }
-        });
-
-        final AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                .setView(view)
-                .create();
-
-
-        dialog.setOnShowListener(new android.content.DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(android.content.DialogInterface dialogInterface) {
-                // Increase Dialog Width for BlackBerry Passport
-                if (dialog.getWindow() != null) {
-                    android.util.DisplayMetrics metrics = new android.util.DisplayMetrics();
-                    getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
-                    int width = (int) (metrics.widthPixels * 0.94);
-                    dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
-                    
-                    // Force focusable mode and show keyboard
-                    dialog.getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE | android.view.WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-                    dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-
-                // Focus first empty row
-                for (int i = 0; i < subtaskContainer.getChildCount(); i++) {
-                    View row = subtaskContainer.getChildAt(i);
-                    final EditText et = (EditText) row.findViewById(R.id.subtask_content);
-                    if (et.getText().toString().isEmpty()) {
-                        et.requestFocus();
-                        // Force native keyboard show for emulator/legacy devices
-                        et.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) 
-                                        getActivity().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
-                                if (imm != null) imm.showSoftInput(et, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
-                            }
-                        }, 100);
-                        break;
-                    }
-                }
-            }
-        });
-
-        dialog.setOnDismissListener(new android.content.DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(android.content.DialogInterface dialog) {
-                // Cleanup any empty sub-tasks on exit
-                List<Entry> children = dbManager.getChildEntries(parent.getId());
-                for (Entry sub : children) {
-                    if (sub.getContent().trim().isEmpty()) {
-                        dbManager.deleteEntry(sub.getId());
-                    }
-                }
-                loadEntries();
-            }
-        });
-
-        dialog.show();
-    }
-
     private int calculateAvailableHours(boolean isToday) {
         if (!isToday) return 14;
         Calendar now = Calendar.getInstance();
@@ -403,9 +223,11 @@ public class DailyLogFragment extends Fragment {
             newEntry.setProjectId(projectId);
             long insertedId = dbManager.insertEntry(newEntry);
             
-            int commitment = dbManager.calculateCommitmentReward(newEntry);
-            if (insertedId != -1 && commitment > 0 && getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
+            if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                int commitment = dbManager.calculateCommitmentReward(newEntry);
+                if (commitment > 0) {
+                    ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
+                }
             }
 
             loadEntries();
@@ -419,7 +241,7 @@ public class DailyLogFragment extends Fragment {
         View v = listView.getChildAt(0);
         int top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
 
-        entries = dbManager.getTodayEntries();
+        entries = new ArrayList<>(dbManager.getTodayEntries());
 
         if (adapter == null || listView.getAdapter() == null) {
             adapter = new EntryAdapter(getActivity(), entries, true, true);
@@ -428,7 +250,7 @@ public class DailyLogFragment extends Fragment {
                 @Override
                 public void onEntryTextClick(Entry entry) {
                     if ("*".equals(entry.getSignifier())) {
-                        showTaskDetailDialog(entry);
+                        uiHelper.showTaskDetailDialog(entry);
                     }
                 }
 
@@ -453,10 +275,13 @@ public class DailyLogFragment extends Fragment {
         } else {
             int completedCount = 0;
             int totalTasks = 0;
-            for (Entry entry : entries) {
-                if (entry.getParentId() == 0 && "*".equals(entry.getSignifier())) {
-                    totalTasks++;
-                    if (entry.isCompleted()) completedCount++;
+            for (Object item : entries) {
+                if (item instanceof Entry) {
+                    Entry entry = (Entry) item;
+                    if (entry.getParentId() == 0 && "*".equals(entry.getSignifier())) {
+                        totalTasks++;
+                        if (entry.isCompleted()) completedCount++;
+                    }
                 }
             }
             completion = totalTasks == 0 ? entries.size() + " items" : completedCount + "/" + totalTasks;

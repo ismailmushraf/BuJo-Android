@@ -55,13 +55,27 @@
 
             <EditText
                 android:id="@+id/et_new_entry"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:hint="Type * task, - note, or o event..."
+                android:hint="Type new task..."
                 android:imeOptions="actionDone"
                 android:inputType="textCapSentences"
                 android:singleLine="true" />
+
+            <!-- New Event Button -->
+            <TextView
+                android:id="@+id/btn_add_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="📅"
+                android:textSize="22sp" />
         </LinearLayout>
 
         <Button

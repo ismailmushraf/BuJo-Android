@@ -16,26 +16,28 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class EntryAdapter extends ArrayAdapter<Entry> {
+public class EntryAdapter extends ArrayAdapter<Object> {
 
     public interface OnEntryInteractionListener {
         void onEntryTextClick(Entry entry);
         void onEntryLongClick(Entry entry, View view);
     }
 
+    private static final int TYPE_ENTRY = 0;
+    private static final int TYPE_HEADER = 1;
+
     private boolean showTags = true;
     private boolean isDailyLog = false;
     private OnEntryInteractionListener listener;
     private EntryUIHelper uiHelper;
 
-    // --- Performance Optimizations: Reusable Objects ---
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a", Locale.US);
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat("MMM d, yyyy h:mm a", Locale.US);
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
     private final int colorText;
     private final int colorTextSecondary;
 
-    public EntryAdapter(Context context, List<Entry> entries, boolean showTags, boolean isDailyLog) {
+    public EntryAdapter(Context context, List<Object> entries, boolean showTags, boolean isDailyLog) {
         super(context, 0, entries);
         this.showTags = showTags;
         this.isDailyLog = isDailyLog;
@@ -43,14 +45,14 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
         this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
     }
 
-    public EntryAdapter(Context context, List<Entry> entries, boolean showTags) {
+    public EntryAdapter(Context context, List<Object> entries, boolean showTags) {
         super(context, 0, entries);
         this.showTags = showTags;
         this.colorText = context.getResources().getColor(R.color.bujo_text);
         this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
     }
 
-    public EntryAdapter(Context context, List<Entry> entries) {
+    public EntryAdapter(Context context, List<Object> entries) {
         super(context, 0, entries);
         this.colorText = context.getResources().getColor(R.color.bujo_text);
         this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
@@ -64,7 +66,17 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
         this.uiHelper = helper;
     }
 
-    private static class ViewHolder {
+    @Override
+    public int getViewTypeCount() {
+        return 2;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (getItem(position) instanceof String) ? TYPE_HEADER : TYPE_ENTRY;
+    }
+
+    private static class EntryViewHolder {
         TextView tvSignifier;
         TextView tvContent;
         TextView tvDeadline;
@@ -72,14 +84,41 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
         View interactionArea;
     }
 
+    private static class HeaderViewHolder {
+        TextView tvTitle;
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        final Entry entry = getItem(position);
-        ViewHolder holder;
+        int type = getItemViewType(position);
+
+        if (type == TYPE_HEADER) {
+            return getHeaderView((String) getItem(position), convertView, parent);
+        } else {
+            return getEntryView((Entry) getItem(position), convertView, parent);
+        }
+    }
+
+    private View getHeaderView(String title, View convertView, ViewGroup parent) {
+        HeaderViewHolder holder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_drawer_section, parent, false);
+            holder = new HeaderViewHolder();
+            holder.tvTitle = (TextView) convertView.findViewById(R.id.drawer_section_title);
+            convertView.setTag(holder);
+        } else {
+            holder = (HeaderViewHolder) convertView.getTag();
+        }
+        holder.tvTitle.setText(title);
+        return convertView;
+    }
+
+    private View getEntryView(final Entry entry, View convertView, ViewGroup parent) {
+        EntryViewHolder holder;
 
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_entry_row, parent, false);
-            holder = new ViewHolder();
+            holder = new EntryViewHolder();
             holder.tvSignifier = (TextView) convertView.findViewById(R.id.row_signifier);
             holder.tvContent = (TextView) convertView.findViewById(R.id.row_content);
             holder.tvDeadline = (TextView) convertView.findViewById(R.id.row_deadline);
@@ -87,41 +126,30 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
             holder.interactionArea = convertView.findViewById(R.id.row_interaction_area);
             convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (EntryViewHolder) convertView.getTag();
         }
 
-        // --- Interaction Splitting ---
-        
         // 1. Bullet/Checkbox Area -> Completion Toggle
-        holder.tvSignifier.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (uiHelper != null) {
-                    uiHelper.toggleEntryCompletion(entry, v);
-                }
+        holder.tvSignifier.setOnClickListener(v -> {
+            if (uiHelper != null) {
+                uiHelper.toggleEntryCompletion(entry, v);
             }
         });
 
         // 2. Interaction Area -> Open Detail Modal
-        holder.interactionArea.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onEntryTextClick(entry);
-                }
+        holder.interactionArea.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onEntryTextClick(entry);
             }
         });
 
-        // 3. Universal Long Press (Both areas trigger the same menu)
-        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (listener != null) {
-                    listener.onEntryLongClick(entry, v);
-                    return true;
-                }
-                return false;
+        // 3. Universal Long Press
+        View.OnLongClickListener longClickListener = v -> {
+            if (listener != null) {
+                listener.onEntryLongClick(entry, v);
+                return true;
             }
+            return false;
         };
         holder.tvSignifier.setOnLongClickListener(longClickListener);
         holder.interactionArea.setOnLongClickListener(longClickListener);
@@ -133,9 +161,6 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
         } else if ("*".equals(entry.getSignifier())) {
             holder.tvSignifier.setBackgroundResource(R.drawable.shape_bujo_box);
             holder.tvSignifier.setText(entry.isCompleted() ? "✓" : "");
-        } else if ("-".equals(entry.getSignifier())) {
-            holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
-            holder.tvSignifier.setText("\uD83D\uDCDD"); // 📝 emoji
         } else if ("o".equals(entry.getSignifier())) {
             holder.tvSignifier.setBackgroundResource(entry.isCompleted() ? R.drawable.ic_event_completed : R.drawable.ic_calendar);
             holder.tvSignifier.setText("");
@@ -144,8 +169,7 @@ public class EntryAdapter extends ArrayAdapter<Entry> {
             holder.tvSignifier.setText(entry.getSignifier());
         }
 
-        boolean shouldStrike = entry.isCompleted() && !"-".equals(entry.getSignifier());
-        if (shouldStrike) {
+        if (entry.isCompleted()) {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             holder.tvContent.setTextColor(colorTextSecondary);
         } else {

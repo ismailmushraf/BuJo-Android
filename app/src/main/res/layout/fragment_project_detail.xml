@@ -52,36 +52,9 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Uncompleted Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="UNCOMPLETED"
-                android:textColor="@color/bujo_text_secondary"
-                android:textSize="12sp"
-                android:paddingLeft="16dp"
-                android:paddingBottom="8dp"/>
 
             <ListView
                 android:id="@+id/lv_uncompleted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="@color/bujo_divider"
-                android:dividerHeight="1dp" />
-
-            <!-- Completed Section -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="COMPLETED"
-                android:textColor="@color/bujo_text_secondary"
-                android:textSize="12sp"
-                android:paddingLeft="16dp"
-                android:paddingTop="16dp"
-                android:paddingBottom="8dp"/>
-
-            <ListView
-                android:id="@+id/lv_completed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:divider="@color/bujo_divider"
@@ -122,13 +95,27 @@
 
             <EditText
                 android:id="@+id/et_new_entry"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="@android:color/transparent"
-                android:hint="Type new entry..."
+                android:hint="Type new task..."
                 android:imeOptions="actionDone"
                 android:inputType="textCapSentences"
                 android:singleLine="true" />
+
+            <!-- New Event Button -->
+            <TextView
+                android:id="@+id/btn_add_event"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp"
+                android:text="📅"
+                android:textSize="22sp" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
