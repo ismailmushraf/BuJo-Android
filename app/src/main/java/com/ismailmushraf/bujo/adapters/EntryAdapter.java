@@ -81,6 +81,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         TextView tvContent;
         TextView tvDeadline;
         TextView tvTag;
+        TextView tvLock;
         View interactionArea;
     }
 
@@ -123,6 +124,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvContent = (TextView) convertView.findViewById(R.id.row_content);
             holder.tvDeadline = (TextView) convertView.findViewById(R.id.row_deadline);
             holder.tvTag = (TextView) convertView.findViewById(R.id.row_tag);
+            holder.tvLock = (TextView) convertView.findViewById(R.id.row_lock_indicator);
             holder.interactionArea = convertView.findViewById(R.id.row_interaction_area);
             convertView.setTag(holder);
         } else {
@@ -200,6 +202,10 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvTag.setText("#" + entry.getProjectTag());
         } else {
             holder.tvTag.setVisibility(View.GONE);
+        }
+
+        if (holder.tvLock != null) {
+            holder.tvLock.setVisibility(entry.isLocked() ? View.VISIBLE : View.GONE);
         }
 
         return convertView;

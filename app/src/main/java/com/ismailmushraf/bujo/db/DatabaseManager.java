@@ -57,6 +57,7 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_PARENT_ID, entry.getParentId());
         values.put(DatabaseHelper.COLUMN_CREATED_AT, entry.getCreatedAt() > 0 ? entry.getCreatedAt() : System.currentTimeMillis());
         values.put(DatabaseHelper.COLUMN_IS_AUDITED, entry.isAudited() ? 1 : 0);
+        values.put(DatabaseHelper.COLUMN_IS_LOCKED, entry.isLockedManually() ? 1 : 0);
         if (entry.isCompleted()) {
             values.put(DatabaseHelper.COLUMN_COMPLETED_AT, entry.getCompletedAt() > 0 ? entry.getCompletedAt() : System.currentTimeMillis());
         }
@@ -80,6 +81,7 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_PROJECT_ID, entry.getProjectId());
         values.put(DatabaseHelper.COLUMN_PARENT_ID, entry.getParentId());
         values.put(DatabaseHelper.COLUMN_IS_AUDITED, entry.isAudited() ? 1 : 0);
+        values.put(DatabaseHelper.COLUMN_IS_LOCKED, entry.isLockedManually() ? 1 : 0);
 
         int pointsDelta = 0;
         Cursor c = database.query(DatabaseHelper.TABLE_ENTRIES,
@@ -193,6 +195,7 @@ public class DatabaseManager {
             int createdAtIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CREATED_AT);
             int parentIdIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PARENT_ID);
             int auditedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_AUDITED);
+            int lockedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_LOCKED);
 
             do {
                 Entry entry = new Entry();
@@ -210,6 +213,7 @@ public class DatabaseManager {
                 if (createdAtIndex >= 0) entry.setCreatedAt(cursor.getLong(createdAtIndex));
                 if (parentIdIndex >= 0) entry.setParentId(cursor.getInt(parentIdIndex));
                 if (auditedIndex >= 0) entry.setAudited(cursor.getInt(auditedIndex) == 1);
+                if (lockedIndex >= 0) entry.setLockedManually(cursor.getInt(lockedIndex) == 1);
 
                 entries.add(entry);
             } while (cursor.moveToNext());
@@ -935,9 +939,11 @@ public class DatabaseManager {
                     } while (c.moveToNext());
                     c.close();
                     
-                    // Mark as audited
+                    // Mark as audited AND migrate missed tasks to Logbook
                     ContentValues cvAudit = new ContentValues();
                     cvAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                    cvAudit.put(DatabaseHelper.COLUMN_MIGRATED, 1);
+                    cvAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0); // Unlock when migrated
                     database.update(DatabaseHelper.TABLE_ENTRIES, cvAudit, 
                             "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
                             DatabaseHelper.COLUMN_TYPE + " = '*' AND " +

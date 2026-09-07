@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bujo.db";
-    private static final int DATABASE_VERSION = 11; // Added last_productive_date for robust streak tracking
+    private static final int DATABASE_VERSION = 12; // Added is_locked for task immutability
 
     // --- ENTRIES TABLE ---
     public static final String TABLE_ENTRIES = "entries";
@@ -24,6 +24,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_CREATED_AT = "created_at";
     public static final String COLUMN_PARENT_ID = "parent_id";
     public static final String COLUMN_IS_AUDITED = "is_audited";
+    public static final String COLUMN_IS_LOCKED = "is_locked";
 
     // --- PROJECTS TABLE ---
     public static final String TABLE_PROJECTS = "projects";
@@ -86,7 +87,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_COMPLETED_AT + " INTEGER, " +
                     COLUMN_CREATED_AT + " INTEGER, " +
                     COLUMN_PARENT_ID + " INTEGER DEFAULT 0, " +
-                    COLUMN_IS_AUDITED + " INTEGER DEFAULT 0" +
+                    COLUMN_IS_AUDITED + " INTEGER DEFAULT 0, " +
+                    COLUMN_IS_LOCKED + " INTEGER DEFAULT 0" +
                     ");";
 
     private static final String TABLE_CREATE_PROJECTS =
@@ -205,6 +207,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 11) {
             db.execSQL("ALTER TABLE " + TABLE_USER_STATS + " ADD COLUMN " + COLUMN_LAST_PRODUCTIVE_DATE + " TEXT;");
+        }
+        if (oldVersion < 12) {
+            db.execSQL("ALTER TABLE " + TABLE_ENTRIES + " ADD COLUMN " + COLUMN_IS_LOCKED + " INTEGER DEFAULT 0;");
         }
     }
 }

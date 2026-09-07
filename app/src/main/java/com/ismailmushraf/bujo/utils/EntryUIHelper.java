@@ -27,12 +27,14 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -57,27 +59,41 @@ public class EntryUIHelper {
     }
 
     public void showContextDialog(final Entry entry, final View sourceView) {
+        if (entry.isLocked()) {
+            new AlertDialog.Builder(context, R.style.BujoDialog)
+                    .setTitle("Task Locked")
+                    .setMessage("Modifications are disabled for this task. It remains set in stone for the day to encourage commitment.")
+                    .setPositiveButton(android.R.string.ok, null)
+                    .show();
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
         builder.setTitle("Options");
 
-        String[] options = {
-                "Edit Item",
-                "Set Date",
-                "Set Reminder Time",
-                entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List",
-                "Delete Item"
-        };
+        List<String> optionsList = new ArrayList<>();
+        optionsList.add("Edit Item");
+        optionsList.add("Set Date");
+        optionsList.add("Set Reminder Time");
+        optionsList.add(entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List");
+        if ("*".equals(entry.getSignifier()) && !entry.isMigrated()) {
+            optionsList.add("Lock Task");
+        }
+        optionsList.add("Delete Item");
+
+        String[] options = optionsList.toArray(new String[0]);
 
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
+                String selected = options[which];
+                if (selected.equals("Edit Item")) {
                     showEditDialog(entry);
-                } else if (which == 1) {
+                } else if (selected.equals("Set Date")) {
                     showDatePicker(entry, sourceView);
-                } else if (which == 2) {
+                } else if (selected.equals("Set Reminder Time")) {
                     showTimePicker(entry);
-                } else if (which == 3) {
+                } else if (selected.equals("Mark as Not Migrated") || selected.equals("Migrate to Future List")) {
                     boolean migrating = !entry.isMigrated();
                     long prevDeadline = entry.getDeadline();
                     boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
@@ -85,7 +101,16 @@ public class EntryUIHelper {
                     entry.setMigrated(migrating);
                     if (migrating) {
                         entry.setDeadline(0);
+                        entry.setLockedManually(false); // Unlock when moving to logbook
                         scheduleNotification(entry);
+                    } else {
+                        // Reset timestamp and set to today when un-migrating
+                        entry.setCreatedAt(System.currentTimeMillis());
+                        entry.setLockedManually(false); // Ensure lock is lifted
+                        Calendar today = Calendar.getInstance();
+                        today.set(Calendar.HOUR_OF_DAY, 12);
+                        today.set(Calendar.MINUTE, 0);
+                        entry.setDeadline(today.getTimeInMillis());
                     }
                     dbManager.updateEntry(entry);
 
@@ -99,7 +124,9 @@ public class EntryUIHelper {
                     }
 
                     listener.onEntryUpdated();
-                } else if (which == 4) {
+                } else if (selected.equals("Lock Task")) {
+                    showLockConfirmation(entry);
+                } else if (selected.equals("Delete Item")) {
                     int pointsDeducted = dbManager.deleteEntry(entry.getId());
                     if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
                         ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
@@ -111,7 +138,28 @@ public class EntryUIHelper {
         builder.show();
     }
 
+    private void showLockConfirmation(final Entry entry) {
+        new AlertDialog.Builder(context, R.style.BujoDialog)
+                .setTitle("Confirm Lock")
+                .setMessage("Locking this task will make it unchangeable and non-deletable for the rest of the day. Are you sure?")
+                .setPositiveButton("Lock Forever", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        entry.setLockedManually(true);
+                        dbManager.updateEntry(entry);
+                        listener.onEntryUpdated();
+                        Toast.makeText(context, "Task locked.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .show();
+    }
+
     private void showEditDialog(final Entry entry) {
+        if (entry.isLocked()) {
+            Toast.makeText(context, "Item is locked.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         final EditText input = new EditText(context);
         input.setText(entry.getContent());
         input.setSelection(input.length());
@@ -390,6 +438,9 @@ public class EntryUIHelper {
     }
 
     public void showTaskDetailDialog(final Entry parent) {
+        if (parent.isLocked()) {
+            Toast.makeText(context, "Task is locked. Subtasks cannot be edited.", Toast.LENGTH_SHORT).show();
+        }
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_task_detail, null);
         final TextView tvTitle = (TextView) view.findViewById(R.id.detail_title);
         final LinearLayout subtaskContainer = (LinearLayout) view.findViewById(R.id.detail_subtask_container);
@@ -442,6 +493,7 @@ public class EntryUIHelper {
                     sig.setOnLongClickListener(new View.OnLongClickListener() {
                         @Override
                         public boolean onLongClick(View v) {
+                            if (parent.isLocked()) return true;
                             new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
                                 @Override
                                 public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -462,24 +514,29 @@ public class EntryUIHelper {
                     btnDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
+                            if (parent.isLocked()) return;
                             deletingIds.add(sub.getId());
                             dbManager.deleteEntry(sub.getId());
                             refreshRef[0].run();
                         }
                     });
 
-                    content.addTextChangedListener(new TextWatcher() {
-                        @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-                        @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                            String val = s.toString();
-                            if (!val.equals(sub.getContent())) {
-                                sub.setContent(val);
-                                dbManager.updateEntry(sub);
+                    if (parent.isLocked()) {
+                        content.setEnabled(false);
+                    } else {
+                        content.addTextChangedListener(new TextWatcher() {
+                            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                            @Override
+                            public void afterTextChanged(Editable s) {
+                                String val = s.toString();
+                                if (!val.equals(sub.getContent())) {
+                                    sub.setContent(val);
+                                    dbManager.updateEntry(sub);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
 
                     subtaskContainer.addView(row);
                 }
@@ -488,32 +545,36 @@ public class EntryUIHelper {
 
         refreshRef[0].run();
 
-        btnAddSubtask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<Entry> currentChildren = dbManager.getChildEntries(parent.getId());
-                if (!currentChildren.isEmpty() && currentChildren.get(currentChildren.size() - 1).getContent().trim().isEmpty()) {
-                    return;
-                }
+        if (parent.isLocked()) {
+            btnAddSubtask.setVisibility(View.GONE);
+        } else {
+            btnAddSubtask.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    List<Entry> currentChildren = dbManager.getChildEntries(parent.getId());
+                    if (!currentChildren.isEmpty() && currentChildren.get(currentChildren.size() - 1).getContent().trim().isEmpty()) {
+                        return;
+                    }
 
-                Entry newSub = new Entry();
-                newSub.setSignifier("*");
-                newSub.setContent("");
-                newSub.setParentId(parent.getId());
-                newSub.setProjectId(parent.getProjectId());
-                newSub.setProjectTag(parent.getProjectTag());
-                newSub.setDeadline(parent.getDeadline());
-                newSub.setCreatedAt(System.currentTimeMillis());
-                dbManager.insertEntry(newSub);
-                refreshRef[0].run();
+                    Entry newSub = new Entry();
+                    newSub.setSignifier("*");
+                    newSub.setContent("");
+                    newSub.setParentId(parent.getId());
+                    newSub.setProjectId(parent.getProjectId());
+                    newSub.setProjectTag(parent.getProjectTag());
+                    newSub.setDeadline(parent.getDeadline());
+                    newSub.setCreatedAt(System.currentTimeMillis());
+                    dbManager.insertEntry(newSub);
+                    refreshRef[0].run();
 
-                View lastRow = subtaskContainer.getChildAt(subtaskContainer.getChildCount() - 1);
-                if (lastRow != null) {
-                    EditText et = (EditText) lastRow.findViewById(R.id.subtask_content);
-                    et.requestFocus();
+                    View lastRow = subtaskContainer.getChildAt(subtaskContainer.getChildCount() - 1);
+                    if (lastRow != null) {
+                        EditText et = (EditText) lastRow.findViewById(R.id.subtask_content);
+                        et.requestFocus();
+                    }
                 }
-            }
-        });
+            });
+        }
 
         final AlertDialog dialog = new AlertDialog.Builder(context, R.style.BujoDialog)
                 .setView(view)
@@ -531,20 +592,22 @@ public class EntryUIHelper {
                     dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
                 }
 
-                for (int i = 0; i < subtaskContainer.getChildCount(); i++) {
-                    View row = subtaskContainer.getChildAt(i);
-                    final EditText et = (EditText) row.findViewById(R.id.subtask_content);
-                    if (et.getText().toString().isEmpty()) {
-                        et.requestFocus();
-                        et.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                InputMethodManager imm = (InputMethodManager) 
-                                        context.getSystemService(Context.INPUT_METHOD_SERVICE);
-                                if (imm != null) imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
-                            }
-                        }, 100);
-                        break;
+                if (!parent.isLocked()) {
+                    for (int i = 0; i < subtaskContainer.getChildCount(); i++) {
+                        View row = subtaskContainer.getChildAt(i);
+                        final EditText et = (EditText) row.findViewById(R.id.subtask_content);
+                        if (et.getText().toString().isEmpty()) {
+                            et.requestFocus();
+                            et.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    InputMethodManager imm = (InputMethodManager) 
+                                            context.getSystemService(Context.INPUT_METHOD_SERVICE);
+                                    if (imm != null) imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
+                                }
+                            }, 100);
+                            break;
+                        }
                     }
                 }
             }

@@ -14,6 +14,7 @@ public class Entry {
     private long createdAt;
     private int parentId;
     private boolean isAudited;
+    private boolean isLockedManually;
 
     public Entry(int id, String signifier, String content, String projectTag, boolean isCompleted) {
         this.id = id;
@@ -25,6 +26,16 @@ public class Entry {
     }
 
     public Entry() {
+    }
+
+    public boolean isLocked() {
+        if (isLockedManually) return true;
+        // Lock if it's a task, NOT migrated, and older than 2 hours
+        if ("*".equals(signifier) && !isMigrated) {
+            long twoHoursInMillis = 2 * 60 * 60 * 1000L;
+            return (System.currentTimeMillis() - createdAt) > twoHoursInMillis;
+        }
+        return false;
     }
 
     // Getters and Setters
@@ -65,5 +76,8 @@ public class Entry {
     public void setParentId(int parentId) { this.parentId = parentId; }
 
     public boolean isAudited() { return isAudited; }
-    public void setAudited(boolean audited) { isAudited = audited; }
+    public void setAudited(boolean audited) { this.isAudited = audited; }
+
+    public boolean isLockedManually() { return isLockedManually; }
+    public void setLockedManually(boolean lockedManually) { isLockedManually = lockedManually; }
 }
