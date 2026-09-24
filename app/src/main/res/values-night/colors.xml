@@ -1,12 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bujo_background">#121212</color> <!-- Very dark grey/black -->
-    <color name="bujo_text">#E0E0E0</color> <!-- Off-white text -->
-    <color name="bujo_text_secondary">#999999</color> <!-- Medium grey -->
-    <color name="bujo_divider">#333333</color> <!-- Dark divider line -->
-    <color name="bujo_box_border">#AAAAAA</color> <!-- Lighter border so it shows up -->
+    <color name="bujo_background">#000000</color> <!-- BB10 uses pitch black -->
+    <color name="bujo_text">#FFFFFF</color> <!-- Off-white text -->
+    <color name="bujo_text_secondary">#AAAAAA</color> <!-- Medium grey -->
+    <color name="bujo_divider">#222222</color> <!-- Dark divider line -->
+    <color name="bujo_box_border">#555555</color> <!-- Lighter border so it shows up -->
 
     <color name="black">#FFFFFFFF</color> <!-- Invert black and white -->
     <color name="white">#FF000000</color>
-    <color name="blue_selection">#2C3E50</color> <!-- Darker selection highlight -->
+    <color name="blue_selection">#00a8df</color> <!-- Darker selection highlight -->
+
+    <!-- BB10 specific colors -->
+    <color name="bb10_blue">#00a8df</color>
+    <color name="bb10_green">#739b26</color>
+    <color name="bb10_bottom_bar_bg">#000000</color>
+    <color name="bb10_bottom_bar_divider">#222222</color>
+    <color name="bb10_folder_dark">#222222</color>
+    <color name="bb10_folder_blue">#0090bf</color>
+    <color name="bb10_folder_yellow">#e2af19</color>
+    <color name="bb10_folder_green">#6b8e23</color>
+    <color name="bb10_folder_purple">#a6338b</color>
+    <color name="bb10_folder_red">#d32f2f</color>
 </resources>

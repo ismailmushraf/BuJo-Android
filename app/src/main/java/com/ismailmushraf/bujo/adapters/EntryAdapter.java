@@ -161,8 +161,15 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
             holder.tvSignifier.setText(">");
         } else if ("*".equals(entry.getSignifier())) {
-            holder.tvSignifier.setBackgroundResource(R.drawable.shape_bujo_box);
-            holder.tvSignifier.setText(entry.isCompleted() ? "✓" : "");
+            // BB10 style checkmark
+            if (entry.isCompleted()) {
+                holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
+                holder.tvSignifier.setText("✓");
+                holder.tvSignifier.setTextColor(getContext().getResources().getColor(R.color.bb10_folder_red));
+            } else {
+                holder.tvSignifier.setBackgroundResource(R.drawable.shape_bujo_box);
+                holder.tvSignifier.setText("");
+            }
         } else if ("o".equals(entry.getSignifier())) {
             holder.tvSignifier.setBackgroundResource(entry.isCompleted() ? R.drawable.ic_event_completed : R.drawable.ic_calendar);
             holder.tvSignifier.setText("");

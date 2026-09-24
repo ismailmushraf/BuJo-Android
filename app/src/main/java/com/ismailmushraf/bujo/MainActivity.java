@@ -40,12 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
     private DrawerAdapter drawerAdapter;
     private List<DrawerItem> drawerItemsList;
     private DatabaseManager dbManager;
-    private Toolbar toolbar;
-    private Menu mainMenu;
+    private View btnOverflow;
+    private View btnFab;
+    private View btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,25 +102,36 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        btnOverflow = findViewById(R.id.btn_bb10_overflow);
+        btnFab = findViewById(R.id.bb10_fab);
+        btnBack = findViewById(R.id.btn_bb10_back);
         
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(true);
-
-        drawerToggle = new ActionBarDrawerToggle(
-                this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                invalidateOptionsMenu();
+        btnOverflow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (drawerLayout.isDrawerOpen(drawerList)) {
+                    drawerLayout.closeDrawer(drawerList);
+                } else {
+                    drawerLayout.openDrawer(drawerList);
+                }
             }
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
+        });
+        
+        btnFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                handleFabClick();
             }
-        };
-        drawerLayout.setDrawerListener(drawerToggle);
+        });
+        
+        if (btnBack != null) {
+            btnBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onBackPressed();
+                }
+            });
+        }
 
         DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
         if (audit != null && audit.totalPenalty > 0) {
@@ -207,21 +218,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void setToolbarTitle(String title) {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setTitle(title);
-        }
+        // No top toolbar anymore, fragments will manage their own titles.
     }
 
     public void setToolbarSubtitle(String subtitle) {
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setSubtitle(subtitle);
-        }
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
+        // No top toolbar anymore
     }
 
     @Override
@@ -239,6 +240,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void refreshLegacyBoxColors(View view) {
+        if (view.getId() == R.id.bb10_fab) {
+            return; // Skip the BB10 FAB so it retains its blue color
+        }
+
         Drawable background = view.getBackground();
         int boxThreshold = (int) (48 * getResources().getDisplayMetrics().density);
         if (background instanceof GradientDrawable
@@ -257,14 +262,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (dbManager != null) {
@@ -272,93 +269,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        this.mainMenu = menu;
-        getMenuInflater().inflate(R.menu.main_menu, menu);
-
-        MenuItem profileItem = menu.findItem(R.id.action_profile);
-        View actionView = MenuItemCompat.getActionView(profileItem);
-
-        if (actionView != null) {
-            TextView tvProfileIcon = actionView.findViewById(R.id.tv_menu_profile_icon);
-            TextView tvProfilePoints = actionView.findViewById(R.id.tv_menu_profile_points);
-
-            // Update the icon based on current user points
-            updateProfileIconText(tvProfileIcon, tvProfilePoints);
-
-            // Click listener to navigate directly to ProfileFragment
-            actionView.setOnClickListener(v -> {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new ProfileFragment());
-                ft.addToBackStack(null); // Allows returning via back button
-                ft.commit();
-                drawerAdapter.setSelectedPosition(-1); // Unhighlight drawer items
-            });
-        }
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem profileItem = menu.findItem(R.id.action_profile);
-        if (profileItem != null) {
-            View actionView = MenuItemCompat.getActionView(profileItem);
-            if (actionView != null) {
-                TextView tvProfileIcon = actionView.findViewById(R.id.tv_menu_profile_icon);
-                TextView tvProfilePoints = actionView.findViewById(R.id.tv_menu_profile_points);
-                updateProfileIconText(tvProfileIcon, tvProfilePoints);
-            }
-        }
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    private void updateProfileIconText(TextView tvProfileIcon, TextView tvProfilePoints) {
-        if (tvProfileIcon == null || dbManager == null) return;
-
-        int[] stats = dbManager.getUserStats();
-        int points = stats[0];
-
-        String rankIcon = "🚶"; // Default Level 1
-        int nextLevelPoints = 500;
-        if (points >= 10000) {
-            rankIcon = "⛩️"; // Level 5: Monk
-            nextLevelPoints = -1;
-        } else if (points >= 5000) {
-            rankIcon = "⛰️"; // Level 4: Ascendant
-            nextLevelPoints = 10000;
-        } else if (points >= 2000) {
-            rankIcon = "🎓"; // Level 3: Scholar
-            nextLevelPoints = 5000;
-        } else if (points >= 500) {
-            rankIcon = "📖"; // Level 2: Apprentice
-            nextLevelPoints = 2000;
-        }
-
-        tvProfileIcon.setText(rankIcon);
-        if (tvProfilePoints != null) {
-            if (nextLevelPoints == -1) {
-                tvProfilePoints.setText(String.valueOf(points));
-            } else {
-                tvProfilePoints.setText(points + "/" + nextLevelPoints);
-            }
-        }
-    }
-
-    // Public method to refresh toolbar icon whenever points are earned/deducted
+    // Profile Menu functionality will be refactored to use the new BB10 layout instead of the Top Menu.
     public void refreshProfileIcon() {
-        if (mainMenu != null) {
-            MenuItem profileItem = mainMenu.findItem(R.id.action_profile);
-            if (profileItem != null) {
-                View actionView = MenuItemCompat.getActionView(profileItem);
-                if (actionView != null) {
-                    TextView tvProfileIcon = actionView.findViewById(R.id.tv_menu_profile_icon);
-                    TextView tvProfilePoints = actionView.findViewById(R.id.tv_menu_profile_points);
-                    updateProfileIconText(tvProfileIcon, tvProfilePoints);
-                }
-            }
-        }
-        supportInvalidateOptionsMenu();
+        // To be updated
     }
 
     private void showAuditModal(DatabaseManager.AuditResult result) {
@@ -472,21 +385,9 @@ public class MainActivity extends AppCompatActivity {
         floatText.setX(location[0]);
         floatText.setY(location[1]);
         
-        // Find the profile icon in the toolbar
-        View profileView = null;
-        if (mainMenu != null) {
-            MenuItem profileItem = mainMenu.findItem(R.id.action_profile);
-            if (profileItem != null) profileView = MenuItemCompat.getActionView(profileItem);
-        }
-        float targetX = root.getWidth() - location[0] - floatText.getMeasuredWidth();
-        float targetY = -location[1];
-        
-        if (profileView != null) {
-            int[] dest = new int[2];
-            profileView.getLocationInWindow(dest);
-            targetX = (dest[0] + (profileView.getWidth() / 2f)) - location[0];
-            targetY = dest[1] - location[1];
-        }
+        // Target coordinate
+        float targetX = root.getWidth() / 2f - location[0];
+        float targetY = root.getHeight() - 100 - location[1];
 
         floatText.animate()
                 .translationX(targetX)
@@ -547,5 +448,13 @@ public class MainActivity extends AppCompatActivity {
             // 5. If we ARE on the default screen, let Android exit the app normally
             super.onBackPressed();
         }
+    }
+
+    private void handleFabClick() {
+        // Since we removed dialogs in favor of BB10 top text box, we can set focus to the top box instead,
+        // or we can implement the "New Task" fullscreen fragment you showed in the 3rd screenshot.
+        // For now, let's open a new dialog or just give it focus.
+        // But since we want "easy as possible", if we are in Projects, let's just do nothing for now 
+        // because they use the top box. In a future iteration we will wire this to a full-screen NewTask.
     }
 }

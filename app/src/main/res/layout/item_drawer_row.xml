@@ -12,7 +12,7 @@
         android:layout_width="32dp"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:textColor="@color/bujo_text_secondary"
+        android:textColor="#FFFFFF"
         android:gravity="center"/>
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:textColor="@color/bujo_text"
+        android:textColor="#FFFFFF"
         android:textStyle="normal" />
 
 </LinearLayout>

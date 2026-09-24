@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Wrapped in a layer-list so it bypasses the GradientDrawable check -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#00a8df" />
+            <stroke android:width="0dp" android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</layer-list>

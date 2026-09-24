@@ -2,31 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/bujo_background">
 
-    <!-- Header Area -->
+    <!-- Header removed based on updated design plan -->
+
+    <!-- Search / Add Bar (BB10 Style) -->
     <LinearLayout
-        android:id="@+id/layout_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
-        <TextView
-            android:id="@+id/tv_projects_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="PROJECTS"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/bujo_text"/>
-
-        <Button
-            android:id="@+id/btn_add_project"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="New Project" />
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:background="@color/bb10_bottom_bar_bg">
+        <EditText
+            android:id="@+id/et_new_project"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:hint="Add a project..."
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:imeOptions="actionDone"
+            android:inputType="textCapSentences"
+            android:singleLine="true" />
     </LinearLayout>
 
     <View
@@ -34,11 +33,31 @@
         android:layout_height="1dp"
         android:background="@color/bujo_divider"/>
 
-    <ListView
-        android:id="@+id/lv_projects"
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Task Lists"
+        android:padding="8dp"
+        android:textStyle="bold"
+        android:textColor="@color/bujo_text_secondary"
+        android:textSize="16sp"
+        android:background="@color/white" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- Grid View for Folders -->
+    <GridView
+        android:id="@+id/gv_projects"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:divider="@color/bujo_divider"
-        android:dividerHeight="1dp" />
+        android:numColumns="3"
+        android:horizontalSpacing="4dp"
+        android:verticalSpacing="4dp"
+        android:padding="4dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical" />
 
 </LinearLayout>

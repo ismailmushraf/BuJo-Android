@@ -110,20 +110,6 @@ public class FutureLogFragment extends Fragment {
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 
-        ((Button) root.findViewById(R.id.btn_prev_month)).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { currentMonth.add(Calendar.MONTH, -1); showMonth(); }
-        });
-        ((Button) root.findViewById(R.id.btn_next_month)).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) { currentMonth.add(Calendar.MONTH, 1); showMonth(); }
-        });
-        ((Button) root.findViewById(R.id.btn_today)).setOnClickListener(new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                currentMonth = Calendar.getInstance();
-                selectedDate = Calendar.getInstance();
-                showMonth();
-            }
-        });
-
         // Changed to use the entire layout container as the touch target
         root.findViewById(R.id.layout_selected_date_banner).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) { showMonth(); }

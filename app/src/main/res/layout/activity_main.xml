@@ -6,34 +6,118 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:background="@color/bujo_background">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/bujo_background"
-            app:titleTextColor="@color/bujo_text"
-            app:subtitleTextColor="@color/bujo_text_secondary"
-            app:contentInsetStartWithNavigation="72dp" />
-
+        <!-- Main Fragment Container above the bottom bar -->
         <FrameLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bb10_bottom_bar" />
+
+        <!-- BB10 Bottom Action Bar -->
+        <RelativeLayout
+            android:id="@+id/bb10_bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:layout_alignParentBottom="true"
+            android:background="@color/bb10_bottom_bar_bg">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bb10_bottom_bar_divider"
+                android:layout_alignParentTop="true" />
+
+            <!-- Left Button (Back) and Slanted Blue Separator -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_back"
+                android:layout_width="80dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_bb10_back"
+                    android:tint="@color/bujo_text" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_bb10_separator"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+
+            <!-- Center Text (New Task) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginBottom="6dp"
+                android:text="New Task"
+                android:textSize="12sp"
+                android:textColor="@color/bujo_text" />
+
+            <!-- Right Button (Overflow/Options to open drawer) -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_overflow"
+                android:layout_width="56dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⋮"
+                    android:textSize="24sp"
+                    android:textColor="@color/bujo_text"/>
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <!-- Protruding Central FAB -->
+        <ImageView
+            android:id="@+id/bb10_fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/bb10_fab_layer"
+            android:src="@drawable/ic_bb10_compose"
+            android:tint="@color/white"
+            android:scaleType="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:elevation="0dp" />
+
+    </RelativeLayout>
 
     <!-- Navigation Drawer -->
     <ListView
         android:id="@+id/nav_drawer_list"
         android:layout_width="300dp"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@color/bujo_background"
-        android:divider="@color/bujo_divider"
+        android:layout_gravity="end"
+        android:background="#000000"
+        android:divider="#222222"
         android:dividerHeight="1dp" />
 
 </android.support.v4.widget.DrawerLayout>

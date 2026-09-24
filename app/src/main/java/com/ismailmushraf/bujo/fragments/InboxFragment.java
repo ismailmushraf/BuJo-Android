@@ -40,7 +40,6 @@ public class InboxFragment extends Fragment {
 
         listView = (ListView) root.findViewById(R.id.lv_daily_bullets);
         final EditText etNewEntry = (EditText) root.findViewById(R.id.et_new_entry);
-        root.findViewById(R.id.btn_plan_tomorrow).setVisibility(View.GONE);
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
@@ -83,22 +82,7 @@ public class InboxFragment extends Fragment {
             }
         });
 
-        // Add this right after initializing etNewEntry
-        TextView btnEmoji = (TextView) root.findViewById(R.id.btn_emoji);
-        btnEmoji.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uiHelper.showEmojiPicker(etNewEntry);
-            }
-        });
-
-        View btnAddEvent = root.findViewById(R.id.btn_add_event);
-        btnAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uiHelper.showAddEventDialog(0, null);
-            }
-        });
+        // Emoji and Event buttons removed from XML
 
         return root;
     }

@@ -162,6 +162,20 @@ public class DatabaseManager {
         return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0", null);
     }
 
+    public int getTaskCountForProject(int projectId) {
+        Cursor c = database.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_ENTRIES +
+                " WHERE " + DatabaseHelper.COLUMN_PROJECT_ID + " = ? AND " +
+                DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                DatabaseHelper.COLUMN_COMPLETED + " = 0",
+                new String[]{String.valueOf(projectId)});
+        int count = 0;
+        if (c != null && c.moveToFirst()) {
+            count = c.getInt(0);
+            c.close();
+        }
+        return count;
+    }
+
     public List<Entry> getCompletedEntriesForProject(int projectId) {
         return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " + DatabaseHelper.COLUMN_COMPLETED + " = 1", DatabaseHelper.COLUMN_COMPLETED_AT + " DESC");
     }

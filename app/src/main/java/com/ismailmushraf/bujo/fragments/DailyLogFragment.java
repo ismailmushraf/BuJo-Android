@@ -93,32 +93,7 @@ public class DailyLogFragment extends Fragment {
             }
         });
 
-        TextView btnEmoji = (TextView) root.findViewById(R.id.btn_emoji);
-        btnEmoji.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uiHelper.showEmojiPicker(etNewEntry);
-            }
-        });
-
-        View btnAddEvent = root.findViewById(R.id.btn_add_event);
-        btnAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uiHelper.showAddEventDialog(0, null);
-            }
-        });
-
-        final android.widget.Button btnPlan = (android.widget.Button) root.findViewById(R.id.btn_plan_tomorrow);
-        btnPlan.setText("Plan Day");
-        btnPlan.setEnabled(true);
-        btnPlan.setTextColor(getResources().getColor(R.color.bujo_text));
-        btnPlan.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showRecommendationDialog();
-            }
-        });
+        // "Plan Day", Emoji, and Add Event buttons have been removed from XML.
 
         return root;
     }

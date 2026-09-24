@@ -3,62 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/bujo_background"
     android:animateLayoutChanges="true">
 
     <LinearLayout
         android:id="@+id/month_controls"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="64dp"
         android:gravity="center_vertical"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp">
-
-        <Button
-            android:id="@+id/btn_prev_month"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:text="&lt;" />
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
 
         <TextView
             android:id="@+id/tv_calendar_month"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
             android:textColor="@color/bujo_text"
-            android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textSize="24sp"
+            android:text="September 2026" />
 
-        <Button
-            android:id="@+id/btn_today"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TODAY" />
-
-        <Button
-            android:id="@+id/btn_next_month"
-            android:layout_width="48dp"
-            android:layout_height="wrap_content"
-            android:text="&gt;" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="#6D8E00" />
+        android:layout_height="3dp"
+        android:background="@color/bb10_green" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="28dp"
-        android:gravity="center_vertical">
+        android:layout_height="36dp"
+        android:gravity="center_vertical"
+        android:background="@color/white">
 
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sun" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Mon" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Tue" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Wed" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Thu" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Fri" android:textStyle="bold" android:textColor="@color/bujo_text" />
         <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sat" android:textStyle="bold" android:textColor="@color/bujo_text" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sun" android:textStyle="bold" android:textColor="@color/bujo_text" />
     </LinearLayout>
 
     <GridView
@@ -66,10 +50,10 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:horizontalSpacing="2dp"
+        android:horizontalSpacing="1dp"
         android:numColumns="7"
-        android:padding="8dp"
-        android:verticalSpacing="2dp" />
+        android:verticalSpacing="1dp"
+        android:background="@color/bujo_divider"/>
 
     <LinearLayout
         android:id="@+id/month_selected_bar"

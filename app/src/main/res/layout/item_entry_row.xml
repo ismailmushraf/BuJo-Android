@@ -13,7 +13,7 @@
         android:layout_height="32dp"
         android:gravity="center"
         android:textSize="20sp"
-        android:textColor="@color/bujo_box_border"
+        android:textColor="@color/bb10_folder_red"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true" />
