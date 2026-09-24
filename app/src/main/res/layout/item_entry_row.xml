@@ -2,17 +2,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="4dp"
+    android:padding="2dp"
     android:gravity="center_vertical">
 
     <!-- Independent Checkbox Area -->
     <TextView
         android:id="@+id/row_signifier"
-        android:layout_marginLeft="12dp"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:gravity="center"
-        android:textSize="20sp"
+        android:textSize="14sp"
         android:textColor="@color/bb10_folder_red"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
@@ -24,7 +24,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
         android:gravity="center_vertical"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
@@ -40,27 +43,27 @@
                 android:id="@+id/row_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="22sp"
+                android:textSize="16sp"
                 android:textColor="@color/bujo_text"/>
 
             <TextView
                 android:id="@+id/row_deadline"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="14sp"
+                android:textSize="12sp"
                 android:textColor="@color/bujo_text_secondary"
                 android:layout_marginTop="2dp"
                 android:visibility="gone"/>
         </LinearLayout>
 
         <!-- Lock Indicator -->
-        <TextView
+        <ImageView
             android:id="@+id/row_lock_indicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🔒"
-            android:textSize="12sp"
-            android:layout_gravity="bottom"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_bb10_lock"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
             android:visibility="gone" />
 
         <!-- Tag -->
@@ -68,11 +71,11 @@
             android:id="@+id/row_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="12sp"
             android:textColor="#0066CC"
             android:background="#E6F2FF"
-            android:padding="4dp"
-            android:layout_marginLeft="8dp"
+            android:padding="2dp"
+            android:layout_marginStart="8dp"
             android:visibility="gone"/>
     </LinearLayout>
 

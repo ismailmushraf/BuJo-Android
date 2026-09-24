@@ -43,7 +43,7 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
     private static class ViewHolder {
         TextView tvSection;
         TextView tvTitle;
-        TextView tvIcon;
+        android.widget.ImageView ivIcon;
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
             } else {
                 convertView = inflater.inflate(R.layout.item_drawer_row, parent, false);
                 holder.tvTitle = (TextView) convertView.findViewById(R.id.drawer_title);
-                holder.tvIcon = (TextView) convertView.findViewById(R.id.drawer_icon);
+                holder.ivIcon = (android.widget.ImageView) convertView.findViewById(R.id.drawer_icon);
             }
             convertView.setTag(holder);
         } else {
@@ -72,12 +72,12 @@ public class DrawerAdapter extends ArrayAdapter<DrawerItem> {
             if (holder.tvSection != null) holder.tvSection.setText(item.title);
         } else {
             if (holder.tvTitle != null) holder.tvTitle.setText(item.title);
-            if (holder.tvIcon != null) {
-                if (item.icon != null) {
-                    holder.tvIcon.setVisibility(View.VISIBLE);
-                    holder.tvIcon.setText(item.icon);
+            if (holder.ivIcon != null) {
+                if (item.iconResId != 0) {
+                    holder.ivIcon.setVisibility(View.VISIBLE);
+                    holder.ivIcon.setImageResource(item.iconResId);
                 } else {
-                    holder.tvIcon.setVisibility(View.GONE);
+                    holder.ivIcon.setVisibility(View.GONE);
                 }
             }
 

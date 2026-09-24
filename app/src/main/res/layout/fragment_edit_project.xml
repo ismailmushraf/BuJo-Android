@@ -36,6 +36,7 @@
             android:background="@color/bujo_divider" />
 
         <TextView
+            android:id="@+id/tv_header_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -87,19 +88,27 @@
         android:orientation="vertical">
 
         <!-- Title Row -->
-        <EditText
-            android:id="@+id/et_project_title"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:background="@color/white"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:hint="Project title"
-            android:textColor="@color/bujo_text"
-            android:textSize="16sp"
-            android:textStyle="italic"
-            android:singleLine="true"
-            android:inputType="textCapSentences" />
+            android:layout_height="48dp"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:background="@color/white">
+
+            <EditText
+                android:id="@+id/et_project_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/bb10_bottom_bar_bg"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:hint="Project title"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="14sp"
+                android:singleLine="true"
+                android:inputType="textCapSentences" />
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -109,7 +118,7 @@
         <!-- Folder Color Switcher Row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="48dp"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -121,8 +130,7 @@
                 android:layout_weight="1"
                 android:text="Folder Color"
                 android:textColor="@color/bujo_text_secondary"
-                android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textSize="14sp" />
 
             <View
                 android:id="@+id/btn_edit_color_picker"
@@ -142,7 +150,7 @@
         <!-- Priority Weight Stars Row -->
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="48dp"
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
@@ -154,8 +162,7 @@
                 android:layout_weight="1"
                 android:text="Priority Weight"
                 android:textColor="@color/bujo_text_secondary"
-                android:textSize="16sp"
-                android:textStyle="italic" />
+                android:textSize="14sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"

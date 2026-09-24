@@ -81,7 +81,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         TextView tvContent;
         TextView tvDeadline;
         TextView tvTag;
-        TextView tvLock;
+        View ivLock;
         View interactionArea;
     }
 
@@ -124,7 +124,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvContent = (TextView) convertView.findViewById(R.id.row_content);
             holder.tvDeadline = (TextView) convertView.findViewById(R.id.row_deadline);
             holder.tvTag = (TextView) convertView.findViewById(R.id.row_tag);
-            holder.tvLock = (TextView) convertView.findViewById(R.id.row_lock_indicator);
+            holder.ivLock = convertView.findViewById(R.id.row_lock_indicator);
             holder.interactionArea = convertView.findViewById(R.id.row_interaction_area);
             convertView.setTag(holder);
         } else {
@@ -181,15 +181,16 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvSignifier.setTextColor(colorText);
         }
 
+        String content = entry.getContent() != null ? entry.getContent() : "";
         if (entry.isCompleted()) {
-            holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            holder.tvContent.setTextColor(colorTextSecondary);
+            android.text.SpannableString spannable = new android.text.SpannableString(content);
+            spannable.setSpan(new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(colorTextSecondary, getContext().getResources().getColor(R.color.bb10_folder_red)), 0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.tvContent.setText(spannable);
         } else {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.tvContent.setText(content);
             holder.tvContent.setTextColor(colorText);
         }
-
-        holder.tvContent.setText(entry.getContent());
 
         if (entry.getDeadline() > 0) {
             holder.tvDeadline.setVisibility(View.VISIBLE);
@@ -214,8 +215,8 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvTag.setVisibility(View.GONE);
         }
 
-        if (holder.tvLock != null) {
-            holder.tvLock.setVisibility(entry.isLocked() ? View.VISIBLE : View.GONE);
+        if (holder.ivLock != null) {
+            holder.ivLock.setVisibility(entry.isLocked() ? View.VISIBLE : View.GONE);
         }
 
         return convertView;

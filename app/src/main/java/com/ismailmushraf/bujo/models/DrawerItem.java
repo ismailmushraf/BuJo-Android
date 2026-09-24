@@ -8,12 +8,19 @@ public class DrawerItem {
     private int type;
     public String title;
     public String icon;
+    public int iconResId;
     public int projectId; // for project items
 
     public DrawerItem(int type, String title, String icon) {
         this.type = type;
         this.title = title;
         this.icon = icon;
+    }
+
+    public DrawerItem(int type, String title, int iconResId) {
+        this.type = type;
+        this.title = title;
+        this.iconResId = iconResId;
     }
 
     public DrawerItem(int type, String title, String icon, int projectId) {

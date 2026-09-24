@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:text="Theme Preference"
                     android:textColor="#222222"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Spinner
@@ -131,7 +131,7 @@
                     android:layout_height="wrap_content"
                     android:text="Default Startup Screen"
                     android:textColor="#222222"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <Spinner
@@ -190,7 +190,7 @@
                 android:layout_weight="1"
                 android:text="Enable Sound Effects"
                 android:textColor="@color/bujo_text"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <CheckBox
                 android:id="@+id/cb_sound_effects"
@@ -217,7 +217,7 @@
                 android:layout_weight="1"
                 android:text="Enable Points Animation"
                 android:textColor="@color/bujo_text"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
 
             <CheckBox
                 android:id="@+id/cb_points_animation"
@@ -266,7 +266,7 @@
                 android:layout_height="wrap_content"
                 android:text="Export Backup to Device"
                 android:textColor="@color/bujo_text"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <View
@@ -290,7 +290,7 @@
                 android:layout_height="wrap_content"
                 android:text="Restore Backup from Device"
                 android:textColor="@color/bujo_text"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <View
@@ -314,7 +314,7 @@
                 android:layout_height="wrap_content"
                 android:text="Delete All Completed Tasks"
                 android:textColor="#D32F2F"
-                android:textSize="16sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <View

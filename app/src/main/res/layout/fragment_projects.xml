@@ -7,42 +7,7 @@
 
     <!-- Header removed based on updated design plan -->
 
-    <!-- Search / Add Bar (BB10 Style) -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:padding="8dp"
-        android:gravity="center_vertical"
-        android:background="@color/bb10_bottom_bar_bg">
-        <EditText
-            android:id="@+id/et_new_project"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@color/white"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:hint="Add a project..."
-            android:textSize="16sp"
-            android:textStyle="italic"
-            android:imeOptions="actionDone"
-            android:inputType="textCapSentences"
-            android:singleLine="true" />
 
-        <View
-            android:id="@+id/btn_color_picker"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_marginStart="8dp"
-            android:background="@drawable/bb10_fab_solid_blue"
-            android:clickable="true"
-            android:focusable="true" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bujo_divider"/>
 
     <TextView
         android:layout_width="match_parent"

@@ -165,16 +165,25 @@ public class MainActivity extends AppCompatActivity {
 
     public void refreshDrawer() {
         drawerItemsList.clear();
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "JOURNAL INDEX", null));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", "\uD83D\uDCE5")); // 📥 icon
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", "\uD83D\uDCDD"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", "📅"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", "\u23F0"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">"));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "JOURNAL INDEX", 0));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", R.drawable.ic_inbox));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", R.drawable.ic_today));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", R.drawable.ic_calendar));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", R.drawable.ic_bb10_timer));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", R.drawable.ic_bb10_logbook));
         drawerAdapter.notifyDataSetChanged();
     }
 
     private void selectItem(int position) {
+        selectItemWithCustomAnim(position, R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    private void selectItemWithPopAnimation(int position) {
+        selectItemWithCustomAnim(position, R.anim.slide_in_left, R.anim.slide_out_right);
+    }
+
+    private void selectItemWithCustomAnim(int position, int enterAnim, int exitAnim) {
+        if (position < 0 || position >= drawerItemsList.size()) return;
         Fragment fragment = null;
         DrawerItem item = drawerItemsList.get(position);
 
@@ -183,26 +192,18 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new InboxFragment();
             } else if ("Today".equals(item.title)) {
                 fragment = new DailyLogFragment();
-            } else if ("Habits".equals(item.title)) {
-                fragment = new HabitsFragment();
             } else if ("Calendar".equals(item.title)) {
                 fragment = new FutureLogFragment();
             } else if ("Logbook".equals(item.title)) {
-                fragment = new MigratedItemsFragment(); // Connects the new Logbook string to the fragment
+                fragment = new MigratedItemsFragment();
             } else if ("Focus Timer".equals(item.title)) {
                 fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment();
-            } else if ("Workouts".equals(item.title)) {
-                fragment = new WorkoutFragment(); // Handle Workout click
-            } else if ("Projects".equals(item.title)) {
-                fragment = new ProjectsFragment();
             }
-        } else if (item.getType() == DrawerItem.TYPE_PROJECT) {
-            fragment = ProjectDetailFragment.newInstance(item.projectId, item.title);
         }
 
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+            ft.setCustomAnimations(enterAnim, exitAnim);
             ft.replace(R.id.fragment_container, fragment);
             ft.commit();
             updateBottomBarButtons(fragment);
@@ -442,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
             } else if ("Calendar".equals(startup)) {
                 startupIndex = 3;
             }
-            selectItem(startupIndex); // Use your existing method to load the fragment
+            selectItemWithPopAnimation(startupIndex); // Uses slide_in_left & slide_out_right for smooth back transition!
         } else {
             // 5. If we ARE on the default screen, let Android exit the app normally
             super.onBackPressed();
@@ -519,6 +520,11 @@ public class MainActivity extends AppCompatActivity {
                 tvFabText.setText("New Habit");
                 tvFabText.setVisibility(View.VISIBLE);
             }
+        } else if (fragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
+            if (tvFabText != null) {
+                tvFabText.setText("Create Project");
+                tvFabText.setVisibility(View.VISIBLE);
+            }
         } else {
             if (tvFabText != null) {
                 tvFabText.setText("New Task");
@@ -531,6 +537,8 @@ public class MainActivity extends AppCompatActivity {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (currentFragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
             ((com.ismailmushraf.bujo.fragments.HabitsFragment) currentFragment).showAddHabitDialog();
+        } else if (currentFragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
+            ((com.ismailmushraf.bujo.fragments.ProjectsFragment) currentFragment).openCreateProjectScreen();
         }
     }
 }

@@ -44,6 +44,15 @@ public class EditProjectFragment extends Fragment {
         return fragment;
     }
 
+    public static EditProjectFragment newInstanceForCreate() {
+        EditProjectFragment fragment = new EditProjectFragment();
+        Bundle args = new Bundle();
+        args.putInt(ARG_PROJECT_ID, -1);
+        args.putString(ARG_PROJECT_NAME, "");
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_edit_project, container, false);
@@ -53,16 +62,25 @@ public class EditProjectFragment extends Fragment {
             originalName = getArguments().getString(ARG_PROJECT_NAME);
         }
 
+        boolean isCreateMode = (projectId <= 0);
+
+        TextView tvHeaderTitle = (TextView) root.findViewById(R.id.tv_header_title);
+        if (tvHeaderTitle != null) {
+            tvHeaderTitle.setText(isCreateMode ? "Create Project" : "Edit Project");
+        }
+
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
 
-        List<Project> allProjects = dbManager.getAllProjects();
-        for (Project p : allProjects) {
-            if (p.getId() == projectId) {
-                originalName = p.getName();
-                originalWeight = p.getWeight() > 0 ? p.getWeight() : 1;
-                originalColor = p.getColor();
-                break;
+        if (!isCreateMode) {
+            List<Project> allProjects = dbManager.getAllProjects();
+            for (Project p : allProjects) {
+                if (p.getId() == projectId) {
+                    originalName = p.getName();
+                    originalWeight = p.getWeight() > 0 ? p.getWeight() : 1;
+                    originalColor = p.getColor();
+                    break;
+                }
             }
         }
         currentWeight = originalWeight;
@@ -113,10 +131,18 @@ public class EditProjectFragment extends Fragment {
         btnSave.setOnClickListener(v -> {
             String newTitle = etTitle.getText().toString().trim();
             if (!newTitle.isEmpty()) {
-                Project project = new Project(projectId, newTitle);
-                project.setWeight(currentWeight);
-                project.setColor(currentColor);
-                dbManager.updateProject(project);
+                if (isCreateMode) {
+                    Project newProject = new Project();
+                    newProject.setName(newTitle);
+                    newProject.setWeight(currentWeight);
+                    newProject.setColor(currentColor);
+                    dbManager.insertProject(newProject);
+                } else {
+                    Project project = new Project(projectId, newTitle);
+                    project.setWeight(currentWeight);
+                    project.setColor(currentColor);
+                    dbManager.updateProject(project);
+                }
 
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).refreshDrawer();
@@ -195,7 +221,8 @@ public class EditProjectFragment extends Fragment {
     private void checkSaveButtonState(EditText etTitle) {
         String newName = etTitle.getText().toString().trim();
         boolean isValid = !newName.isEmpty();
-        boolean hasChanged = !newName.equals(originalName) || currentWeight != originalWeight || currentColor != originalColor;
+        boolean isCreateMode = (projectId <= 0);
+        boolean hasChanged = isCreateMode || !newName.equals(originalName) || currentWeight != originalWeight || currentColor != originalColor;
         boolean enable = isValid && hasChanged;
 
         btnSave.setEnabled(enable);

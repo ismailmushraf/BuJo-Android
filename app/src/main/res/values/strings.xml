@@ -6,4 +6,5 @@
     <string name="engagement_check_title">Engagement Check</string>
     <string name="engagement_check_text">Are you still there? Tap within 3 minutes.</string>
     <string name="btn_im_here">I\'M HERE</string>
+    <string name="plan_day_txt">Plan Day</string>
 </resources>
