@@ -36,6 +36,7 @@ public class DailyLogFragment extends Fragment {
 
     private EntryAdapter adapter;
     private List<Object> entries;
+    private List<Object> allEntriesList = new ArrayList<>();
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
@@ -69,6 +70,14 @@ public class DailyLogFragment extends Fragment {
 
         listView.setOnItemClickListener(null);
         listView.setOnItemLongClickListener(null);
+
+        etNewEntry.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterEntries(s.toString());
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
 
         etNewEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -140,41 +149,50 @@ public class DailyLogFragment extends Fragment {
 
         refreshRecs.run();
 
-        new android.app.AlertDialog.Builder(getActivity())
-               .setTitle("Plan Sessions")
-               .setView(view)
-               .setPositiveButton("Add to Log", new android.content.DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(android.content.DialogInterface dialog, int which) {
-                       boolean isToday = rgTarget.getCheckedRadioButtonId() == R.id.rb_today;
-                       Calendar targetDate = Calendar.getInstance();
-                       if (!isToday) targetDate.add(Calendar.DAY_OF_YEAR, 1);
-                       targetDate.set(Calendar.HOUR_OF_DAY, 12);
-                       targetDate.set(Calendar.MINUTE, 0);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
 
-                       android.util.SparseBooleanArray checked = lvRecs.getCheckedItemPositions();
-                       int totalCommitment = 0;
-                       for (int i = 0; i < currentRecs.size(); i++) {
-                           if (checked.get(i)) {
-                               Entry e = currentRecs.get(i);
-                               e.setDeadline(targetDate.getTimeInMillis());
-                               e.setCreatedAt(System.currentTimeMillis());
-                               if (dbManager.insertEntry(e) != -1) {
-                                   totalCommitment += dbManager.calculateCommitmentReward(e);
-                               }
-                           }
-                       }
-                       loadEntries();
-                       
-                       if (totalCommitment > 0 && getActivity() instanceof MainActivity) {
-                           MainActivity main = (MainActivity) getActivity();
-                           main.showPlanningBonusModal(totalCommitment);
-                           main.refreshProfileIcon(); // Immediate refresh
-                       }
-                   }
-               })
-               .setNegativeButton(android.R.string.cancel, null)
-               .show();
+        view.findViewById(R.id.btn_plan_cancel).setOnClickListener(v -> dialog.dismiss());
+
+        view.findViewById(R.id.btn_plan_add).setOnClickListener(v -> {
+            dialog.dismiss();
+            boolean isToday = rgTarget.getCheckedRadioButtonId() == R.id.rb_today;
+            Calendar targetDate = Calendar.getInstance();
+            if (!isToday) targetDate.add(Calendar.DAY_OF_YEAR, 1);
+            targetDate.set(Calendar.HOUR_OF_DAY, 12);
+            targetDate.set(Calendar.MINUTE, 0);
+
+            android.util.SparseBooleanArray checked = lvRecs.getCheckedItemPositions();
+            int totalCommitment = 0;
+            for (int i = 0; i < currentRecs.size(); i++) {
+                if (checked.get(i)) {
+                    Entry e = currentRecs.get(i);
+                    e.setDeadline(targetDate.getTimeInMillis());
+                    e.setCreatedAt(System.currentTimeMillis());
+                    if (dbManager.insertEntry(e) != -1) {
+                        totalCommitment += dbManager.calculateCommitmentReward(e);
+                    }
+                }
+            }
+            loadEntries();
+
+            if (totalCommitment > 0 && getActivity() instanceof MainActivity) {
+                MainActivity main = (MainActivity) getActivity();
+                main.showPlanningBonusModal(totalCommitment);
+                main.refreshProfileIcon();
+            }
+        });
+
+        dialog.setOnShowListener(d -> {
+            if (dialog.getWindow() != null) {
+                android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+                int width = (int) (metrics.widthPixels * 0.88);
+                dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
+
+        dialog.show();
     }
 
     private int calculateAvailableHours(boolean isToday) {
@@ -214,12 +232,29 @@ public class DailyLogFragment extends Fragment {
         }
     }
 
+    private void filterEntries(String query) {
+        if (adapter == null) return;
+        List<Object> filtered = com.ismailmushraf.bujo.utils.SearchHelper.filter(allEntriesList, query, item -> {
+            if (item instanceof Entry) {
+                Entry e = (Entry) item;
+                return e.getContent() != null ? e.getContent() : "";
+            } else if (item instanceof String) {
+                return (String) item;
+            }
+            return "";
+        });
+        adapter.clear();
+        adapter.addAll(filtered);
+        adapter.notifyDataSetChanged();
+    }
+
     private void loadEntries() {
         int index = listView.getFirstVisiblePosition();
         View v = listView.getChildAt(0);
         int top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
 
-        entries = new ArrayList<>(dbManager.getTodayEntries());
+        allEntriesList = new ArrayList<>(dbManager.getTodayEntries());
+        entries = new ArrayList<>(allEntriesList);
 
         if (adapter == null || listView.getAdapter() == null) {
             adapter = new EntryAdapter(getActivity(), entries, true, true);
@@ -227,8 +262,12 @@ public class DailyLogFragment extends Fragment {
             adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
                 @Override
                 public void onEntryTextClick(Entry entry) {
-                    if ("*".equals(entry.getSignifier())) {
-                        uiHelper.showTaskDetailDialog(entry);
+                    if (getFragmentManager() != null && entry != null) {
+                        android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                        ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
+                        ft.addToBackStack(null);
+                        ft.commit();
                     }
                 }
 

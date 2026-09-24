@@ -1,81 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@drawable/shape_bujo_box"
-    android:padding="16dp">
+    android:layout_height="52dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:background="@color/white">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_habit_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/bujo_text"
-                android:textSize="18sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tv_habit_progress"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/bujo_text_secondary"
-                android:textSize="12sp"
-                android:layout_marginTop="2dp" />
-
-            <TextView
-                android:id="@+id/tv_habit_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/bujo_text_secondary"
-                android:textSize="12sp"
-                android:layout_marginTop="1dp"
-                android:visibility="gone" />
-        </LinearLayout>
-
-        <CheckBox
-            android:id="@+id/cb_habit_today"
+        <TextView
+            android:id="@+id/tv_habit_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:button="@null"
-            android:background="@drawable/shape_bujo_box"
-            android:padding="8dp"
-            android:text="DONE"
-            android:textSize="12sp"
-            android:textStyle="bold"
             android:textColor="@color/bujo_text"
-            android:minHeight="0dp"
-            android:minWidth="0dp"/>
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_habit_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="11sp"
+            android:layout_marginTop="1dp" />
+
+        <TextView
+            android:id="@+id/tv_habit_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="11sp"
+            android:layout_marginTop="1dp"
+            android:visibility="gone" />
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progress_habit"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="6dp"
-        android:layout_marginTop="12dp"
-        android:max="100" />
-
-    <!-- Mini History Grid -->
+    <!-- 10-day history graph dots aligned at right end -->
     <LinearLayout
         android:id="@+id/layout_history_grid"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="12dp"
-        android:gravity="right">
-        <!-- 7-14 small dots will be added here programmatically -->
+        android:gravity="center_vertical|end">
     </LinearLayout>
 
 </LinearLayout>

@@ -5,9 +5,30 @@
     android:orientation="vertical"
     android:background="@color/bujo_background">
 
-    <!-- Header removed based on updated design plan -->
+    <!-- Search Bar (BB10 Style) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:gravity="center_vertical"
+        android:background="@color/bb10_bottom_bar_bg">
+        <EditText
+            android:id="@+id/et_search_project"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:hint="Search projects..."
+            android:textSize="16sp"
+            android:singleLine="true"
+            android:inputType="textCapSentences" />
+    </LinearLayout>
 
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
 
     <TextView
         android:layout_width="match_parent"

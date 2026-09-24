@@ -474,7 +474,8 @@ public class MainActivity extends AppCompatActivity {
         View btnSettings = findViewById(R.id.btn_bb10_settings);
         TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
 
-        if (fragment instanceof com.ismailmushraf.bujo.fragments.EditProjectFragment) {
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.EditProjectFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.EditTaskFragment) {
             if (bottomBar != null) bottomBar.setVisibility(View.GONE);
             if (btnFab != null) btnFab.setVisibility(View.GONE);
             return;
@@ -490,8 +491,6 @@ public class MainActivity extends AppCompatActivity {
             isPrimaryScreen = true;
         } else if (fragment instanceof com.ismailmushraf.bujo.fragments.InboxFragment && "Inbox".equals(startup)) {
             isPrimaryScreen = true;
-        } else if (fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment && "Calendar".equals(startup)) {
-            isPrimaryScreen = true;
         }
 
         if (btnBack != null) {
@@ -505,15 +504,16 @@ public class MainActivity extends AppCompatActivity {
         if (btnSettings != null) btnSettings.setVisibility(primaryOnlyNavVisibility);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.SettingsFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment) {
+            fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment) {
             if (btnFab != null) btnFab.setVisibility(View.GONE);
-            if (btnOverflow != null) btnOverflow.setVisibility(View.GONE);
+            if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);
             return;
         }
 
         if (btnFab != null) btnFab.setVisibility(View.VISIBLE);
-        if (btnOverflow != null) btnOverflow.setVisibility(View.VISIBLE);
+        if (btnOverflow != null) btnOverflow.setVisibility(isPrimaryScreen ? View.VISIBLE : View.INVISIBLE);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
             if (tvFabText != null) {
@@ -539,6 +539,8 @@ public class MainActivity extends AppCompatActivity {
             ((com.ismailmushraf.bujo.fragments.HabitsFragment) currentFragment).showAddHabitDialog();
         } else if (currentFragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
             ((com.ismailmushraf.bujo.fragments.ProjectsFragment) currentFragment).openCreateProjectScreen();
+        } else {
+            navigateToFragment(com.ismailmushraf.bujo.fragments.EditTaskFragment.newInstanceForCreate());
         }
     }
 }

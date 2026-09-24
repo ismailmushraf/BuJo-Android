@@ -174,34 +174,28 @@ public class EntryUIHelper {
             }
         });
 
-        // Fixed Bottom Delete Button
+        // Fixed Bottom Delete Button with Confirmation
         view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
             dialog.dismiss();
-            int pointsDeducted = dbManager.deleteEntry(entry.getId());
-            if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
-                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
-            }
-            if (listener != null) listener.onEntryUpdated();
+            BB10DialogHelper.showConfirmDialog(context, "Delete Task", "Are you sure you want to delete this task?", "Delete", () -> {
+                int pointsDeducted = dbManager.deleteEntry(entry.getId());
+                if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
+                    ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
+                }
+                if (listener != null) listener.onEntryUpdated();
+            });
         });
 
         dialog.show();
     }
 
     private void showLockConfirmation(final Entry entry) {
-        new AlertDialog.Builder(context, R.style.BujoDialog)
-                .setTitle("Confirm Lock")
-                .setMessage("Locking this task will make it unchangeable and non-deletable for the rest of the day. Are you sure?")
-                .setPositiveButton("Lock Forever", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        entry.setLockedManually(true);
-                        dbManager.updateEntry(entry);
-                        listener.onEntryUpdated();
-                        Toast.makeText(context, "Task locked.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+        BB10DialogHelper.showConfirmDialog(context, "Confirm Lock", "Locking this task will make it unchangeable and non-deletable for the rest of the day. Are you sure?", "Lock Forever", () -> {
+            entry.setLockedManually(true);
+            dbManager.updateEntry(entry);
+            listener.onEntryUpdated();
+            Toast.makeText(context, "Task locked.", Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void showEditDialog(final Entry entry) {

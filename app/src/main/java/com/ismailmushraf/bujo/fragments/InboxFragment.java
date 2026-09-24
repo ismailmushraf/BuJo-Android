@@ -26,6 +26,7 @@ public class InboxFragment extends Fragment {
 
     private EntryAdapter adapter;
     private List<Object> entries;
+    private List<Object> allEntriesList = new ArrayList<>();
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
@@ -57,6 +58,14 @@ public class InboxFragment extends Fragment {
 
         listView.setOnItemClickListener(null);
         listView.setOnItemLongClickListener(null);
+
+        etNewEntry.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterEntries(s.toString());
+            }
+            @Override public void afterTextChanged(android.text.Editable s) {}
+        });
 
         etNewEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -125,14 +134,37 @@ public class InboxFragment extends Fragment {
         }
     }
 
+    private void filterEntries(String query) {
+        if (adapter == null) return;
+        List<Object> filtered = com.ismailmushraf.bujo.utils.SearchHelper.filter(allEntriesList, query, item -> {
+            if (item instanceof Entry) {
+                Entry e = (Entry) item;
+                return e.getContent() != null ? e.getContent() : "";
+            } else if (item instanceof String) {
+                return (String) item;
+            }
+            return "";
+        });
+        adapter.clear();
+        adapter.addAll(filtered);
+        adapter.notifyDataSetChanged();
+    }
+
     private void loadEntries() {
-        entries = new ArrayList<>(dbManager.getInboxEntries());
+        allEntriesList = new ArrayList<>(dbManager.getInboxEntries());
+        entries = new ArrayList<>(allEntriesList);
         adapter = new EntryAdapter(getActivity(), entries, true);
         adapter.setUIHelper(uiHelper);
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                // Future: show detail modal?
+                if (getFragmentManager() != null && entry != null) {
+                    android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
             }
 
             @Override

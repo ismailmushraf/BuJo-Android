@@ -144,8 +144,12 @@ public class ProjectDetailFragment extends Fragment {
         uncompletedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                if ("*".equals(entry.getSignifier())) {
-                    uiHelper.showTaskDetailDialog(entry);
+                if (getFragmentManager() != null && entry != null) {
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
+                    ft.addToBackStack(null);
+                    ft.commit();
                 }
             }
 

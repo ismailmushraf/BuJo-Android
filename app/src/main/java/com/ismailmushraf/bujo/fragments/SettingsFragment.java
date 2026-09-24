@@ -95,7 +95,7 @@ public class SettingsFragment extends Fragment {
 
         // --- 2. Startup Screen Configuration (BB10 Dropdown) ---
         Spinner spinnerStartup = (Spinner) root.findViewById(R.id.spinner_startup);
-        final String[] screens = {"Inbox", "Today", "Calendar"};
+        final String[] screens = {"Inbox", "Today"};
         ArrayAdapter<String> startupAdapter = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_spinner, screens);
         startupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStartup.setAdapter(startupAdapter);
@@ -103,8 +103,6 @@ public class SettingsFragment extends Fragment {
         String currentStartup = prefs.getString("startup_screen", "Today");
         if ("Inbox".equals(currentStartup)) {
             spinnerStartup.setSelection(0);
-        } else if ("Calendar".equals(currentStartup)) {
-            spinnerStartup.setSelection(2);
         } else {
             spinnerStartup.setSelection(1);
         }
@@ -167,7 +165,7 @@ public class SettingsFragment extends Fragment {
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(getActivity())
+                new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
                         .setTitle("Clear Completed Tasks")
                         .setMessage("Are you sure you want to permanently delete all completed tasks across all projects and logs?")
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -216,7 +214,7 @@ public class SettingsFragment extends Fragment {
             }
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
         builder.setTitle("Select Export Location:\n" + currentDir.getAbsolutePath());
         builder.setItems(folderNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
             @Override
@@ -270,7 +268,7 @@ public class SettingsFragment extends Fragment {
             }
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
         builder.setTitle("Select Backup File:\n" + currentDir.getAbsolutePath());
         builder.setItems(displayNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
             @Override
@@ -288,7 +286,7 @@ public class SettingsFragment extends Fragment {
     }
 
     private void confirmAndImport(final File selectedDbFile) {
-        new AlertDialog.Builder(getActivity())
+        new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
                 .setTitle("Restore Backup")
                 .setMessage("Restore from " + selectedDbFile.getName() + "? This will overwrite your current journal completely.")
                 .setPositiveButton("Restore", new DialogInterface.OnClickListener() {

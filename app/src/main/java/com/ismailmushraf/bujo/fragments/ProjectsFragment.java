@@ -25,6 +25,7 @@ public class ProjectsFragment extends Fragment {
     private GridView gridView;
     private DatabaseManager dbManager;
     private List<Project> projectList;
+    private List<Project> allProjectsList = new java.util.ArrayList<>();
     private ProjectFolderAdapter adapter;
 
     @Override
@@ -37,6 +38,34 @@ public class ProjectsFragment extends Fragment {
         }
 
         gridView = (GridView) root.findViewById(R.id.gv_projects);
+        android.widget.EditText etSearch = (android.widget.EditText) root.findViewById(R.id.et_search_project);
+
+        if (etSearch != null) {
+            etSearch.addTextChangedListener(new android.text.TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    filterProjects(s.toString());
+                }
+                @Override public void afterTextChanged(android.text.Editable s) {}
+            });
+
+            etSearch.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE || actionId == 0) {
+                    processQuickProjectCreation(etSearch);
+                    return true;
+                }
+                return false;
+            });
+
+            etSearch.setOnKeyListener((v, keyCode, event) -> {
+                if (event.getAction() == android.view.KeyEvent.ACTION_DOWN &&
+                        (keyCode == android.view.KeyEvent.KEYCODE_ENTER || keyCode == android.view.KeyEvent.KEYCODE_NUMPAD_ENTER || keyCode == android.view.KeyEvent.KEYCODE_PLUS)) {
+                    processQuickProjectCreation(etSearch);
+                    return true;
+                }
+                return false;
+            });
+        }
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
@@ -109,11 +138,13 @@ public class ProjectsFragment extends Fragment {
 
             sidebarView.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(deleteView -> {
                 dialog.dismiss();
-                dbManager.deleteProjectAndAllEntries(selectedProject.getId());
-                loadProjects();
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).refreshDrawer();
-                }
+                com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Delete Project", "Are you sure you want to delete '" + selectedProject.getName() + "' and all its tasks?", "Delete", () -> {
+                    dbManager.deleteProjectAndAllEntries(selectedProject.getId());
+                    loadProjects();
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).refreshDrawer();
+                    }
+                });
             });
 
             dialog.show();
@@ -121,6 +152,34 @@ public class ProjectsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void processQuickProjectCreation(android.widget.EditText etSearch) {
+        String projectName = etSearch.getText().toString().trim();
+        if (projectName.isEmpty()) return;
+
+        // Check if project name already exists (case-insensitive)
+        for (Project p : allProjectsList) {
+            if (p != null && p.getName() != null && p.getName().equalsIgnoreCase(projectName)) {
+                android.widget.Toast.makeText(getActivity(), "Project already exists", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        Project newProject = new Project();
+        newProject.setName(projectName);
+        newProject.setWeight(1);
+        int defaultColor = getResources().getColor(R.color.bb10_folder_blue);
+        newProject.setColor(defaultColor);
+
+        dbManager.insertProject(newProject);
+        loadProjects();
+
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).refreshDrawer();
+        }
+
+        etSearch.setText("");
     }
 
     public void openCreateProjectScreen() {
@@ -132,8 +191,17 @@ public class ProjectsFragment extends Fragment {
         ft.commit();
     }
 
+    private void filterProjects(String query) {
+        if (adapter == null) return;
+        List<Project> filtered = com.ismailmushraf.bujo.utils.SearchHelper.filter(allProjectsList, query, p -> p != null ? p.getName() : "");
+        adapter.clear();
+        adapter.addAll(filtered);
+        adapter.notifyDataSetChanged();
+    }
+
     private void loadProjects() {
-        projectList = dbManager.getAllProjects();
+        allProjectsList = dbManager.getAllProjects();
+        projectList = new java.util.ArrayList<>(allProjectsList);
         adapter = new ProjectFolderAdapter(getActivity(), projectList, dbManager);
         gridView.setAdapter(adapter);
     }
