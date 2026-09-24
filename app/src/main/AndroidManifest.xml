@@ -7,6 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".BuJoApp"
@@ -35,6 +36,8 @@
         </activity>
 
         <receiver android:name=".utils.AlarmReceiver" android:exported="false" />
+        <receiver android:name=".utils.FocusCheckReceiver" android:exported="false" />
+        <service android:name=".services.PomodoroService" android:exported="false" />
     </application>
 
 </manifest>

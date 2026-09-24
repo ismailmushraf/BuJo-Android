@@ -107,6 +107,7 @@ public class EntryUIHelper {
                         // Reset timestamp and set to today when un-migrating
                         entry.setCreatedAt(System.currentTimeMillis());
                         entry.setLockedManually(false); // Ensure lock is lifted
+                        entry.setCompleted(false); // Mark as uncompleted when bringing back to Today
                         Calendar today = Calendar.getInstance();
                         today.set(Calendar.HOUR_OF_DAY, 12);
                         today.set(Calendar.MINUTE, 0);

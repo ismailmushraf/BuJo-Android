@@ -130,17 +130,21 @@ public class MainActivity extends AppCompatActivity {
         refreshDrawer();
 
         if (savedInstanceState == null) {
-            android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-            String startup = prefs.getString("startup_screen", "Today");
+            String navigateTo = getIntent().getStringExtra("NAVIGATE_TO");
+            if ("Pomodoro".equals(navigateTo)) {
+                selectItem(5); 
+            } else {
+                android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+                String startup = prefs.getString("startup_screen", "Today");
 
-            int startupIndex = 2; // Default to Today
-            if ("Inbox".equals(startup)) {
-                startupIndex = 1;
-            } else if ("Calendar".equals(startup)) {
-                startupIndex = 3;
+                int startupIndex = 2; // Default to Today
+                if ("Inbox".equals(startup)) {
+                    startupIndex = 1;
+                } else if ("Calendar".equals(startup)) {
+                    startupIndex = 3;
+                }
+                selectItem(startupIndex);
             }
-
-            selectItem(startupIndex);
         }
     }
 
@@ -151,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", "\uD83D\uDCDD"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Habits", "\uD83C\uDF31"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", "📅"));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", "\u23F0"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">")); // Changed name
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Workouts", "\uD83D\uDCAA")); // Add Workout module
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Projects", "+"));
@@ -176,6 +181,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new FutureLogFragment();
             } else if ("Logbook".equals(item.title)) {
                 fragment = new MigratedItemsFragment(); // Connects the new Logbook string to the fragment
+            } else if ("Focus Timer".equals(item.title)) {
+                fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment();
             } else if ("Workouts".equals(item.title)) {
                 fragment = new WorkoutFragment(); // Handle Workout click
             } else if ("Projects".equals(item.title)) {

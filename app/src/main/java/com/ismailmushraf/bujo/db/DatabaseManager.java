@@ -939,7 +939,7 @@ public class DatabaseManager {
                     } while (c.moveToNext());
                     c.close();
                     
-                    // Mark as audited AND migrate missed tasks to Logbook
+                    // 1. Migrate only UNCOMPLETED missed tasks to Logbook and mark as audited
                     ContentValues cvAudit = new ContentValues();
                     cvAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
                     cvAudit.put(DatabaseHelper.COLUMN_MIGRATED, 1);
@@ -948,7 +948,18 @@ public class DatabaseManager {
                             "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
                             DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
                             DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
-                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0", new String[]{auditDate});
+                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                            DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
+
+                    // 2. Mark COMPLETED tasks as audited so they don't get processed again (don't migrate them)
+                    ContentValues cvCompleted = new ContentValues();
+                    cvCompleted.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                    database.update(DatabaseHelper.TABLE_ENTRIES, cvCompleted,
+                            "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
+                            DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
+                            DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                            DatabaseHelper.COLUMN_COMPLETED + " = 1", new String[]{auditDate});
                 }
                 cal.add(Calendar.DAY_OF_YEAR, 1);
             }
