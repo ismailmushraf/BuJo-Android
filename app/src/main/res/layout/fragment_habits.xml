@@ -13,24 +13,12 @@
         android:gravity="center_vertical">
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="ACTIVE HABITS"
             android:textColor="@color/bujo_text_secondary"
             android:textSize="14sp"
             android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/btn_add_habit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="0dp"
-            android:text="+ NEW HABIT"
-            android:textSize="12sp"
-            android:background="@drawable/shape_bujo_box"
-            android:textColor="@color/bujo_text"
-            android:padding="8dp"/>
     </LinearLayout>
 
     <ListView

@@ -12,11 +12,13 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:padding="8dp"
+        android:gravity="center_vertical"
         android:background="@color/bb10_bottom_bar_bg">
         <EditText
             android:id="@+id/et_new_project"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@color/white"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
@@ -26,6 +28,15 @@
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:singleLine="true" />
+
+        <View
+            android:id="@+id/btn_color_picker"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bb10_fab_solid_blue"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 
     <View
@@ -53,7 +64,7 @@
         android:id="@+id/gv_projects"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"
+        android:numColumns="5"
         android:horizontalSpacing="4dp"
         android:verticalSpacing="4dp"
         android:padding="4dp"

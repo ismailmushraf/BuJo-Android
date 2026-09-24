@@ -10,11 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:padding="8dp"
+        android:gravity="center_vertical"
         android:background="@color/bb10_bottom_bar_bg">
         <EditText
             android:id="@+id/et_new_entry"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:background="@color/white"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
@@ -24,6 +26,19 @@
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
             android:singleLine="true" />
+
+        <Button
+            android:id="@+id/btn_plan_tomorrow"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:minHeight="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Plan Day"
+            android:textSize="12sp"
+            android:textColor="@color/bujo_text"
+            android:background="@drawable/shape_bujo_box" />
     </LinearLayout>
 
     <View

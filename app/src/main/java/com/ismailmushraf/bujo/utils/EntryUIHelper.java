@@ -25,6 +25,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -58,6 +59,15 @@ public class EntryUIHelper {
         this.listener = listener;
     }
 
+    private static class SidebarOption {
+        String title;
+        int iconResId;
+        SidebarOption(String title, int iconResId) {
+            this.title = title;
+            this.iconResId = iconResId;
+        }
+    }
+
     public void showContextDialog(final Entry entry, final View sourceView) {
         if (entry.isLocked()) {
             new AlertDialog.Builder(context, R.style.BujoDialog)
@@ -68,25 +78,59 @@ public class EntryUIHelper {
             return;
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
-        builder.setTitle("Options");
+        final android.app.Dialog dialog = new android.app.Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_bb10_context_sidebar, null);
+        dialog.setContentView(view);
 
-        List<String> optionsList = new ArrayList<>();
-        optionsList.add("Edit Item");
-        optionsList.add("Set Date");
-        optionsList.add("Set Reminder Time");
-        optionsList.add(entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List");
-        if ("*".equals(entry.getSignifier()) && !entry.isMigrated()) {
-            optionsList.add("Lock Task");
+        if (dialog.getWindow() != null) {
+            WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = Gravity.END;
+            lp.windowAnimations = R.style.BB10SidebarAnimation;
+            dialog.getWindow().setAttributes(lp);
         }
-        optionsList.add("Delete Item");
 
-        String[] options = optionsList.toArray(new String[0]);
+        view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(v -> dialog.dismiss());
 
-        builder.setItems(options, new DialogInterface.OnClickListener() {
+        TextView tvTitle = (TextView) view.findViewById(R.id.sidebar_task_title);
+        tvTitle.setText(entry.getContent());
+
+        final List<SidebarOption> optionsList = new ArrayList<>();
+        optionsList.add(new SidebarOption("Edit Item", android.R.drawable.ic_menu_edit));
+        optionsList.add(new SidebarOption("Set Date", R.drawable.ic_calendar));
+        optionsList.add(new SidebarOption("Set Reminder Time", R.drawable.ic_today));
+        optionsList.add(new SidebarOption(entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List", R.drawable.ic_inbox));
+        if ("*".equals(entry.getSignifier()) && !entry.isMigrated()) {
+            optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
+        }
+
+        ListView lvOptions = (ListView) view.findViewById(R.id.lv_sidebar_options);
+        ArrayAdapter<SidebarOption> adapter = new ArrayAdapter<SidebarOption>(context, R.layout.item_sidebar_option, optionsList) {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String selected = options[which];
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parent, false);
+                }
+                SidebarOption option = getItem(position);
+                TextView tv = (TextView) convertView.findViewById(R.id.tv_option_title);
+                android.widget.ImageView iv = (android.widget.ImageView) convertView.findViewById(R.id.iv_option_icon);
+                if (option != null) {
+                    tv.setText(option.title);
+                    iv.setImageResource(option.iconResId);
+                }
+                return convertView;
+            }
+        };
+        lvOptions.setAdapter(adapter);
+
+        lvOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+                dialog.dismiss();
+                SidebarOption option = optionsList.get(position);
+                String selected = option.title;
                 if (selected.equals("Edit Item")) {
                     showEditDialog(entry);
                 } else if (selected.equals("Set Date")) {
@@ -101,13 +145,12 @@ public class EntryUIHelper {
                     entry.setMigrated(migrating);
                     if (migrating) {
                         entry.setDeadline(0);
-                        entry.setLockedManually(false); // Unlock when moving to logbook
+                        entry.setLockedManually(false);
                         scheduleNotification(entry);
                     } else {
-                        // Reset timestamp and set to today when un-migrating
                         entry.setCreatedAt(System.currentTimeMillis());
-                        entry.setLockedManually(false); // Ensure lock is lifted
-                        entry.setCompleted(false); // Mark as uncompleted when bringing back to Today
+                        entry.setLockedManually(false);
+                        entry.setCompleted(false);
                         Calendar today = Calendar.getInstance();
                         today.set(Calendar.HOUR_OF_DAY, 12);
                         today.set(Calendar.MINUTE, 0);
@@ -124,19 +167,24 @@ public class EntryUIHelper {
                         }
                     }
 
-                    listener.onEntryUpdated();
+                    if (listener != null) listener.onEntryUpdated();
                 } else if (selected.equals("Lock Task")) {
                     showLockConfirmation(entry);
-                } else if (selected.equals("Delete Item")) {
-                    int pointsDeducted = dbManager.deleteEntry(entry.getId());
-                    if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
-                        ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
-                    }
-                    listener.onEntryUpdated();
                 }
             }
         });
-        builder.show();
+
+        // Fixed Bottom Delete Button
+        view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
+            dialog.dismiss();
+            int pointsDeducted = dbManager.deleteEntry(entry.getId());
+            if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
+                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
+            }
+            if (listener != null) listener.onEntryUpdated();
+        });
+
+        dialog.show();
     }
 
     private void showLockConfirmation(final Entry entry) {

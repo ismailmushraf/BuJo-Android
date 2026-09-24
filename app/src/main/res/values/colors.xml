@@ -16,7 +16,7 @@
     <!-- BB10 specific colors -->
     <color name="bb10_blue">#00a8df</color>
     <color name="bb10_green">#739b26</color>
-    <color name="bb10_bottom_bar_bg">#f4f4f4</color>
+    <color name="bb10_bottom_bar_bg">#E5E5E5</color>
     <color name="bb10_bottom_bar_divider">#cccccc</color>
     <color name="bb10_folder_dark">#323232</color>
     <color name="bb10_folder_blue">#0090bf</color>

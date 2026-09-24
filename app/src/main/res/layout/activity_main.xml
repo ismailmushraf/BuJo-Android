@@ -19,87 +19,213 @@
             android:layout_above="@+id/bb10_bottom_bar" />
 
         <!-- BB10 Bottom Action Bar -->
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/bb10_bottom_bar"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="48dp"
             android:layout_alignParentBottom="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
             android:background="@color/bb10_bottom_bar_bg">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/bb10_bottom_bar_divider"
-                android:layout_alignParentTop="true" />
 
             <!-- Left Button (Back) and Slanted Blue Separator -->
             <LinearLayout
                 android:id="@+id/btn_bb10_back"
-                android:layout_width="80dp"
+                android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
+                android:gravity="center"
                 android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
                     android:src="@drawable/ic_bb10_back"
                     android:tint="@color/bujo_text" />
 
                 <ImageView
-                    android:layout_width="16dp"
+                    android:layout_width="10dp"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_bb10_separator"
+                    android:scaleType="fitCenter"
                     android:layout_marginStart="8dp" />
             </LinearLayout>
 
-            <!-- Center Text (New Task) -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginBottom="6dp"
-                android:text="New Task"
-                android:textSize="12sp"
-                android:textColor="@color/bujo_text" />
+            <!-- Projects Button -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_projects"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|bottom"
+                android:paddingBottom="4dp"
+                android:visibility="gone"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
 
-            <!-- Right Button (Overflow/Options to open drawer) -->
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_project"
+                    android:tint="@color/bujo_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Projects"
+                    android:textSize="10sp"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:textColor="@color/bujo_text" />
+            </LinearLayout>
+
+            <!-- Habits Button -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_habits"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|bottom"
+                android:paddingBottom="4dp"
+                android:visibility="gone"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_habits"
+                    android:tint="@color/bujo_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Habits"
+                    android:textSize="10sp"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:textColor="@color/bujo_text" />
+            </LinearLayout>
+
+            <!-- Center Anchor / Text space for FAB -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|bottom"
+                android:paddingBottom="4dp">
+
+                <TextView
+                    android:id="@+id/tv_bb10_fab_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="New Task"
+                    android:textSize="10sp"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:textColor="@color/bujo_text" />
+            </LinearLayout>
+
+            <!-- Workouts Button -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_workouts"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|bottom"
+                android:paddingBottom="4dp"
+                android:visibility="gone"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_workout"
+                    android:tint="@color/bujo_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workouts"
+                    android:textSize="10sp"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:textColor="@color/bujo_text" />
+            </LinearLayout>
+
+            <!-- Settings Button -->
+            <LinearLayout
+                android:id="@+id/btn_bb10_settings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal|bottom"
+                android:paddingBottom="4dp"
+                android:visibility="gone"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:layout_marginBottom="2dp"
+                    android:src="@drawable/ic_bb10_gear"
+                    android:tint="@color/bujo_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Settings"
+                    android:textSize="10sp"
+                    android:singleLine="true"
+                    android:maxLines="1"
+                    android:textColor="@color/bujo_text" />
+            </LinearLayout>
+
+            <!-- Right Button (Overflow) -->
             <LinearLayout
                 android:id="@+id/btn_bb10_overflow"
-                android:layout_width="56dp"
+                android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:layout_alignParentEnd="true"
                 android:orientation="vertical"
                 android:gravity="center"
                 android:background="?android:attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="⋮"
-                    android:textSize="24sp"
-                    android:textColor="@color/bujo_text"/>
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_bb10_more"
+                    android:tint="@color/bujo_text"/>
             </LinearLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <!-- Protruding Central FAB -->
         <ImageView
             android:id="@+id/bb10_fab"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="22dp"
             android:background="@drawable/bb10_fab_layer"
             android:src="@drawable/ic_bb10_compose"
             android:tint="@color/white"

@@ -2,130 +2,325 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="@color/bujo_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
+        android:orientation="vertical">
 
-        <!-- Theme Selection -->
+        <!-- Top Header: "Settings" -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="@color/bujo_text"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="#00a8df" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <!-- SECTION 1: Preferences -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="THEME PREFERENCE"
-            android:textColor="@color/bujo_text_secondary"
-            android:textSize="14sp"
+            android:text="Preferences"
+            android:textColor="#666666"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:paddingBottom="8dp" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:background="#F0F0F0" />
 
-        <RadioGroup
-            android:id="@+id/rg_theme"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/shape_bujo_box"
-            android:padding="8dp">
-            <RadioButton
-                android:id="@+id/rb_theme_light"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Light Theme"
-                android:textColor="@color/bujo_text" />
-            <RadioButton
-                android:id="@+id/rb_theme_dark"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Dark Theme"
-                android:textColor="@color/bujo_text" />
-            <RadioButton
-                android:id="@+id/rb_theme_auto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Auto (Matches Time of Day)"
-                android:textColor="@color/bujo_text" />
-        </RadioGroup>
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
 
-        <!-- Startup Screen Selection -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DEFAULT STARTUP SCREEN"
-            android:textColor="@color/bujo_text_secondary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:paddingTop="24dp"
-            android:paddingBottom="8dp" />
-
-        <Spinner
-            android:id="@+id/spinner_startup"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/shape_bujo_box" />
-
-        <!-- Gamification Settings -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="GAMIFICATION &amp; FEEDBACK"
-            android:textColor="@color/bujo_text_secondary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:paddingTop="24dp"
-            android:paddingBottom="8dp" />
-
+        <!-- Theme Selection Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/shape_bujo_box"
-            android:padding="8dp">
-            <CheckBox
-                android:id="@+id/cb_sound_effects"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@color/white">
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Enable Sound Effects"
-                android:textColor="@color/bujo_text" />
-            <CheckBox
-                android:id="@+id/cb_points_animation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Enable Points Animation"
-                android:textColor="@color/bujo_text"
-                android:checked="true" />
+                android:layout_height="38dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@drawable/shape_bb10_dropdown">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Theme Preference"
+                    android:textColor="#222222"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinner_theme"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="end|center_vertical" />
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_bb10_dropdown_arrow"
+                    android:tint="#333333" />
+
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Data Management -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <!-- Startup Screen Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:background="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="38dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:background="@drawable/shape_bb10_dropdown">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Default Startup Screen"
+                    android:textColor="#222222"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <Spinner
+                    android:id="@+id/spinner_startup"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="end|center_vertical" />
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_gravity="center_vertical"
+                    android:src="@drawable/ic_bb10_dropdown_arrow"
+                    android:tint="#333333" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <!-- SECTION 2: Gamification & Feedback -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DATA MANAGEMENT"
-            android:textColor="@color/bujo_text_secondary"
-            android:textSize="14sp"
+            android:text="Gamification &amp; Feedback"
+            android:textColor="#666666"
+            android:textSize="11sp"
             android:textStyle="bold"
-            android:paddingTop="24dp"
-            android:paddingBottom="8dp" />
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:background="#F0F0F0" />
 
-        <Button
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable Sound Effects"
+                android:textColor="@color/bujo_text"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/cb_sound_effects"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Enable Points Animation"
+                android:textColor="@color/bujo_text"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/cb_points_animation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <!-- SECTION 3: Data Management -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Data Management"
+            android:textColor="#666666"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:background="#F0F0F0" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <LinearLayout
             android:id="@+id/btn_export_backup"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="EXPORT BACKUP TO DEVICE" />
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true">
 
-        <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Export Backup to Device"
+                android:textColor="@color/bujo_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <LinearLayout
             android:id="@+id/btn_import_backup"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="24dp"
-            android:text="RESTORE BACKUP FROM DEVICE" />
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true">
 
-        <Button
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Restore Backup from Device"
+                android:textColor="@color/bujo_text"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
+
+        <LinearLayout
             android:id="@+id/btn_clear_completed"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="DELETE ALL COMPLETED TASKS"
-            android:textColor="#D32F2F" />
+            android:layout_height="56dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="@color/white"
+            android:clickable="true"
+            android:focusable="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Delete All Completed Tasks"
+                android:textColor="#D32F2F"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/bujo_divider" />
 
     </LinearLayout>
 </ScrollView>

@@ -241,6 +241,9 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_PROJECT_NAME, project.getName());
         values.put(DatabaseHelper.COLUMN_PROJECT_WEIGHT, project.getWeight() > 0 ? project.getWeight() : 1);
         values.put(DatabaseHelper.COLUMN_PROJECT_CREATED_AT, project.getCreatedAt() > 0 ? project.getCreatedAt() : System.currentTimeMillis());
+        if (project.getColor() != 0) {
+            values.put(DatabaseHelper.COLUMN_PROJECT_COLOR, project.getColor());
+        }
         return database.insert(DatabaseHelper.TABLE_PROJECTS, null, values);
     }
 
@@ -248,6 +251,9 @@ public class DatabaseManager {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_PROJECT_NAME, project.getName());
         values.put(DatabaseHelper.COLUMN_PROJECT_WEIGHT, project.getWeight());
+        if (project.getColor() != 0) {
+            values.put(DatabaseHelper.COLUMN_PROJECT_COLOR, project.getColor());
+        }
         int updated = database.update(DatabaseHelper.TABLE_PROJECTS, values, DatabaseHelper.COLUMN_ID + " = ?",
                 new String[]{String.valueOf(project.getId())});
 
@@ -323,6 +329,7 @@ public class DatabaseManager {
             int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
             int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
             int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
+            int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
 
             do {
                 Project project = new Project();
@@ -330,6 +337,7 @@ public class DatabaseManager {
                 project.setName(cursor.getString(nameIndex));
                 if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
                 if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
+                if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
                 projects.add(project);
             } while (cursor.moveToNext());
             cursor.close();
@@ -345,12 +353,14 @@ public class DatabaseManager {
             int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
             int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
             int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
+            int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
 
             Project project = new Project();
             project.setId(cursor.getInt(idIndex));
             project.setName(cursor.getString(nameIndex));
             if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
             if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
+            if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
             cursor.close();
             return project;
         }

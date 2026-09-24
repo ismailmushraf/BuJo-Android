@@ -93,12 +93,15 @@ public class DailyLogFragment extends Fragment {
             }
         });
 
-        // "Plan Day", Emoji, and Add Event buttons have been removed from XML.
+        View btnPlan = root.findViewById(R.id.btn_plan_tomorrow);
+        if (btnPlan != null) {
+            btnPlan.setOnClickListener(v -> showRecommendationDialog());
+        }
 
         return root;
     }
 
-    private void showRecommendationDialog() {
+    public void showRecommendationDialog() {
         View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_plan_day, null);
         final android.widget.RadioGroup rgTarget = (android.widget.RadioGroup) view.findViewById(R.id.rg_plan_target);
         final TextView tvHours = (TextView) view.findViewById(R.id.tv_available_hours);

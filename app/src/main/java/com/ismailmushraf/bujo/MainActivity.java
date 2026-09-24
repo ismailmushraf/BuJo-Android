@@ -57,36 +57,12 @@ public class MainActivity extends AppCompatActivity {
         drawerList = (ListView) findViewById(R.id.nav_drawer_list);
 
         // Header view matching screenshot with back arrow
-        View headerView = getLayoutInflater().inflate(R.layout.nav_header, drawerList, false);
-        drawerList.addHeaderView(headerView, null, false);
-
         dbManager = new DatabaseManager(this);
         dbManager.open();
 
         drawerItemsList = new ArrayList<>();
         drawerAdapter = new DrawerAdapter(this, drawerItemsList);
         drawerList.setAdapter(drawerAdapter);
-
-        // Header navigation back click closes drawer
-        headerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawerLayout.closeDrawer(drawerList);
-            }
-        });
-
-        View btnSettings = headerView.findViewById(R.id.header_settings);
-        btnSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new SettingsFragment());
-                ft.commit();
-
-                drawerAdapter.setSelectedPosition(-1); // Removes highlight from the main list
-                drawerLayout.closeDrawer(drawerList);
-            }
-        });
 
         drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -133,6 +109,34 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+        View btnProjects = findViewById(R.id.btn_bb10_projects);
+        if (btnProjects != null) {
+            btnProjects.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.ProjectsFragment()));
+        }
+
+        View btnHabits = findViewById(R.id.btn_bb10_habits);
+        if (btnHabits != null) {
+            btnHabits.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.HabitsFragment()));
+        }
+
+        View btnWorkouts = findViewById(R.id.btn_bb10_workouts);
+        if (btnWorkouts != null) {
+            btnWorkouts.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.WorkoutFragment()));
+        }
+
+        View btnSettings = findViewById(R.id.btn_bb10_settings);
+        if (btnSettings != null) {
+            btnSettings.setOnClickListener(v -> navigateToFragment(new SettingsFragment()));
+        }
+
+        getSupportFragmentManager().addOnBackStackChangedListener(new android.support.v4.app.FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                updateBottomBarButtons(current);
+            }
+        });
+
         DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
         if (audit != null && audit.totalPenalty > 0) {
             showAuditModal(audit);
@@ -164,16 +168,9 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "JOURNAL INDEX", null));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", "\uD83D\uDCE5")); // 📥 icon
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", "\uD83D\uDCDD"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Habits", "\uD83C\uDF31"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", "📅"));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", "\u23F0"));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">")); // Changed name
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Workouts", "\uD83D\uDCAA")); // Add Workout module
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Projects", "+"));
-        List<Project> projects = dbManager.getAllProjects();
-        for (Project p : projects) {
-            drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_PROJECT, p.getName(), "-", p.getId()));
-        }
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", ">"));
         drawerAdapter.notifyDataSetChanged();
     }
 
@@ -205,8 +202,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
             ft.replace(R.id.fragment_container, fragment);
             ft.commit();
+            updateBottomBarButtons(fragment);
         }
 
         drawerAdapter.setSelectedPosition(position);
@@ -450,11 +449,88 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void navigateToFragment(Fragment fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+        ft.replace(R.id.fragment_container, fragment);
+        ft.addToBackStack(null);
+        ft.commit();
+        updateBottomBarButtons(fragment);
+    }
+
+    public void updateBottomBarButtons(Fragment fragment) {
+        if (fragment == null) {
+            fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        }
+
+        View bottomBar = findViewById(R.id.bb10_bottom_bar);
+        View btnBack = findViewById(R.id.btn_bb10_back);
+        View btnFab = findViewById(R.id.bb10_fab);
+        View btnOverflow = findViewById(R.id.btn_bb10_overflow);
+        View btnProjects = findViewById(R.id.btn_bb10_projects);
+        View btnHabits = findViewById(R.id.btn_bb10_habits);
+        View btnWorkouts = findViewById(R.id.btn_bb10_workouts);
+        View btnSettings = findViewById(R.id.btn_bb10_settings);
+        TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
+
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.EditProjectFragment) {
+            if (bottomBar != null) bottomBar.setVisibility(View.GONE);
+            if (btnFab != null) btnFab.setVisibility(View.GONE);
+            return;
+        } else {
+            if (bottomBar != null) bottomBar.setVisibility(View.VISIBLE);
+        }
+
+        android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String startup = prefs.getString("startup_screen", "Today");
+
+        boolean isPrimaryScreen = false;
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.DailyLogFragment && "Today".equals(startup)) {
+            isPrimaryScreen = true;
+        } else if (fragment instanceof com.ismailmushraf.bujo.fragments.InboxFragment && "Inbox".equals(startup)) {
+            isPrimaryScreen = true;
+        } else if (fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment && "Calendar".equals(startup)) {
+            isPrimaryScreen = true;
+        }
+
+        if (btnBack != null) {
+            btnBack.setVisibility(isPrimaryScreen ? View.INVISIBLE : View.VISIBLE);
+        }
+
+        int primaryOnlyNavVisibility = isPrimaryScreen ? View.VISIBLE : View.GONE;
+        if (btnProjects != null) btnProjects.setVisibility(primaryOnlyNavVisibility);
+        if (btnHabits != null) btnHabits.setVisibility(primaryOnlyNavVisibility);
+        if (btnWorkouts != null) btnWorkouts.setVisibility(primaryOnlyNavVisibility);
+        if (btnSettings != null) btnSettings.setVisibility(primaryOnlyNavVisibility);
+
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.SettingsFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment) {
+            if (btnFab != null) btnFab.setVisibility(View.GONE);
+            if (btnOverflow != null) btnOverflow.setVisibility(View.GONE);
+            if (tvFabText != null) tvFabText.setVisibility(View.GONE);
+            return;
+        }
+
+        if (btnFab != null) btnFab.setVisibility(View.VISIBLE);
+        if (btnOverflow != null) btnOverflow.setVisibility(View.VISIBLE);
+
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
+            if (tvFabText != null) {
+                tvFabText.setText("New Habit");
+                tvFabText.setVisibility(View.VISIBLE);
+            }
+        } else {
+            if (tvFabText != null) {
+                tvFabText.setText("New Task");
+                tvFabText.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     private void handleFabClick() {
-        // Since we removed dialogs in favor of BB10 top text box, we can set focus to the top box instead,
-        // or we can implement the "New Task" fullscreen fragment you showed in the 3rd screenshot.
-        // For now, let's open a new dialog or just give it focus.
-        // But since we want "easy as possible", if we are in Projects, let's just do nothing for now 
-        // because they use the top box. In a future iteration we will wire this to a full-screen NewTask.
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (currentFragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
+            ((com.ismailmushraf.bujo.fragments.HabitsFragment) currentFragment).showAddHabitDialog();
+        }
     }
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:top="8dp">
+    <item android:top="6dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/bb10_folder_red" />
             <corners android:radius="4dp" />
         </shape>
     </item>
-    <item android:left="32dp" android:right="32dp" android:bottom="8dp">
+    <item android:left="16dp" android:right="16dp" android:bottom="68dp">
         <shape android:shape="rectangle">
             <solid android:color="@color/bb10_folder_red" />
             <corners android:topLeftRadius="4dp" android:topRightRadius="4dp" />

@@ -73,8 +73,6 @@ public class ProjectDetailFragment extends Fragment {
 
         lvUncompleted = root.findViewById(R.id.lv_uncompleted);
         final EditText etNewEntry = root.findViewById(R.id.et_new_entry);
-        View editProject = root.findViewById(R.id.btn_edit_project);
-        View deleteProject = root.findViewById(R.id.btn_delete_project);
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
@@ -86,12 +84,7 @@ public class ProjectDetailFragment extends Fragment {
 
         loadEntries();
 
-        editProject.setOnClickListener(v -> showEditProjectDialog());
-        deleteProject.setOnClickListener(v -> showDeleteProjectConfirmation());
         setupInputListener(etNewEntry);
-
-        root.findViewById(R.id.btn_emoji).setOnClickListener(v -> uiHelper.showEmojiPicker(etNewEntry));
-        root.findViewById(R.id.btn_add_event).setOnClickListener(v -> uiHelper.showAddEventDialog(projectId, projectName));
 
         return root;
     }

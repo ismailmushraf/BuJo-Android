@@ -41,16 +41,29 @@ public class ProjectFolderAdapter extends ArrayAdapter<Project> {
         int count = dbManager.getTaskCountForProject(project.getId());
         tvCount.setText(count + (count == 1 ? " Task" : " Tasks"));
         
-        // Cycle colors
-        int[] bgs = {
-            R.drawable.bb10_folder_dark,
-            R.drawable.bb10_folder_blue,
-            R.drawable.bb10_folder_yellow,
-            R.drawable.bb10_folder_green,
-            R.drawable.bb10_folder_purple,
-            R.drawable.bb10_folder_red
+        // Cycle colors dynamically using a single bb10_folder.xml template
+        int[] colors = {
+            getContext().getResources().getColor(R.color.bb10_folder_dark),
+            getContext().getResources().getColor(R.color.bb10_folder_blue),
+            getContext().getResources().getColor(R.color.bb10_folder_yellow),
+            getContext().getResources().getColor(R.color.bb10_folder_green),
+            getContext().getResources().getColor(R.color.bb10_folder_purple),
+            getContext().getResources().getColor(R.color.bb10_folder_red)
         };
-        background.setBackgroundResource(bgs[position % bgs.length]);
+        int selectedColor = (project != null && project.getColor() != 0) ? project.getColor() : colors[position % colors.length];
+
+        android.graphics.drawable.LayerDrawable folderDrawable = 
+                (android.graphics.drawable.LayerDrawable) getContext().getResources().getDrawable(R.drawable.bb10_folder).mutate();
+        
+        android.graphics.drawable.GradientDrawable body = 
+                (android.graphics.drawable.GradientDrawable) folderDrawable.findDrawableByLayerId(R.id.folder_body);
+        android.graphics.drawable.GradientDrawable tab = 
+                (android.graphics.drawable.GradientDrawable) folderDrawable.findDrawableByLayerId(R.id.folder_tab);
+        
+        if (body != null) body.setColor(selectedColor);
+        if (tab != null) tab.setColor(selectedColor);
+
+        background.setBackgroundDrawable(folderDrawable);
 
         return convertView;
     }

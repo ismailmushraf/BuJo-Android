@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bujo.db";
-    private static final int DATABASE_VERSION = 12; // Added is_locked for task immutability
+    private static final int DATABASE_VERSION = 13; // Added project color
 
     // --- ENTRIES TABLE ---
     public static final String TABLE_ENTRIES = "entries";
@@ -31,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PROJECT_NAME = "name";
     public static final String COLUMN_PROJECT_WEIGHT = "weight";
     public static final String COLUMN_PROJECT_CREATED_AT = "created_at";
+    public static final String COLUMN_PROJECT_COLOR = "color";
 
     // --- HABITS TABLE ---
     public static final String TABLE_HABITS = "habits";
@@ -96,7 +97,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                     COLUMN_PROJECT_NAME + " TEXT, " +
                     COLUMN_PROJECT_WEIGHT + " INTEGER DEFAULT 1, " +
-                    COLUMN_PROJECT_CREATED_AT + " INTEGER" +
+                    COLUMN_PROJECT_CREATED_AT + " INTEGER, " +
+                    COLUMN_PROJECT_COLOR + " INTEGER DEFAULT 0" +
                     ");";
 
     private static final String TABLE_CREATE_HABITS =
@@ -210,6 +212,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 12) {
             db.execSQL("ALTER TABLE " + TABLE_ENTRIES + " ADD COLUMN " + COLUMN_IS_LOCKED + " INTEGER DEFAULT 0;");
+        }
+        if (oldVersion < 13) {
+            db.execSQL("ALTER TABLE " + TABLE_PROJECTS + " ADD COLUMN " + COLUMN_PROJECT_COLOR + " INTEGER DEFAULT 0;");
         }
     }
 }

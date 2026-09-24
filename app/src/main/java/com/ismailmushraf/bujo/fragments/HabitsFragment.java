@@ -50,13 +50,6 @@ public class HabitsFragment extends Fragment {
 
         listView = (ListView) root.findViewById(R.id.lv_habits);
         tvEmpty = (TextView) root.findViewById(R.id.tv_empty_habits);
-        
-        root.findViewById(R.id.btn_add_habit).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddHabitDialog();
-            }
-        });
 
         loadHabits();
 
@@ -89,7 +82,7 @@ public class HabitsFragment extends Fragment {
         }
     }
 
-    private void showAddHabitDialog() {
+    public void showAddHabitDialog() {
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
         b.setTitle("New Habit Commitment");
 
@@ -284,25 +277,56 @@ public class HabitsFragment extends Fragment {
             }
 
             convertView.setOnLongClickListener(v -> {
-                String[] options = {"Edit Goal Time", "Delete Habit"};
-                new AlertDialog.Builder(getActivity())
-                        .setTitle(h.getName())
-                        .setItems(options, (dialog, which) -> {
-                            if (which == 0) {
-                                showEditHabitTimeDialog(h);
-                            } else if (which == 1) {
-                                new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                                        .setTitle("Delete Habit")
-                                        .setMessage("Are you sure you want to stop tracking this habit?")
-                                        .setPositiveButton("Delete", (d, w) -> {
-                                            dbManager.deleteHabit(h.getId());
-                                            loadHabits();
-                                        })
-                                        .setNegativeButton(android.R.string.cancel, null)
-                                        .show();
-                            }
-                        })
-                        .show();
+                final android.app.Dialog dialog = new android.app.Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+                View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_bb10_context_sidebar, null);
+                dialog.setContentView(view);
+
+                if (dialog.getWindow() != null) {
+                    android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+                    lp.copyFrom(dialog.getWindow().getAttributes());
+                    lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+                    lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+                    lp.gravity = android.view.Gravity.END;
+                    lp.windowAnimations = R.style.BB10SidebarAnimation;
+                    dialog.getWindow().setAttributes(lp);
+                }
+
+                view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(scrimView -> dialog.dismiss());
+
+                TextView tvTitle = (TextView) view.findViewById(R.id.sidebar_task_title);
+                tvTitle.setText(h.getName());
+
+                ListView lvOptions = (ListView) view.findViewById(R.id.lv_sidebar_options);
+                final List<String> optionsList = new java.util.ArrayList<>();
+                optionsList.add("Edit");
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.item_sidebar_option, R.id.tv_option_title, optionsList) {
+                    @Override
+                    public View getView(int position, View convertView1, ViewGroup parentGroup) {
+                        if (convertView1 == null) {
+                            convertView1 = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parentGroup, false);
+                        }
+                        TextView tv = (TextView) convertView1.findViewById(R.id.tv_option_title);
+                        android.widget.ImageView iv = (android.widget.ImageView) convertView1.findViewById(R.id.iv_option_icon);
+                        tv.setText(optionsList.get(position));
+                        iv.setImageResource(R.drawable.ic_bb10_compose);
+                        return convertView1;
+                    }
+                };
+                lvOptions.setAdapter(adapter);
+
+                lvOptions.setOnItemClickListener((parentAdapter, view1, pos, id) -> {
+                    dialog.dismiss();
+                    showEditHabitTimeDialog(h);
+                });
+
+                view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(deleteView -> {
+                    dialog.dismiss();
+                    dbManager.deleteHabit(h.getId());
+                    loadHabits();
+                });
+
+                dialog.show();
                 return true;
             });
 

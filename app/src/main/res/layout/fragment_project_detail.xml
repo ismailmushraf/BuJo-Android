@@ -1,121 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/bujo_background">
 
-    <!-- Scrollable content area -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/layout_input"
-        android:fillViewport="true">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Header -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="8dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingTop="12dp"
-                    android:paddingBottom="12dp"
-                    android:text="PROJECT ENTRIES"
-                    android:textColor="@color/bujo_text_secondary"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-                <Button
-                    android:id="@+id/btn_edit_project"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="0dp"
-                    android:text="GOAL SETTINGS"
-                    android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp"
-                    android:layout_marginRight="8dp" />
-                <Button
-                    android:id="@+id/btn_delete_project"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:minHeight="0dp"
-                    android:text="DELETE"
-                    android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
-            </LinearLayout>
-
-
-            <ListView
-                android:id="@+id/lv_uncompleted"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="@color/bujo_divider"
-                android:dividerHeight="1dp" />
-
-            <View android:layout_width="match_parent" android:layout_height="20dp" />
-        </LinearLayout>
-    </ScrollView>
-
-    <!-- Pinned Input Section -->
+    <!-- Top Input Bar (BB10 Style) -->
     <LinearLayout
-        android:id="@+id/layout_input"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:background="@color/bb10_bottom_bar_bg">
+        <EditText
+            android:id="@+id/et_new_entry"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:hint="Add a task or search"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:imeOptions="actionDone"
+            android:inputType="textCapSentences"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- Header -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        android:background="@color/bujo_background">
-
-        <LinearLayout
+        android:gravity="center_vertical"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+        <TextView
+            android:id="@+id/tv_project_title_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp"
-            android:background="@drawable/shape_bujo_box">
-
-            <TextView
-                android:id="@+id/btn_emoji"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="📝"
-                android:textSize="22sp"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"/>
-
-            <EditText
-                android:id="@+id/et_new_entry"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="@android:color/transparent"
-                android:hint="Type new task..."
-                android:imeOptions="actionDone"
-                android:inputType="textCapSentences"
-                android:singleLine="true" />
-
-            <!-- New Event Button -->
-            <TextView
-                android:id="@+id/btn_add_event"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:paddingLeft="8dp"
-                android:paddingRight="8dp"
-                android:text="📅"
-                android:textSize="22sp" />
-        </LinearLayout>
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="PROJECT ENTRIES"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
-</RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_uncompleted"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/bujo_divider"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

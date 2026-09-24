@@ -50,41 +50,55 @@ public class SettingsFragment extends Fragment {
 
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 
-        // --- 1. Theme Configuration ---
-        RadioGroup rgTheme = (RadioGroup) root.findViewById(R.id.rg_theme);
-        int currentTheme = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
+        // --- 1. Theme Configuration (BB10 Dropdown) ---
+        Spinner spinnerTheme = (Spinner) root.findViewById(R.id.spinner_theme);
+        final String[] themes = {"Light Theme", "Dark Theme", "Auto"};
+        ArrayAdapter<String> themeAdapter = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_spinner, themes);
+        themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTheme.setAdapter(themeAdapter);
 
+        int currentTheme = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
         if (currentTheme == AppCompatDelegate.MODE_NIGHT_NO) {
-            rgTheme.check(R.id.rb_theme_light);
+            spinnerTheme.setSelection(0);
         } else if (currentTheme == AppCompatDelegate.MODE_NIGHT_YES) {
-            rgTheme.check(R.id.rb_theme_dark);
+            spinnerTheme.setSelection(1);
         } else {
-            rgTheme.check(R.id.rb_theme_auto);
+            spinnerTheme.setSelection(2);
         }
 
-        rgTheme.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        spinnerTheme.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            private boolean initialized = false;
+
             @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!initialized) {
+                    initialized = true;
+                    return;
+                }
                 int mode = AppCompatDelegate.MODE_NIGHT_AUTO;
-                if (checkedId == R.id.rb_theme_light) {
+                if (position == 0) {
                     mode = AppCompatDelegate.MODE_NIGHT_NO;
-                } else if (checkedId == R.id.rb_theme_dark) {
+                } else if (position == 1) {
                     mode = AppCompatDelegate.MODE_NIGHT_YES;
                 }
 
-                prefs.edit().putInt("theme_mode", mode).apply();
-                AppCompatDelegate.setDefaultNightMode(mode);
-                // The BlackBerry Android 4.3 runtime does not always recreate an
-                // AppCompat activity for a DayNight change, so request it explicitly.
-                if (getActivity() != null) getActivity().recreate();
+                if (mode != prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_AUTO)) {
+                    prefs.edit().putInt("theme_mode", mode).apply();
+                    AppCompatDelegate.setDefaultNightMode(mode);
+                    if (getActivity() != null) getActivity().recreate();
+                }
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // --- 2. Startup Screen Configuration ---
+        // --- 2. Startup Screen Configuration (BB10 Dropdown) ---
         Spinner spinnerStartup = (Spinner) root.findViewById(R.id.spinner_startup);
         final String[] screens = {"Inbox", "Today", "Calendar"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_dropdown_item, screens);
-        spinnerStartup.setAdapter(adapter);
+        ArrayAdapter<String> startupAdapter = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_spinner, screens);
+        startupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerStartup.setAdapter(startupAdapter);
 
         String currentStartup = prefs.getString("startup_screen", "Today");
         if ("Inbox".equals(currentStartup)) {
@@ -130,7 +144,7 @@ public class SettingsFragment extends Fragment {
         });
 
         // --- 4. Backup & Restore Configuration ---
-        Button btnExport = (Button) root.findViewById(R.id.btn_export_backup);
+        View btnExport = root.findViewById(R.id.btn_export_backup);
         btnExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -139,7 +153,7 @@ public class SettingsFragment extends Fragment {
             }
         });
 
-        Button btnImport = (Button) root.findViewById(R.id.btn_import_backup);
+        View btnImport = root.findViewById(R.id.btn_import_backup);
         btnImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -149,7 +163,7 @@ public class SettingsFragment extends Fragment {
         });
 
         // --- 4. Clear Completed Tasks ---
-        Button btnClear = (Button) root.findViewById(R.id.btn_clear_completed);
+        View btnClear = root.findViewById(R.id.btn_clear_completed);
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -5,6 +5,7 @@ public class Project {
     private String name;
     private int weight; // Priority 1-5
     private long createdAt;
+    private int color = 0; // 0 = default/palette color
 
     public Project() {
     }
@@ -44,5 +45,13 @@ public class Project {
 
     public void setCreatedAt(long createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
     }
 }
