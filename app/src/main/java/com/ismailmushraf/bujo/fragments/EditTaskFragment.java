@@ -40,6 +40,7 @@ public class EditTaskFragment extends Fragment {
 
     private String currentContent = "";
     private boolean isCompleted = false;
+    private boolean isMigrated = false;
     private long dueDate = 0;
     private boolean hasDueDate = false;
     private long reminderTime = 0;
@@ -50,6 +51,7 @@ public class EditTaskFragment extends Fragment {
     // Initial state tracking for unsaved changes comparison
     private String initialContent = "";
     private boolean initialCompleted = false;
+    private boolean initialMigrated = false;
     private long initialDueDate = 0;
     private boolean initialHasDueDate = false;
     private long initialReminder = 0;
@@ -153,6 +155,7 @@ public class EditTaskFragment extends Fragment {
             if (entry != null) {
                 currentContent = entry.getContent() != null ? entry.getContent() : "";
                 isCompleted = entry.isCompleted();
+                isMigrated = entry.isMigrated();
                 selectedProjectId = entry.getProjectId();
                 selectedProjectTag = entry.getProjectTag() != null ? entry.getProjectTag() : "";
 
@@ -165,12 +168,22 @@ public class EditTaskFragment extends Fragment {
                         hasDueDate = true;
                     }
                 }
+
+                if (entry.isLocked()) {
+                    etTitle.setEnabled(false);
+                    cbDueDateToggle.setEnabled(false);
+                    cbReminderToggle.setEnabled(false);
+                    layoutDueDatePicker.setEnabled(false);
+                    layoutReminderPicker.setEnabled(false);
+                    btnSelectProject.setEnabled(false);
+                }
             }
         }
 
         // Store initial state
         initialContent = currentContent;
         initialCompleted = isCompleted;
+        initialMigrated = isMigrated;
         initialDueDate = dueDate;
         initialHasDueDate = hasDueDate;
         initialReminder = reminderTime;
@@ -224,8 +237,6 @@ public class EditTaskFragment extends Fragment {
             checkSaveButtonState();
         });
 
-        layoutDueDatePicker.setOnClickListener(v -> showDatePickerForDueDate());
-
         // 3. Reminder Toggle & Picker
         cbReminderToggle.setOnCheckedChangeListener((toggle, isChecked) -> {
             hasReminder = isChecked;
@@ -239,10 +250,15 @@ public class EditTaskFragment extends Fragment {
             checkSaveButtonState();
         });
 
-        layoutReminderPicker.setOnClickListener(v -> showDateTimePickerForReminder());
-
-        // 4. Project Selector Click
-        btnSelectProject.setOnClickListener(v -> showProjectPickerDialog());
+        if (!isCreateMode && loadEntryById(entryId) != null && loadEntryById(entryId).isLocked()) {
+            layoutDueDatePicker.setOnClickListener(null);
+            layoutReminderPicker.setOnClickListener(null);
+            btnSelectProject.setOnClickListener(null);
+        } else {
+            layoutDueDatePicker.setOnClickListener(v -> showDatePickerForDueDate());
+            layoutReminderPicker.setOnClickListener(v -> showDateTimePickerForReminder());
+            btnSelectProject.setOnClickListener(v -> showProjectPickerDialog());
+        }
 
         // Cancel Button Action
         root.findViewById(R.id.btn_cancel_task).setOnClickListener(v -> handleCancelAction());
@@ -582,6 +598,7 @@ public class EditTaskFragment extends Fragment {
         String newTitle = etTitle.getText().toString().trim();
         return !newTitle.equals(initialContent)
                 || isCompleted != initialCompleted
+                || isMigrated != initialMigrated
                 || hasDueDate != initialHasDueDate
                 || (hasDueDate && dueDate != initialDueDate)
                 || hasReminder != initialHasReminder
@@ -614,6 +631,15 @@ public class EditTaskFragment extends Fragment {
         entry.setSignifier("*");
         entry.setContent(title);
         entry.setCompleted(isCompleted);
+
+        // Preserve isMigrated unless newly scheduled with a Due Date or Reminder
+        boolean newlyScheduled = (hasDueDate && !initialHasDueDate) || (hasReminder && !initialHasReminder);
+        if (newlyScheduled) {
+            entry.setMigrated(false);
+        } else {
+            entry.setMigrated(isMigrated);
+        }
+
         entry.setProjectId(selectedProjectId);
         entry.setProjectTag(selectedProjectTag);
 

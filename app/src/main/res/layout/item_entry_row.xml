@@ -56,17 +56,7 @@
                 android:visibility="gone"/>
         </LinearLayout>
 
-        <!-- Lock Indicator -->
-        <ImageView
-            android:id="@+id/row_lock_indicator"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:src="@drawable/ic_bb10_lock"
-            android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:visibility="gone" />
-
-        <!-- Tag -->
+        <!-- Tag / Project Title -->
         <TextView
             android:id="@+id/row_tag"
             android:layout_width="wrap_content"
@@ -77,6 +67,16 @@
             android:padding="2dp"
             android:layout_marginStart="8dp"
             android:visibility="gone"/>
+
+        <!-- Lock Indicator (Far Right) -->
+        <ImageView
+            android:id="@+id/row_lock_indicator"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_bb10_lock"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>
