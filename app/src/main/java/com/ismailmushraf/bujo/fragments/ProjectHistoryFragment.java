@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
@@ -52,6 +53,11 @@ public class ProjectHistoryFragment extends Fragment {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setToolbarTitle(projectName + " HISTORY");
             ((MainActivity) getActivity()).setToolbarSubtitle("");
+        }
+
+        TextView tvHistoryTitle = root.findViewById(R.id.tv_project_history_title);
+        if (tvHistoryTitle != null) {
+            tvHistoryTitle.setText(projectName != null && !projectName.isEmpty() ? projectName + " (History)" : "History");
         }
 
         listView = (ListView) root.findViewById(R.id.lv_project_history);

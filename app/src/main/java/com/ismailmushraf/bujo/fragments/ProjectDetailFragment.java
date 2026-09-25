@@ -71,6 +71,11 @@ public class ProjectDetailFragment extends Fragment {
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 
+        TextView tvDetailTitle = root.findViewById(R.id.tv_project_detail_title);
+        if (tvDetailTitle != null) {
+            tvDetailTitle.setText(projectName != null && !projectName.isEmpty() ? projectName : "Project");
+        }
+
         lvUncompleted = root.findViewById(R.id.lv_uncompleted);
         final EditText etNewEntry = root.findViewById(R.id.et_new_entry);
 
@@ -206,86 +211,142 @@ public class ProjectDetailFragment extends Fragment {
         }
     }
 
-    private void showEditProjectDialog() {
-        final Project project = dbManager.getOrCreateProject(projectName); // Get fresh object
-        
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity());
-        b.setTitle("Goal Settings");
+    public void openRightSidebar() {
+        if (getActivity() == null) return;
 
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(30, 30, 30, 30);
+        final android.app.Dialog dialog = new android.app.Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_bb10_project_sidebar, null);
+        dialog.setContentView(view);
 
-        final EditText etName = new EditText(getActivity());
-        etName.setHint("Goal Name");
-        etName.setText(project.getName());
-        layout.addView(etName);
+        if (dialog.getWindow() != null) {
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = android.view.Gravity.END;
+            lp.windowAnimations = R.style.BB10SidebarAnimation;
+            dialog.getWindow().setAttributes(lp);
+        }
 
-        final TextView label = new TextView(getActivity());
-        label.setText("Priority Weight (1-5 stars)");
-        label.setPadding(0, 20, 0, 0);
-        layout.addView(label);
+        view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(v -> dialog.dismiss());
 
-        final android.widget.RatingBar rb = new android.widget.RatingBar(getActivity(), null, android.R.attr.ratingBarStyle);
-        rb.setNumStars(5);
-        rb.setStepSize(1.0f);
-        rb.setRating(project.getWeight());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        rb.setLayoutParams(lp);
-        layout.addView(rb);
+        TextView tvProjectName = view.findViewById(R.id.sidebar_project_name);
+        TextView tvCreatedDate = view.findViewById(R.id.sidebar_project_created_date);
+        TextView tvStats = view.findViewById(R.id.sidebar_project_stats);
 
-        b.setView(layout);
-        b.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+        tvProjectName.setText(projectName);
+
+        Project project = dbManager.getOrCreateProject(projectName);
+        List<Entry> allEntries = dbManager.getEntriesForProject(projectId);
+        int totalTasks = allEntries.size();
+        int completedTasks = 0;
+        for (Entry e : allEntries) {
+            if (e.isCompleted()) completedTasks++;
+        }
+
+        if (project != null && project.getCreatedAt() > 0) {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy", java.util.Locale.US);
+            tvCreatedDate.setText("Created: " + sdf.format(new java.util.Date(project.getCreatedAt())));
+        } else {
+            tvCreatedDate.setText("Project Goal");
+        }
+
+        if (totalTasks > 0) {
+            int pct = (int) ((completedTasks * 100.0f) / totalTasks);
+            tvStats.setText("Completed: " + completedTasks + " of " + totalTasks + " (" + pct + "%)");
+        } else {
+            tvStats.setText("No tasks created yet");
+        }
+
+        class SidebarOption {
+            String title;
+            int iconResId;
+            SidebarOption(String title, int iconResId) {
+                this.title = title;
+                this.iconResId = iconResId;
+            }
+        }
+
+        List<SidebarOption> optionsList = new ArrayList<>();
+        optionsList.add(new SidebarOption("History", R.drawable.ic_bb10_history));
+        optionsList.add(new SidebarOption("Edit", android.R.drawable.ic_menu_edit));
+
+        ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
+        android.widget.ArrayAdapter<SidebarOption> adapter = new android.widget.ArrayAdapter<SidebarOption>(getActivity(), R.layout.item_sidebar_option, optionsList) {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String newName = etName.getText().toString().trim();
-                int newWeight = (int) rb.getRating();
-                if (newWeight < 1) newWeight = 1;
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parent, false);
+                }
+                SidebarOption option = getItem(position);
+                TextView tv = convertView.findViewById(R.id.tv_option_title);
+                android.widget.ImageView iv = convertView.findViewById(R.id.iv_option_icon);
+                if (option != null) {
+                    tv.setText(option.title);
+                    iv.setImageResource(option.iconResId);
+                }
+                return convertView;
+            }
+        };
+        lvOptions.setAdapter(adapter);
 
-                if (!newName.isEmpty()) {
-                    project.setName(newName);
-                    project.setWeight(newWeight);
-                    dbManager.updateProject(project);
-                    projectName = newName;
-                    
-                    if (getActivity() instanceof MainActivity) {
-                        ((MainActivity) getActivity()).setToolbarTitle(projectName);
-                        ((MainActivity) getActivity()).refreshDrawer();
-                    }
-                    loadEntries();
+        lvOptions.setOnItemClickListener((parent, v, position, id) -> {
+            dialog.dismiss();
+            SidebarOption option = optionsList.get(position);
+            if ("History".equals(option.title)) {
+                if (getFragmentManager() != null) {
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                    ft.replace(R.id.fragment_container, ProjectHistoryFragment.newInstance(projectId, projectName));
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
+            } else if ("Edit".equals(option.title)) {
+                if (getFragmentManager() != null) {
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                    ft.replace(R.id.fragment_container, EditProjectFragment.newInstance(projectId, projectName));
+                    ft.addToBackStack(null);
+                    ft.commit();
                 }
             }
         });
-        b.setNegativeButton(android.R.string.cancel, null);
-        b.show();
+
+        view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
+            dialog.dismiss();
+            showDeleteProjectConfirmation();
+        });
+
+        dialog.show();
     }
 
     private void showDeleteProjectConfirmation() {
-        new AlertDialog.Builder(getActivity())
-                .setTitle("Delete Project")
-                .setMessage("How would you like to handle the entries in this project?")
-                .setPositiveButton("Keep Entries", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Original behavior: Unassign only
-                        if (dbManager.deleteProjectAndUnassignEntries(projectId)) {
-                            ((MainActivity) getActivity()).refreshDrawer();
-                            ((MainActivity) getActivity()).showDailyLog();
-                        }
-                    }
-                })
-                .setNeutralButton("Delete Everything", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        int appliedPoints = dbManager.deleteProjectAndAllEntries(projectId);
+        if (getActivity() == null) return;
+        com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(
+                getActivity(),
+                "Delete Project",
+                "Are you sure you want to delete '" + projectName + "' and all its tasks?",
+                "Delete",
+                () -> {
+                    int pointsDeducted = dbManager.deleteProjectAndAllEntries(projectId);
+                    if (getActivity() instanceof MainActivity) {
                         MainActivity main = (MainActivity) getActivity();
-                        main.animatePointsChange(appliedPoints, main.getWindow().getDecorView());
+                        if (pointsDeducted > 0) {
+                            main.animatePointsChange(-pointsDeducted, main.getWindow().getDecorView());
+                        }
                         main.refreshDrawer();
                         main.showDailyLog();
                     }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+                }
+        );
+    }
+
+    public int getProjectId() {
+        return projectId;
+    }
+
+    public String getProjectName() {
+        return projectName;
     }
 
     @Override public void onDestroy() { super.onDestroy(); dbManager.close(); }

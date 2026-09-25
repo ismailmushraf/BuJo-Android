@@ -56,6 +56,20 @@ public class EditTaskFragment extends Fragment {
     private boolean initialHasReminder = false;
     private int initialProjectId = 0;
 
+    public static class SubtaskItem {
+        public int id;
+        public String content;
+        public boolean isCompleted;
+        public SubtaskItem(int id, String content, boolean isCompleted) {
+            this.id = id;
+            this.content = content;
+            this.isCompleted = isCompleted;
+        }
+    }
+
+    private final List<SubtaskItem> subtasksList = new java.util.ArrayList<>();
+    private android.widget.LinearLayout containerSubtasks;
+
     private TextView btnSave;
     private EditText etTitle;
     private TextView tvStatusTick;
@@ -82,9 +96,15 @@ public class EditTaskFragment extends Fragment {
     }
 
     public static EditTaskFragment newInstanceForCreate() {
+        return newInstanceForCreate(0, "");
+    }
+
+    public static EditTaskFragment newInstanceForCreate(int defaultProjectId, String defaultProjectTag) {
         EditTaskFragment fragment = new EditTaskFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_ENTRY_ID, -1);
+        args.putInt("default_project_id", defaultProjectId);
+        args.putString("default_project_tag", defaultProjectTag);
         fragment.setArguments(args);
         return fragment;
     }
@@ -102,6 +122,12 @@ public class EditTaskFragment extends Fragment {
 
         boolean isCreateMode = (entryId <= 0);
 
+        if (isCreateMode && getArguments() != null) {
+            selectedProjectId = getArguments().getInt("default_project_id", 0);
+            selectedProjectTag = getArguments().getString("default_project_tag", "");
+            if (selectedProjectTag == null) selectedProjectTag = "";
+        }
+
         TextView tvHeaderTitle = (TextView) root.findViewById(R.id.tv_task_header_title);
         if (tvHeaderTitle != null) {
             tvHeaderTitle.setText(isCreateMode ? "New Task" : "Edit Task");
@@ -110,6 +136,7 @@ public class EditTaskFragment extends Fragment {
         btnSave = (TextView) root.findViewById(R.id.btn_save_task);
         etTitle = (EditText) root.findViewById(R.id.et_edit_task_title);
         tvStatusTick = (TextView) root.findViewById(R.id.tv_task_status_tick);
+        containerSubtasks = (android.widget.LinearLayout) root.findViewById(R.id.container_subtasks);
         cbDueDateToggle = (BB10ToggleSwitch) root.findViewById(R.id.cb_due_date_toggle);
         layoutDueDatePicker = root.findViewById(R.id.layout_due_date_picker);
         tvDueDateValue = (TextView) root.findViewById(R.id.tv_due_date_value);
@@ -156,6 +183,18 @@ public class EditTaskFragment extends Fragment {
         updateDueDateUI(false);
         updateReminderUI(false);
         updateProjectUI();
+
+        subtasksList.clear();
+        if (!isCreateMode && entryId > 0) {
+            List<Entry> childEntries = dbManager.getChildEntries(entryId);
+            for (Entry child : childEntries) {
+                subtasksList.add(new SubtaskItem(child.getId(), child.getContent() != null ? child.getContent() : "", child.isCompleted()));
+            }
+        }
+        if (subtasksList.isEmpty() || !subtasksList.get(subtasksList.size() - 1).content.trim().isEmpty()) {
+            subtasksList.add(new SubtaskItem(0, "", false));
+        }
+        renderSubtasks(false);
 
         etTitle.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -216,11 +255,7 @@ public class EditTaskFragment extends Fragment {
     }
 
     private Entry loadEntryById(int id) {
-        List<Entry> entries = dbManager.getTodayEntries();
-        for (Entry e : entries) if (e.getId() == id) return e;
-        List<Entry> inbox = dbManager.getInboxEntries();
-        for (Entry e : inbox) if (e.getId() == id) return e;
-        return null;
+        return dbManager.getEntryById(id);
     }
 
     private void updateStatusTickUI() {
@@ -230,6 +265,91 @@ public class EditTaskFragment extends Fragment {
         } else {
             tvStatusTick.setBackgroundResource(R.drawable.bb10_checkbox_unchecked_bg);
             tvStatusTick.setText("");
+        }
+    }
+
+    private void renderSubtasks(boolean focusLast) {
+        if (containerSubtasks == null || getActivity() == null) return;
+        containerSubtasks.removeAllViews();
+
+        for (int i = 0; i < subtasksList.size(); i++) {
+            final int index = i;
+            final SubtaskItem item = subtasksList.get(i);
+
+            View row = LayoutInflater.from(getActivity()).inflate(R.layout.item_edit_subtask_row, containerSubtasks, false);
+            final TextView tvTick = row.findViewById(R.id.subtask_tick);
+            final EditText etContent = row.findViewById(R.id.et_subtask_content);
+            final View btnDelete = row.findViewById(R.id.btn_delete_subtask);
+
+            tvTick.setText(item.isCompleted ? "✓" : "");
+            tvTick.setBackgroundResource(item.isCompleted ? R.drawable.bb10_checkbox_checked_bg : R.drawable.bb10_checkbox_unchecked_bg);
+            etContent.setText(item.content);
+
+            if (item.isCompleted) {
+                etContent.setPaintFlags(etContent.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            } else {
+                etContent.setPaintFlags(etContent.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+            }
+
+            tvTick.setOnClickListener(v -> {
+                item.isCompleted = !item.isCompleted;
+                tvTick.setText(item.isCompleted ? "✓" : "");
+                tvTick.setBackgroundResource(item.isCompleted ? R.drawable.bb10_checkbox_checked_bg : R.drawable.bb10_checkbox_unchecked_bg);
+                if (item.isCompleted) {
+                    etContent.setPaintFlags(etContent.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+                } else {
+                    etContent.setPaintFlags(etContent.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                }
+                checkSaveButtonState();
+            });
+
+            btnDelete.setOnClickListener(v -> {
+                if (subtasksList.size() > 1) {
+                    subtasksList.remove(index);
+                    renderSubtasks(false);
+                    checkSaveButtonState();
+                } else {
+                    item.content = "";
+                    item.isCompleted = false;
+                    renderSubtasks(false);
+                    checkSaveButtonState();
+                }
+            });
+
+            etContent.addTextChangedListener(new TextWatcher() {
+                @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    item.content = s.toString();
+                    if (index == subtasksList.size() - 1 && !item.content.trim().isEmpty()) {
+                        subtasksList.add(new SubtaskItem(0, "", false));
+                        renderSubtasks(false);
+                    }
+                    checkSaveButtonState();
+                }
+                @Override public void afterTextChanged(Editable s) {}
+            });
+
+            etContent.setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_NEXT ||
+                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                    actionId == 0) {
+                    if (!item.content.trim().isEmpty()) {
+                        if (index == subtasksList.size() - 1) {
+                            subtasksList.add(new SubtaskItem(0, "", false));
+                        }
+                        renderSubtasks(true);
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            containerSubtasks.addView(row);
+
+            if (focusLast && index == subtasksList.size() - 1) {
+                etContent.requestFocus();
+            }
         }
     }
 
@@ -508,11 +628,54 @@ public class EditTaskFragment extends Fragment {
             entry.setHasTime(false);
         }
 
+        long parentEntryId = entryId;
         if (isCreateMode) {
             entry.setCreatedAt(System.currentTimeMillis());
-            dbManager.insertEntry(entry);
+            parentEntryId = dbManager.insertEntry(entry);
         } else {
             dbManager.updateEntry(entry);
+        }
+
+        if (parentEntryId > 0) {
+            List<Entry> existingChildren = dbManager.getChildEntries((int) parentEntryId);
+            java.util.Set<Integer> keptChildIds = new java.util.HashSet<>();
+
+            for (SubtaskItem subItem : subtasksList) {
+                String subContent = subItem.content != null ? subItem.content.trim() : "";
+                if (subContent.isEmpty()) continue;
+
+                if (subItem.id > 0) {
+                    keptChildIds.add(subItem.id);
+                    Entry child = new Entry();
+                    child.setId(subItem.id);
+                    child.setParentId((int) parentEntryId);
+                    child.setSignifier("*");
+                    child.setContent(subContent);
+                    child.setCompleted(subItem.isCompleted);
+                    child.setProjectId(selectedProjectId);
+                    child.setProjectTag(selectedProjectTag);
+                    dbManager.updateEntry(child);
+                } else {
+                    Entry child = new Entry();
+                    child.setParentId((int) parentEntryId);
+                    child.setSignifier("*");
+                    child.setContent(subContent);
+                    child.setCompleted(subItem.isCompleted);
+                    child.setProjectId(selectedProjectId);
+                    child.setProjectTag(selectedProjectTag);
+                    child.setCreatedAt(System.currentTimeMillis());
+                    long insertedChildId = dbManager.insertEntry(child);
+                    if (insertedChildId > 0) {
+                        keptChildIds.add((int) insertedChildId);
+                    }
+                }
+            }
+
+            for (Entry oldChild : existingChildren) {
+                if (!keptChildIds.contains(oldChild.getId())) {
+                    dbManager.deleteEntry(oldChild.getId());
+                }
+            }
         }
 
         if (getActivity() instanceof MainActivity) {

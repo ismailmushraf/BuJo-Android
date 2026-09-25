@@ -162,6 +162,14 @@ public class DatabaseManager {
         return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0", null);
     }
 
+    public Entry getEntryById(int id) {
+        List<Entry> entries = getEntries(DatabaseHelper.COLUMN_ID + " = " + id, null);
+        if (entries != null && !entries.isEmpty()) {
+            return entries.get(0);
+        }
+        return null;
+    }
+
     public int getTaskCountForProject(int projectId) {
         Cursor c = database.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_ENTRIES +
                 " WHERE " + DatabaseHelper.COLUMN_PROJECT_ID + " = ? AND " +
@@ -963,7 +971,7 @@ public class DatabaseManager {
                     } while (c.moveToNext());
                     c.close();
                     
-                    // 1. Migrate only UNCOMPLETED missed tasks to Logbook and mark as audited
+                    // 1. Migrate only UNCOMPLETED missed non-project tasks to Logbook and mark as audited
                     ContentValues cvAudit = new ContentValues();
                     cvAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
                     cvAudit.put(DatabaseHelper.COLUMN_MIGRATED, 1);
@@ -972,6 +980,20 @@ public class DatabaseManager {
                             "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
                             DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
                             DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                            DatabaseHelper.COLUMN_PROJECT_ID + " <= 0 AND " +
+                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                            DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
+
+                    // 1b. Mark UNCOMPLETED project tasks as audited without migrating them
+                    ContentValues cvProjectAudit = new ContentValues();
+                    cvProjectAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                    cvProjectAudit.put(DatabaseHelper.COLUMN_MIGRATED, 0);
+                    cvProjectAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0);
+                    database.update(DatabaseHelper.TABLE_ENTRIES, cvProjectAudit, 
+                            "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
+                            DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
+                            DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                            DatabaseHelper.COLUMN_PROJECT_ID + " > 0 AND " +
                             DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
                             DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
 

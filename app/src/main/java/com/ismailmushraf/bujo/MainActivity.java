@@ -85,7 +85,10 @@ public class MainActivity extends AppCompatActivity {
         btnOverflow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (drawerLayout.isDrawerOpen(drawerList)) {
+                Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                if (current instanceof ProjectDetailFragment) {
+                    ((ProjectDetailFragment) current).openRightSidebar();
+                } else if (drawerLayout.isDrawerOpen(drawerList)) {
                     drawerLayout.closeDrawer(drawerList);
                 } else {
                     drawerLayout.openDrawer(drawerList);
@@ -505,15 +508,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.SettingsFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment) {
+            fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.ProjectHistoryFragment) {
             if (btnFab != null) btnFab.setVisibility(View.GONE);
             if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);
             return;
         }
 
+        boolean isOverflowVisible = isPrimaryScreen || (fragment instanceof ProjectDetailFragment);
         if (btnFab != null) btnFab.setVisibility(View.VISIBLE);
-        if (btnOverflow != null) btnOverflow.setVisibility(isPrimaryScreen ? View.VISIBLE : View.INVISIBLE);
+        if (btnOverflow != null) btnOverflow.setVisibility(isOverflowVisible ? View.VISIBLE : View.INVISIBLE);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
             if (tvFabText != null) {
@@ -539,6 +544,9 @@ public class MainActivity extends AppCompatActivity {
             ((com.ismailmushraf.bujo.fragments.HabitsFragment) currentFragment).showAddHabitDialog();
         } else if (currentFragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
             ((com.ismailmushraf.bujo.fragments.ProjectsFragment) currentFragment).openCreateProjectScreen();
+        } else if (currentFragment instanceof ProjectDetailFragment) {
+            ProjectDetailFragment pdf = (ProjectDetailFragment) currentFragment;
+            navigateToFragment(com.ismailmushraf.bujo.fragments.EditTaskFragment.newInstanceForCreate(pdf.getProjectId(), pdf.getProjectName()));
         } else {
             navigateToFragment(com.ismailmushraf.bujo.fragments.EditTaskFragment.newInstanceForCreate());
         }

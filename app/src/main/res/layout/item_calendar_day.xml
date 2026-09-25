@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="4dp">
+    android:layout_height="38dp"
+    android:padding="2dp">
 
-    <!-- The Date Number -->
-    <TextView
-        android:id="@+id/tv_day_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="20sp" />
-
-    <!-- Indicator Dots Container -->
+    <!-- Left Task Indicator Dots/Bars Container -->
     <LinearLayout
         android:id="@+id/layout_dots"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_marginTop="2dp" />
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="4dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical" />
 
-</LinearLayout>
+    <!-- Centered Day Number -->
+    <TextView
+        android:id="@+id/tv_day_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textSize="17sp" />
+
+</RelativeLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="38dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/subtask_tick"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:gravity="center"
+        android:textSize="13sp"
+        android:textColor="@color/white"
+        android:background="@drawable/bb10_checkbox_unchecked_bg"
+        android:clickable="true"
+        android:focusable="true" />
+
+    <EditText
+        android:id="@+id/et_subtask_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:background="@android:color/transparent"
+        android:hint="Add subtask..."
+        android:textColor="@color/bujo_text"
+        android:textColorHint="@color/bujo_text_secondary"
+        android:textSize="14sp"
+        android:singleLine="true"
+        android:imeOptions="actionNext"
+        android:inputType="textCapSentences" />
+
+    <TextView
+        android:id="@+id/btn_delete_subtask"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:gravity="center"
+        android:text="×"
+        android:textColor="@color/bujo_text_secondary"
+        android:textSize="18sp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?android:attr/selectableItemBackground" />
+
+</LinearLayout>

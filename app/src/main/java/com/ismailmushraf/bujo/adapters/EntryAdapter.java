@@ -103,9 +103,9 @@ public class EntryAdapter extends ArrayAdapter<Object> {
     private View getHeaderView(String title, View convertView, ViewGroup parent) {
         HeaderViewHolder holder;
         if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_drawer_section, parent, false);
+            convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_section_header, parent, false);
             holder = new HeaderViewHolder();
-            holder.tvTitle = (TextView) convertView.findViewById(R.id.drawer_section_title);
+            holder.tvTitle = (TextView) convertView.findViewById(R.id.section_header_title);
             convertView.setTag(holder);
         } else {
             holder = (HeaderViewHolder) convertView.getTag();
@@ -194,15 +194,33 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
         if (entry.getDeadline() > 0) {
             holder.tvDeadline.setVisibility(View.VISIBLE);
+
+            java.util.Calendar todayCal = java.util.Calendar.getInstance();
+            todayCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            todayCal.set(java.util.Calendar.MINUTE, 0);
+            todayCal.set(java.util.Calendar.SECOND, 0);
+            todayCal.set(java.util.Calendar.MILLISECOND, 0);
+            long startOfToday = todayCal.getTimeInMillis();
+
+            boolean isOverdue = !entry.isCompleted() && entry.getDeadline() < startOfToday;
+
             if (isDailyLog) {
                 if (entry.hasTime()) {
                     holder.tvDeadline.setText("Time: " + timeFormat.format(new Date(entry.getDeadline())));
+                    holder.tvDeadline.setTextColor(colorTextSecondary);
                 } else {
                     holder.tvDeadline.setVisibility(View.GONE);
                 }
             } else {
                 SimpleDateFormat sdf = entry.hasTime() ? dateTimeFormat : dateFormat;
-                holder.tvDeadline.setText((entry.hasTime() ? "Reminder: " : "Date: ") + sdf.format(new Date(entry.getDeadline())));
+                String deadlineText = (entry.hasTime() ? "Reminder: " : "Date: ") + sdf.format(new Date(entry.getDeadline()));
+                if (isOverdue) {
+                    holder.tvDeadline.setText(deadlineText + " (Overdue)");
+                    holder.tvDeadline.setTextColor(getContext().getResources().getColor(R.color.bb10_folder_red));
+                } else {
+                    holder.tvDeadline.setText(deadlineText);
+                    holder.tvDeadline.setTextColor(colorTextSecondary);
+                }
             }
         } else {
             holder.tvDeadline.setVisibility(View.GONE);
