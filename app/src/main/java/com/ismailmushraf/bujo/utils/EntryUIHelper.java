@@ -21,7 +21,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
@@ -70,11 +69,10 @@ public class EntryUIHelper {
 
     public void showContextDialog(final Entry entry, final View sourceView) {
         if (entry.isLocked()) {
-            new AlertDialog.Builder(context, R.style.BujoDialog)
-                    .setTitle("Task Locked")
-                    .setMessage("Modifications are disabled for this task. It remains set in stone for the day to encourage commitment.")
-                    .setPositiveButton(android.R.string.ok, null)
-                    .show();
+            BB10DialogHelper.showAlertDialog(context, 
+                "Task Locked", 
+                "Modifications are disabled for this task. It remains set in stone for the day to encourage commitment.", 
+                "OK");
             return;
         }
 
@@ -101,9 +99,6 @@ public class EntryUIHelper {
         if (entry.isMigrated()) {
             optionsList.add(new SidebarOption("Mark as Not Migrated", R.drawable.ic_inbox));
         } else {
-            optionsList.add(new SidebarOption("Edit Item", android.R.drawable.ic_menu_edit));
-            optionsList.add(new SidebarOption("Set Date", R.drawable.ic_calendar));
-            optionsList.add(new SidebarOption("Set Reminder Time", R.drawable.ic_today));
             optionsList.add(new SidebarOption("Migrate to Future List", R.drawable.ic_inbox));
             if ("*".equals(entry.getSignifier())) {
                 optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
@@ -135,13 +130,7 @@ public class EntryUIHelper {
                 dialog.dismiss();
                 SidebarOption option = optionsList.get(position);
                 String selected = option.title;
-                if (selected.equals("Edit Item")) {
-                    showEditDialog(entry);
-                } else if (selected.equals("Set Date")) {
-                    showDatePicker(entry, sourceView);
-                } else if (selected.equals("Set Reminder Time")) {
-                    showTimePicker(entry);
-                } else if (selected.equals("Mark as Not Migrated") || selected.equals("Migrate to Future List")) {
+                if (selected.equals("Mark as Not Migrated") || selected.equals("Migrate to Future List")) {
                     boolean migrating = !entry.isMigrated();
                     long prevDeadline = entry.getDeadline();
                     boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
@@ -200,114 +189,6 @@ public class EntryUIHelper {
             listener.onEntryUpdated();
             Toast.makeText(context, "Task locked.", Toast.LENGTH_SHORT).show();
         });
-    }
-
-    private void showEditDialog(final Entry entry) {
-        if (entry.isLocked()) {
-            Toast.makeText(context, "Item is locked.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        final EditText input = new EditText(context);
-        input.setText(entry.getContent());
-        input.setSelection(input.length());
-        new AlertDialog.Builder(context, R.style.BujoDialog)
-                .setTitle("Edit item")
-                .setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String content = input.getText().toString().trim();
-                        if (!content.isEmpty()) {
-                            entry.setContent(content);
-                            dbManager.updateEntry(entry);
-                            listener.onEntryUpdated();
-                        }
-                    }
-                })
-                .show();
-    }
-
-    private void showDatePicker(final Entry entry, final View sourceView) {
-        final Calendar c = Calendar.getInstance();
-        if (entry.getDeadline() > 0) {
-            c.setTimeInMillis(entry.getDeadline());
-        }
-
-        DatePickerDialog datePickerDialog = new DatePickerDialog(context,
-                new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        Calendar selected = Calendar.getInstance();
-
-                        if (entry.getDeadline() > 0) {
-                            selected.setTimeInMillis(entry.getDeadline());
-                        } else {
-                            selected.set(Calendar.HOUR_OF_DAY, 12);
-                            selected.set(Calendar.MINUTE, 0);
-                            selected.set(Calendar.SECOND, 0);
-                        }
-
-                        selected.set(Calendar.YEAR, year);
-                        selected.set(Calendar.MONTH, monthOfYear);
-                        selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-
-                        long prevDeadline = entry.getDeadline();
-                        boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
-
-                        entry.setDeadline(selected.getTimeInMillis());
-                        entry.setHasTime(false);
-
-                        boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
-
-                        dbManager.updateEntry(entry);
-                        scheduleNotification(entry);
-
-                        if (context instanceof com.ismailmushraf.bujo.MainActivity) {
-                            if (!wasToday && isToday) {
-                                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(5, sourceView);
-                            } else if (wasToday && !isToday) {
-                                ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-5, sourceView);
-                            }
-                        }
-
-                        listener.onEntryUpdated();
-                    }
-                }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-
-        datePickerDialog.show();
-    }
-
-    private void showTimePicker(final Entry entry) {
-        final Calendar c = Calendar.getInstance();
-        if (entry.getDeadline() > 0) {
-            c.setTimeInMillis(entry.getDeadline());
-        }
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(context,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        Calendar selected = Calendar.getInstance();
-
-                        if (entry.getDeadline() > 0) {
-                            selected.setTimeInMillis(entry.getDeadline());
-                        }
-
-                        selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        selected.set(Calendar.MINUTE, minute);
-                        selected.set(Calendar.SECOND, 0);
-
-                        entry.setDeadline(selected.getTimeInMillis());
-                        entry.setHasTime(true);
-
-                        dbManager.updateEntry(entry);
-                        scheduleNotification(entry);
-                        listener.onEntryUpdated();
-                    }
-                }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
-
-        timePickerDialog.show();
     }
 
     private void scheduleNotification(Entry entry) {

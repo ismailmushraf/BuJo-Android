@@ -54,4 +54,51 @@ public class BB10DialogHelper {
 
         dialog.show();
     }
+
+    public static void showAlertDialog(Context context, String title, String message, String btnText) {
+        if (context == null) return;
+
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog_bb10_confirm, null);
+        TextView tvTitle = (TextView) view.findViewById(R.id.tv_confirm_title);
+        TextView tvMessage = (TextView) view.findViewById(R.id.tv_confirm_message);
+        TextView btnPositive = (TextView) view.findViewById(R.id.btn_confirm_positive);
+        TextView btnNegative = (TextView) view.findViewById(R.id.btn_confirm_negative);
+
+        if (tvTitle != null) tvTitle.setText(title);
+        if (tvMessage != null) tvMessage.setText(message);
+        
+        // Use the negative button as the single 'OK' button because it's styled normally (black text), 
+        // while the positive one is usually red (Delete). Actually, let's use positive and change color if needed, or just use negative.
+        if (btnNegative != null) {
+            btnNegative.setText(btnText != null ? btnText : "OK");
+        }
+        
+        if (btnPositive != null) {
+            btnPositive.setVisibility(View.GONE);
+            // also hide the divider above negative button
+            ViewGroup parent = (ViewGroup) btnPositive.getParent();
+            if (parent != null && parent.getChildCount() > 1) {
+                View div = parent.getChildAt(1); // divider is at index 1
+                if (div != null) div.setVisibility(View.GONE);
+            }
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
+
+        if (btnNegative != null) {
+            btnNegative.setOnClickListener(v -> dialog.dismiss());
+        }
+
+        dialog.setOnShowListener(d -> {
+            if (dialog.getWindow() != null) {
+                DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+                int width = (int) (metrics.widthPixels * 0.88);
+                dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
+
+        dialog.show();
+    }
 }

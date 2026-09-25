@@ -1,3 +1,5 @@
-- [x] Update `app/src/main/res/layout/header_workout.xml` with BB10 layout (top bar, weight/reps/note row, settings-style timer row, separator row)
-- [x] Update `app/src/main/res/layout/fragment_workout.xml` (remove padding, adjust properties)
-- [x] Update `app/src/main/java/com/ismailmushraf/bujo/fragments/WorkoutFragment.java` (bind new views, setup timer buttons, refactor adapter view, implement BB10 context menu for deletion)
+- [x] Hide FAB in WorkoutFragment (`MainActivity.java`)
+- [x] Remove "Journal Index" from Navigation Drawer (`MainActivity.java`)
+- [x] Center options in Context Sidebar (`dialog_bb10_context_sidebar.xml`)
+- [x] Center options in Project Sidebar (`dialog_bb10_project_sidebar.xml`)
+- [x] Center options in Navigation Drawer (`activity_main.xml`)

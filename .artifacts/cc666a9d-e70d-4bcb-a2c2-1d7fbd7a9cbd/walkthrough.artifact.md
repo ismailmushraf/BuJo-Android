@@ -1,20 +1,24 @@
-# Workouts Page BB10 Redesign Tweaks Complete
+# Side Bar and Workouts Tweaks Complete
 
-I have applied the requested layout and logic tweaks to the Workouts page.
+I've executed all items detailed in the plan, addressing both the Workout page adjustments and the global Sidebar changes.
 
 ## Summary of Changes
 
-1. **Header Layout Adjustments (`header_workout.xml`)**
-   - Decreased the height of the Weight and Reps inputs row to a slimmer `40dp`.
-   - Extracted the "Notes" input field into its own dedicated 3rd row, spanning the full width of the screen.
-   - Assigned the "Notes" row the exact same `40dp` height as the Weight/Reps row for visual consistency.
-   - Maintained the clean BB10 1dp divider lines between these rows.
+1. **FAB Removal from Workouts Page**
+   - Modified `MainActivity.java` inside `updateBottomBarButtons()` to listen for `WorkoutFragment` and `WorkoutHistoryFragment`.
+   - The central Floating Action Button (FAB), its label, and the Overflow button are now explicitly hidden when browsing the Workouts sections.
 
-2. **Autocomplete Suggestions Update (`WorkoutFragment.java`)**
-   - Fixed an issue where the `ArrayAdapter` for the autocomplete dropdown wasn't updating properly with new unique workouts.
-   - Now, immediately after you log a new set (which saves the exercise name in the database), the fragment re-initializes the suggestions list. Next time you click or type into the search box, the newly added workout name will immediately appear in the dropdown.
+2. **Removed "Journal Index" Header**
+   - Removed the hardcoded section header `DrawerItem.TYPE_SECTION` in `MainActivity.java`'s `refreshDrawer()` method. The drawer list now starts directly with "Inbox".
+
+3. **Centered Primary Sidebar Items (Global Change)**
+   - Modified `dialog_bb10_context_sidebar.xml` (Task/Habit/Workout Long Press Menu).
+   - Modified `dialog_bb10_project_sidebar.xml` (Project Long Press Menu).
+   - Modified `activity_main.xml` (Main Navigation Drawer).
+   - For all 3 files, I wrapped the middle `ListView` inside a `RelativeLayout` and applied `android:layout_centerVertical="true"` alongside `android:layout_height="wrap_content"`.
+   - This effectively floats the primary interaction items perfectly in the vertical center of the sidebar, leaving the fixed top headers and fixed bottom action bars (like "Delete") undisturbed.
 
 ## Verification
-- Run the app and navigate to the Workouts tab.
-- Observe the new 2-row layout for the inputs (Row 1: Weight & Reps, Row 2: Notes) and their slimmed-down heights.
-- Type a completely new exercise name (e.g., "Dragon Flags"), log a set, and then tap the exercise name box again. The newly added exercise should now be available in the dropdown suggestions.
+- Open the app and open the Main Navigation drawer. Observe that "Journal Index" is gone, and the navigation items sit securely in the middle of the screen.
+- Long press on a Task or Project to verify that the Context/Project sidebar items are vertically centered, while the Title stays at the top and "Delete" stays at the bottom.
+- Navigate to the Workouts page. Verify the central BB10 FAB (and its "New Task" text) completely disappears.

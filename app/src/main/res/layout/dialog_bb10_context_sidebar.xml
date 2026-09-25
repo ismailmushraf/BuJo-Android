@@ -85,14 +85,20 @@
             android:background="#222222" />
 
         <!-- 2. MIDDLE SECTION: Options List (Except Delete) -->
-        <ListView
-            android:id="@+id/lv_sidebar_options"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/top_divider"
-            android:layout_above="@id/bottom_divider"
-            android:divider="#222222"
-            android:dividerHeight="1dp" />
+            android:layout_above="@id/bottom_divider">
+
+            <ListView
+                android:id="@+id/lv_sidebar_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:divider="#222222"
+                android:dividerHeight="1dp" />
+        </RelativeLayout>
 
     </RelativeLayout>
 </LinearLayout>

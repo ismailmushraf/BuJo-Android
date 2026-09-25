@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;
+    private View drawerView;
     private DrawerAdapter drawerAdapter;
     private List<DrawerItem> drawerItemsList;
     private DatabaseManager dbManager;
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.nav_drawer_list);
+        drawerView = findViewById(R.id.nav_drawer_container);
 
         // Header view matching screenshot with back arrow
         dbManager = new DatabaseManager(this);
@@ -89,10 +91,10 @@ public class MainActivity extends AppCompatActivity {
                 Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
                 if (current instanceof ProjectDetailFragment) {
                     ((ProjectDetailFragment) current).openRightSidebar();
-                } else if (drawerLayout.isDrawerOpen(drawerList)) {
-                    drawerLayout.closeDrawer(drawerList);
+                } else if (drawerLayout.isDrawerOpen(drawerView)) {
+                    drawerLayout.closeDrawer(drawerView);
                 } else {
-                    drawerLayout.openDrawer(drawerList);
+                    drawerLayout.openDrawer(drawerView);
                 }
             }
         });
@@ -163,16 +165,16 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             String navigateTo = getIntent().getStringExtra("NAVIGATE_TO");
             if ("Pomodoro".equals(navigateTo)) {
-                selectItem(4); 
+                selectItem(3); 
             } else {
                 android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
                 String startup = prefs.getString("startup_screen", "Today");
 
-                int startupIndex = 2; // Default to Today
+                int startupIndex = 1; // Default to Today
                 if ("Inbox".equals(startup)) {
-                    startupIndex = 1;
+                    startupIndex = 0;
                 } else if ("Calendar".equals(startup)) {
-                    startupIndex = 3;
+                    startupIndex = 2;
                 }
                 selectItem(startupIndex);
             }
@@ -181,7 +183,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void refreshDrawer() {
         drawerItemsList.clear();
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_SECTION, "JOURNAL INDEX", 0));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", R.drawable.ic_inbox));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", R.drawable.ic_today));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", R.drawable.ic_calendar));
@@ -226,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         drawerAdapter.setSelectedPosition(position);
-        drawerLayout.closeDrawer(drawerList);
+        drawerLayout.closeDrawer(drawerView);
     }
 
     public void showDailyLog() {
@@ -423,8 +424,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         // 1. If the navigation drawer is open, close it first
-        if (drawerLayout.isDrawerOpen(drawerList)) {
-            drawerLayout.closeDrawer(drawerList);
+        if (drawerLayout.isDrawerOpen(drawerView)) {
+            drawerLayout.closeDrawer(drawerView);
             return;
         }
 
@@ -453,11 +454,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 4. If we are NOT on the default screen, navigate there instead of exiting
         if (!isDefaultScreen) {
-            int startupIndex = 2; // Default to Today
+            int startupIndex = 1; // Default to Today
             if ("Inbox".equals(startup)) {
-                startupIndex = 1;
+                startupIndex = 0;
             } else if ("Calendar".equals(startup)) {
-                startupIndex = 3;
+                startupIndex = 2;
             }
             selectItemWithPopAnimation(startupIndex); // Uses slide_in_left & slide_out_right for smooth back transition!
         } else {
@@ -523,7 +524,9 @@ public class MainActivity extends AppCompatActivity {
             fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.ProjectHistoryFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment) {
+            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutHistoryFragment) {
             if (btnFab != null) btnFab.setVisibility(View.GONE);
             if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);

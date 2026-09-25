@@ -297,13 +297,20 @@
     </RelativeLayout>
 
     <!-- Navigation Drawer -->
-    <ListView
-        android:id="@+id/nav_drawer_list"
+    <RelativeLayout
+        android:id="@+id/nav_drawer_container"
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="#000000"
-        android:divider="#222222"
-        android:dividerHeight="1dp" />
+        android:background="#000000">
+
+        <ListView
+            android:id="@+id/nav_drawer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:divider="#222222"
+            android:dividerHeight="1dp" />
+    </RelativeLayout>
 
 </android.support.v4.widget.DrawerLayout>
