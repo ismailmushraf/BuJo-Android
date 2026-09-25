@@ -98,12 +98,16 @@ public class EntryUIHelper {
         tvTitle.setText(entry.getContent());
 
         final List<SidebarOption> optionsList = new ArrayList<>();
-        optionsList.add(new SidebarOption("Edit Item", android.R.drawable.ic_menu_edit));
-        optionsList.add(new SidebarOption("Set Date", R.drawable.ic_calendar));
-        optionsList.add(new SidebarOption("Set Reminder Time", R.drawable.ic_today));
-        optionsList.add(new SidebarOption(entry.isMigrated() ? "Mark as Not Migrated" : "Migrate to Future List", R.drawable.ic_inbox));
-        if ("*".equals(entry.getSignifier()) && !entry.isMigrated()) {
-            optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
+        if (entry.isMigrated()) {
+            optionsList.add(new SidebarOption("Mark as Not Migrated", R.drawable.ic_inbox));
+        } else {
+            optionsList.add(new SidebarOption("Edit Item", android.R.drawable.ic_menu_edit));
+            optionsList.add(new SidebarOption("Set Date", R.drawable.ic_calendar));
+            optionsList.add(new SidebarOption("Set Reminder Time", R.drawable.ic_today));
+            optionsList.add(new SidebarOption("Migrate to Future List", R.drawable.ic_inbox));
+            if ("*".equals(entry.getSignifier())) {
+                optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
+            }
         }
 
         ListView lvOptions = (ListView) view.findViewById(R.id.lv_sidebar_options);

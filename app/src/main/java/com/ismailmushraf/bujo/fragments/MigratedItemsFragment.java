@@ -64,11 +64,13 @@ public class MigratedItemsFragment extends Fragment {
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                // Should we show detail in logbook? Yes, consistency is better.
-                // But detail dialog is currently private to DailyLogFragment.
-                // I should probably move it to uiHelper or make a static helper.
-                // For now, let's just toggle completion on click if no listener.
-                // Wait, I already added click zone in adapter.
+                if (getFragmentManager() != null && entry != null) {
+                    android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
+                    ft.addToBackStack(null);
+                    ft.commit();
+                }
             }
 
             @Override
