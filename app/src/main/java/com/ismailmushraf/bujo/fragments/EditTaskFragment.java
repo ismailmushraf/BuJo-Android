@@ -56,6 +56,7 @@ public class EditTaskFragment extends Fragment {
     private boolean initialHasReminder = false;
     private int initialProjectId = 0;
 
+    private TextView btnSave;
     private EditText etTitle;
     private TextView tvStatusTick;
     private BB10ToggleSwitch cbDueDateToggle;
@@ -106,6 +107,7 @@ public class EditTaskFragment extends Fragment {
             tvHeaderTitle.setText(isCreateMode ? "New Task" : "Edit Task");
         }
 
+        btnSave = (TextView) root.findViewById(R.id.btn_save_task);
         etTitle = (EditText) root.findViewById(R.id.et_edit_task_title);
         tvStatusTick = (TextView) root.findViewById(R.id.tv_task_status_tick);
         cbDueDateToggle = (BB10ToggleSwitch) root.findViewById(R.id.cb_due_date_toggle);
@@ -155,10 +157,19 @@ public class EditTaskFragment extends Fragment {
         updateReminderUI(false);
         updateProjectUI();
 
+        etTitle.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                checkSaveButtonState();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
         // 1. Status Tick Click Listener
         tvStatusTick.setOnClickListener(v -> {
             isCompleted = !isCompleted;
             updateStatusTickUI();
+            checkSaveButtonState();
         });
 
         // 2. Due Date Toggle & Picker
@@ -171,6 +182,7 @@ public class EditTaskFragment extends Fragment {
                 dueDate = c.getTimeInMillis();
             }
             updateDueDateUI(true);
+            checkSaveButtonState();
         });
 
         layoutDueDatePicker.setOnClickListener(v -> showDatePickerForDueDate());
@@ -185,6 +197,7 @@ public class EditTaskFragment extends Fragment {
                 reminderTime = c.getTimeInMillis();
             }
             updateReminderUI(true);
+            checkSaveButtonState();
         });
 
         layoutReminderPicker.setOnClickListener(v -> showDateTimePickerForReminder());
@@ -198,6 +211,7 @@ public class EditTaskFragment extends Fragment {
         // Save Button Action
         root.findViewById(R.id.btn_save_task).setOnClickListener(v -> handleSaveAction(isCreateMode));
 
+        checkSaveButtonState();
         return root;
     }
 
@@ -324,6 +338,19 @@ public class EditTaskFragment extends Fragment {
         viewProjectColorBlock.setBackgroundColor(color);
     }
 
+    private void checkSaveButtonState() {
+        if (btnSave == null || etTitle == null) return;
+
+        String newTitle = etTitle.getText().toString().trim();
+        boolean isValid = !newTitle.isEmpty();
+        boolean isCreateMode = (entryId <= 0);
+        boolean hasChanged = isCreateMode ? !newTitle.isEmpty() : hasUnsavedChanges();
+        boolean enable = isValid && hasChanged;
+
+        btnSave.setEnabled(enable);
+        btnSave.setTextColor(enable ? android.graphics.Color.parseColor("#00a8df") : android.graphics.Color.parseColor("#A0C8E6"));
+    }
+
     private void showDatePickerForDueDate() {
         final Calendar c = Calendar.getInstance();
         if (dueDate > 0) c.setTimeInMillis(dueDate);
@@ -334,6 +361,7 @@ public class EditTaskFragment extends Fragment {
             dueDate = selected.getTimeInMillis();
             hasDueDate = true;
             updateDueDateUI();
+            checkSaveButtonState();
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
         dpd.show();
     }
@@ -355,6 +383,7 @@ public class EditTaskFragment extends Fragment {
                 reminderTime = selected.getTimeInMillis();
                 hasReminder = true;
                 updateReminderUI();
+                checkSaveButtonState();
             }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), false);
             tpd.show();
         }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
@@ -415,6 +444,7 @@ public class EditTaskFragment extends Fragment {
                 selectedProjectTag = selected.getName();
             }
             updateProjectUI();
+            checkSaveButtonState();
         });
 
         dialog.setOnShowListener(d -> {

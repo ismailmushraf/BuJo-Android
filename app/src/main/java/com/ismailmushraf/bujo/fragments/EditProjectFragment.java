@@ -122,11 +122,7 @@ public class EditProjectFragment extends Fragment {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        root.findViewById(R.id.btn_cancel).setOnClickListener(v -> {
-            if (getFragmentManager() != null) {
-                getFragmentManager().popBackStack();
-            }
-        });
+        root.findViewById(R.id.btn_cancel).setOnClickListener(v -> handleCancelAction(etTitle));
 
         btnSave.setOnClickListener(v -> {
             String newTitle = etTitle.getText().toString().trim();
@@ -216,6 +212,30 @@ public class EditProjectFragment extends Fragment {
             layout.addView(circle);
         }
         dialog.show();
+    }
+
+    private boolean hasUnsavedChanges(EditText etTitle) {
+        String newName = etTitle.getText().toString().trim();
+        boolean isCreateMode = (projectId <= 0);
+        if (isCreateMode) {
+            return !newName.isEmpty() || currentWeight != 1 || currentColor != 0;
+        } else {
+            return !newName.equals(originalName) || currentWeight != originalWeight || currentColor != originalColor;
+        }
+    }
+
+    private void handleCancelAction(EditText etTitle) {
+        if (hasUnsavedChanges(etTitle)) {
+            com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Discard Changes", "Are you sure you want to discard your changes?", "Discard", () -> {
+                if (getFragmentManager() != null) {
+                    getFragmentManager().popBackStack();
+                }
+            });
+        } else {
+            if (getFragmentManager() != null) {
+                getFragmentManager().popBackStack();
+            }
+        }
     }
 
     private void checkSaveButtonState(EditText etTitle) {

@@ -60,7 +60,8 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="Save"
-            android:textColor="#00a8df"
+            android:textColor="#A0C8E6"
+            android:enabled="false"
             android:textSize="15sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
@@ -329,7 +330,7 @@
                 <!-- Far-left 3dp vertical color bar -->
                 <View
                     android:id="@+id/view_project_color_block"
-                    android:layout_width="3dp"
+                    android:layout_width="4dp"
                     android:layout_height="match_parent"
                     android:background="@color/bb10_folder_blue" />
 
