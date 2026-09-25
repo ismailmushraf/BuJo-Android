@@ -116,7 +116,7 @@
         <GridView
             android:id="@+id/grid_week"
             android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_height="44dp"
             android:horizontalSpacing="0dp"
             android:numColumns="7"
             android:scrollbars="none"

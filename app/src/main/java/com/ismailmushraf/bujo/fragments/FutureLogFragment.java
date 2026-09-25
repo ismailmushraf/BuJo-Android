@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -24,6 +25,7 @@ import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
+import com.ismailmushraf.bujo.utils.EntryUIHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ public class FutureLogFragment extends Fragment {
     private ListView agendaList;
 
     private DatabaseManager dbManager;
+    private EntryUIHelper uiHelper;
     private Calendar currentMonth;
     private Calendar selectedDate;
     private List<Entry> deadlineEntries;
@@ -74,6 +77,17 @@ public class FutureLogFragment extends Fragment {
 
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
+
+        uiHelper = new EntryUIHelper(getActivity(), dbManager, new EntryUIHelper.OnEntryUpdatedListener() {
+            @Override
+            public void onEntryUpdated() {
+                if (agendaContainer.getVisibility() == View.VISIBLE) {
+                    reloadVisibleEntries();
+                } else {
+                    showMonth();
+                }
+            }
+        });
 
         currentMonth = Calendar.getInstance();
         selectedDate = Calendar.getInstance();
@@ -120,10 +134,10 @@ public class FutureLogFragment extends Fragment {
                     if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                         if (diffY < 0) {
                             currentMonth.add(Calendar.MONTH, 1);
-                            showMonth();
+                            showMonthWithAnimation(true);
                         } else {
                             currentMonth.add(Calendar.MONTH, -1);
-                            showMonth();
+                            showMonthWithAnimation(false);
                         }
                         return true;
                     }
@@ -145,6 +159,20 @@ public class FutureLogFragment extends Fragment {
             showAgendaForSelectedDate();
         } else {
             showMonth();
+        }
+    }
+
+    private void showMonthWithAnimation(boolean slideUp) {
+        showMonth();
+        if (monthGrid != null) {
+            float startTranslation = slideUp ? monthGrid.getHeight() : -monthGrid.getHeight();
+            if (startTranslation == 0) startTranslation = slideUp ? 300f : -300f;
+            monthGrid.setTranslationY(startTranslation);
+            monthGrid.animate()
+                    .translationY(0f)
+                    .setDuration(220)
+                    .setInterpolator(new DecelerateInterpolator())
+                    .start();
         }
     }
 
@@ -254,9 +282,11 @@ public class FutureLogFragment extends Fragment {
             if (convertView == null) {
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_calendar_task_row, parent, false);
             }
-            Entry entry = getItem(position);
+            final Entry entry = getItem(position);
             TextView tvTimeDue = convertView.findViewById(R.id.tv_time_due);
             TextView tvTaskTitle = convertView.findViewById(R.id.tv_task_title);
+            TextView tvTaskProject = convertView.findViewById(R.id.tv_task_project);
+            TextView tvTaskTick = convertView.findViewById(R.id.tv_task_status_tick);
 
             if (entry != null) {
                 if (entry.hasTime() && entry.getDeadline() > 0) {
@@ -264,7 +294,41 @@ public class FutureLogFragment extends Fragment {
                 } else {
                     tvTimeDue.setText("Due");
                 }
-                tvTaskTitle.setText(entry.getContent() != null ? entry.getContent() : "");
+
+                String content = entry.getContent() != null ? entry.getContent() : "";
+                if (entry.isCompleted()) {
+                    android.text.SpannableString spannable = new android.text.SpannableString(content);
+                    spannable.setSpan(new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(
+                            getContext().getResources().getColor(R.color.bujo_text_secondary),
+                            getContext().getResources().getColor(R.color.bb10_folder_red)),
+                            0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    tvTaskTitle.setText(spannable);
+                } else {
+                    tvTaskTitle.setPaintFlags(tvTaskTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                    tvTaskTitle.setText(content);
+                }
+
+                if (entry.getProjectTag() != null && !entry.getProjectTag().trim().isEmpty()) {
+                    tvTaskProject.setVisibility(View.VISIBLE);
+                    tvTaskProject.setText("#" + entry.getProjectTag().trim());
+                } else {
+                    tvTaskProject.setVisibility(View.GONE);
+                }
+
+                if (entry.isCompleted()) {
+                    tvTaskTick.setBackgroundResource(R.drawable.bb10_checkbox_checked_bg);
+                    tvTaskTick.setText("✓");
+                } else {
+                    tvTaskTick.setBackgroundResource(R.drawable.bb10_checkbox_unchecked_bg);
+                    tvTaskTick.setText("");
+                }
+
+                tvTaskTick.setOnClickListener(v -> {
+                    if (uiHelper != null) {
+                        uiHelper.toggleEntryCompletion(entry, v);
+                        notifyDataSetChanged();
+                    }
+                });
             }
 
             convertView.setOnClickListener(v -> {
@@ -342,7 +406,10 @@ public class FutureLogFragment extends Fragment {
         @Override public long getItemId(int position) { return position; }
         @Override public View getView(int position, View convertView, ViewGroup parent) {
             Calendar day = days.get(position);
-            return bindDayView(context, day, convertView, false);
+            View view = bindDayView(context, day, convertView, false);
+            int heightPx = (int) (44 * getResources().getDisplayMetrics().density);
+            view.setLayoutParams(new android.widget.AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, heightPx));
+            return view;
         }
     }
 

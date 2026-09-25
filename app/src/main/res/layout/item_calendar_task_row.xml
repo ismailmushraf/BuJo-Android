@@ -4,8 +4,8 @@
     android:layout_height="48dp"
     android:orientation="horizontal"
     android:gravity="center_vertical"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
@@ -19,16 +19,39 @@
         android:textSize="14sp"
         android:textStyle="bold" />
 
-    <!-- Right Column: Task Title -->
+    <!-- Center Column: Task Title -->
     <TextView
         android:id="@+id/tv_task_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
         android:textColor="#222222"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:singleLine="true"
         android:ellipsize="end" />
+
+    <!-- Right Column: Project Tag -->
+    <TextView
+        android:id="@+id/tv_task_project"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:textColor="#00a8df"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <!-- Far Right Column: Status Checkmark Tick -->
+    <TextView
+        android:id="@+id/tv_task_status_tick"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        android:background="@drawable/bb10_checkbox_unchecked_bg"
+        android:clickable="true"
+        android:focusable="true" />
 
 </LinearLayout>
