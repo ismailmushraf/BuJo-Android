@@ -3,111 +3,221 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
     android:background="@color/bujo_background"
     android:descendantFocusability="beforeDescendants">
+
     <View
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:focusable="true"
         android:focusableInTouchMode="true" />
-    <!-- SECTION 1: TIMER -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/shape_bujo_box"
-        android:padding="16dp"
-        android:gravity="center">
-        <Chronometer
-            android:id="@+id/chronometer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="48sp"
-            android:textColor="@color/bujo_text"
-            android:textStyle="bold"/>
-        <Button
-            android:id="@+id/btn_timer_toggle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="START SESSION" />
-    </LinearLayout>
 
-    <!-- SECTION 2: SET INPUT -->
+    <!-- 1. Top Bar: Search / Add Bar (BB10 Style) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/shape_bujo_box"
-        android:padding="12dp">
+        android:layout_height="48dp"
+        android:padding="8dp"
+        android:gravity="center_vertical"
+        android:background="@color/bb10_bottom_bar_bg">
 
         <AutoCompleteTextView
             android:id="@+id/auto_exercise"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Exercise Name"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/white"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:hint="Add a workout or search"
+            android:textSize="16sp"
+            android:imeOptions="actionDone"
             android:inputType="textCapWords"
             android:completionThreshold="1"
-            android:background="@android:color/transparent"
-            android:paddingBottom="8dp"/>
-
-        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bujo_divider"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="8dp">
-
-            <EditText
-                android:id="@+id/et_weight"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="numberDecimal"
-                android:hint="Weight (0 if bodyweight)"
-                android:textSize="14sp"
-                android:background="@android:color/transparent"/>
-
-            <EditText
-                android:id="@+id/et_reps"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:inputType="number"
-                android:hint="Reps"
-                android:textSize="14sp"
-                android:background="@android:color/transparent"/>
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/et_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Note for this round..."
-            android:textSize="14sp"
-            android:inputType="textCapSentences"
-            android:background="@android:color/transparent"/>
+            android:singleLine="true" />
 
         <Button
             android:id="@+id/btn_add_set"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="8dp"
-            android:text="LOG SET" />
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginStart="8dp"
+            android:minHeight="0dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Log Set"
+            android:textSize="12sp"
+            android:textColor="@color/bujo_text"
+            android:background="@drawable/shape_bb10_btn_layer"
+            android:clickable="true"
+            android:focusable="true" />
     </LinearLayout>
 
-    <!-- SECTION 3: HEADER FOR THE LIST -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- 2. Inputs for Weight, Reps -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        android:background="@color/white">
+
+        <EditText
+            android:id="@+id/et_weight"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:inputType="numberDecimal"
+            android:hint="Weight"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@android:color/transparent"/>
+
+        <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/bujo_divider" />
+
+        <EditText
+            android:id="@+id/et_reps"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:inputType="number"
+            android:hint="Reps"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:background="@android:color/transparent"/>
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- 3. Notes -->
+    <EditText
+        android:id="@+id/et_note"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:hint="Notes..."
+        android:textSize="14sp"
+        android:inputType="textCapSentences"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="@color/white"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/bujo_background" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- 3. Timer (Settings style row) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@color/white">
+
+        <!-- Timer Label/Value on the left -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Session Timer"
+                android:textColor="@color/bujo_text"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <Chronometer
+                android:id="@+id/chronometer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#0066CC"
+                android:textSize="16sp" />
+        </LinearLayout>
+
+        <!-- Controls on the right -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/btn_timer_toggle"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/ic_bb10_play"
+                android:tint="@color/bujo_text"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="4dp" />
+
+            <ImageView
+                android:id="@+id/btn_timer_reset"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_bb10_reset"
+                android:tint="@color/bujo_text_secondary"
+                android:background="?android:attr/selectableItemBackground"
+                android:padding="4dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        android:background="@color/bujo_background" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
+
+    <!-- 4. Section Header: Today's Log (Settings Style Separator) -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TODAY'S LOG"
+        android:text="Today's Log"
+        android:textColor="#666666"
+        android:textSize="11sp"
         android:textStyle="bold"
-        android:textColor="@color/bujo_text_secondary"
-        android:layout_marginTop="16dp"
-        android:paddingBottom="4dp"/>
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:background="#F0F0F0" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"/>
 
 </LinearLayout>

@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.graphics.drawable.Drawable;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private List<DrawerItem> drawerItemsList;
     private DatabaseManager dbManager;
     private View btnOverflow;
-    private View btnFab;
+    private ImageView btnFab;
     private View btnBack;
 
     @Override
@@ -79,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnOverflow = findViewById(R.id.btn_bb10_overflow);
-        btnFab = findViewById(R.id.bb10_fab);
+        btnFab = (ImageView) findViewById(R.id.bb10_fab);
         btnBack = findViewById(R.id.btn_bb10_back);
         
         btnOverflow.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +111,18 @@ public class MainActivity extends AppCompatActivity {
                     onBackPressed();
                 }
             });
+        }
+
+        View.OnClickListener resetClickListener = v -> {
+            Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (current instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
+                ((com.ismailmushraf.bujo.fragments.PomodoroFragment) current).handleResetClick();
+            }
+        };
+
+        View btnReset = findViewById(R.id.btn_bb10_reset);
+        if (btnReset != null) {
+            btnReset.setOnClickListener(resetClickListener);
         }
 
         View btnProjects = findViewById(R.id.btn_bb10_projects);
@@ -150,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             String navigateTo = getIntent().getStringExtra("NAVIGATE_TO");
             if ("Pomodoro".equals(navigateTo)) {
-                selectItem(5); 
+                selectItem(4); 
             } else {
                 android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
                 String startup = prefs.getString("startup_screen", "Today");
@@ -469,7 +482,7 @@ public class MainActivity extends AppCompatActivity {
 
         View bottomBar = findViewById(R.id.bb10_bottom_bar);
         View btnBack = findViewById(R.id.btn_bb10_back);
-        View btnFab = findViewById(R.id.bb10_fab);
+        ImageView fabView = findViewById(R.id.bb10_fab);
         View btnOverflow = findViewById(R.id.btn_bb10_overflow);
         View btnProjects = findViewById(R.id.btn_bb10_projects);
         View btnHabits = findViewById(R.id.btn_bb10_habits);
@@ -517,6 +530,28 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
+        View btnResetBar = findViewById(R.id.btn_bb10_reset);
+        View space1 = findViewById(R.id.space_bb10_pomodoro_1);
+        View space2 = findViewById(R.id.space_bb10_pomodoro_2);
+        View space5 = findViewById(R.id.space_bb10_pomodoro_5);
+
+        if (fragment instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
+            if (fabView != null) fabView.setVisibility(View.VISIBLE);
+            if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
+            if (tvFabText != null) tvFabText.setVisibility(View.VISIBLE);
+            if (btnResetBar != null) btnResetBar.setVisibility(View.VISIBLE);
+            if (space1 != null) space1.setVisibility(View.VISIBLE);
+            if (space2 != null) space2.setVisibility(View.VISIBLE);
+            if (space5 != null) space5.setVisibility(View.VISIBLE);
+            return;
+        } else {
+            if (btnResetBar != null) btnResetBar.setVisibility(View.GONE);
+            if (space1 != null) space1.setVisibility(View.GONE);
+            if (space2 != null) space2.setVisibility(View.GONE);
+            if (space5 != null) space5.setVisibility(View.GONE);
+            if (fabView != null) fabView.setImageResource(R.drawable.ic_bb10_compose);
+        }
+
         boolean isOverflowVisible = isPrimaryScreen || (fragment instanceof ProjectDetailFragment);
         if (btnFab != null) btnFab.setVisibility(View.VISIBLE);
         if (btnOverflow != null) btnOverflow.setVisibility(isOverflowVisible ? View.VISIBLE : View.INVISIBLE);
@@ -539,6 +574,36 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void updateFabForPomodoro(boolean isRunning, boolean isPaused, boolean isFocus) {
+        ImageView fab = findViewById(R.id.bb10_fab);
+        TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
+        View btnResetBar = findViewById(R.id.btn_bb10_reset);
+
+        if (fab != null) {
+            if (isRunning) {
+                fab.setImageResource(R.drawable.ic_bb10_pause);
+            } else {
+                fab.setImageResource(R.drawable.ic_bb10_play);
+            }
+        }
+
+        if (tvFabText != null) {
+            if (isRunning) {
+                tvFabText.setText("Pause");
+            } else if (isPaused) {
+                tvFabText.setText("Resume");
+            } else {
+                tvFabText.setText(isFocus ? "Start" : "Start Break");
+            }
+            tvFabText.setVisibility(View.VISIBLE);
+        }
+
+        if (btnResetBar != null) {
+            btnResetBar.setEnabled(true);
+            btnResetBar.setAlpha(isRunning ? 0.5f : 1.0f);
+        }
+    }
+
     private void handleFabClick() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (currentFragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
@@ -548,6 +613,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (currentFragment instanceof ProjectDetailFragment) {
             ProjectDetailFragment pdf = (ProjectDetailFragment) currentFragment;
             navigateToFragment(com.ismailmushraf.bujo.fragments.EditTaskFragment.newInstanceForCreate(pdf.getProjectId(), pdf.getProjectName()));
+        } else if (currentFragment instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
+            ((com.ismailmushraf.bujo.fragments.PomodoroFragment) currentFragment).handlePrimaryClick();
         } else {
             navigateToFragment(com.ismailmushraf.bujo.fragments.EditTaskFragment.newInstanceForCreate());
         }

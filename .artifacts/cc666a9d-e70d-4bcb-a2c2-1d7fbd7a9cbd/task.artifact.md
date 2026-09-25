@@ -1,0 +1,3 @@
+- [x] Update `app/src/main/res/layout/header_workout.xml` with BB10 layout (top bar, weight/reps/note row, settings-style timer row, separator row)
+- [x] Update `app/src/main/res/layout/fragment_workout.xml` (remove padding, adjust properties)
+- [x] Update `app/src/main/java/com/ismailmushraf/bujo/fragments/WorkoutFragment.java` (bind new views, setup timer buttons, refactor adapter view, implement BB10 context menu for deletion)

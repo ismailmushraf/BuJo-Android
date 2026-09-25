@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
@@ -29,7 +30,7 @@ import java.util.Locale;
 public class PomodoroFragment extends Fragment implements PomodoroService.OnTimerTickListener {
 
     private TextView tvCountdown, tvModeLabel;
-    private Button btnPrimary, btnSecondary, btnSkip;
+    private Button btnSkip;
     private Spinner spinnerTasks, spinnerFocusDuration, spinnerBreakDuration;
 
     private PomodoroService pomodoroService;
@@ -58,8 +59,6 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
 
         tvCountdown = root.findViewById(R.id.tv_countdown);
         tvModeLabel = root.findViewById(R.id.tv_mode_label);
-        btnPrimary = root.findViewById(R.id.btn_timer_primary);
-        btnSecondary = root.findViewById(R.id.btn_timer_secondary);
         btnSkip = root.findViewById(R.id.btn_timer_skip);
         spinnerTasks = root.findViewById(R.id.spinner_tasks);
         spinnerFocusDuration = root.findViewById(R.id.spinner_focus_duration);
@@ -71,9 +70,20 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
         setupTaskSpinner();
         setupDurationSpinners();
 
-        btnPrimary.setOnClickListener(v -> handlePrimaryClick());
-        btnSecondary.setOnClickListener(v -> handleSecondaryClick());
         btnSkip.setOnClickListener(v -> handleSkipClick());
+
+        AdapterView.OnItemSelectedListener durationChangeListener = new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (pomodoroService != null && !pomodoroService.isRunning() && !pomodoroService.isPaused()) {
+                    updateUIFromService();
+                }
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        };
+
+        spinnerFocusDuration.setOnItemSelectedListener(durationChangeListener);
+        spinnerBreakDuration.setOnItemSelectedListener(durationChangeListener);
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setToolbarTitle("FOCUS TIMER");
@@ -115,8 +125,8 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
         spinnerBreakDuration.setSelection(0); // Default to 5
     }
 
-    private void handlePrimaryClick() {
-        if (!isBound) return;
+    public void handlePrimaryClick() {
+        if (!isBound || pomodoroService == null) return;
 
         if (pomodoroService.isRunning()) {
             pomodoroService.pauseTimer();
@@ -126,24 +136,24 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
             boolean isFocus = "FOCUS".equals(tvModeLabel.getText().toString());
             int focusMins = (Integer) spinnerFocusDuration.getSelectedItem();
             int breakMins = (Integer) spinnerBreakDuration.getSelectedItem();
-            
-            int currentMins = isFocus ? focusMins : breakMins;
 
-            String task = spinnerTasks.getSelectedItem().toString();
+            int currentMins = isFocus ? focusMins : breakMins;
+            String task = spinnerTasks.getSelectedItem() != null ? spinnerTasks.getSelectedItem().toString() : "Focus Session";
             pomodoroService.setDurations(focusMins, breakMins);
             pomodoroService.startTimer(currentMins * 60 * 1000L, isFocus, task);
         }
         updateUIFromService();
     }
 
-    private void handleSecondaryClick() {
-        if (!isBound) return;
-        pomodoroService.stopTimer();
+    public void handleResetClick() {
+        if (pomodoroService != null) {
+            pomodoroService.stopTimer();
+        }
         updateUIFromService();
     }
 
     private void handleSkipClick() {
-        if (!isBound) return;
+        if (!isBound || pomodoroService == null) return;
         pomodoroService.skipTimer();
         updateUIFromService();
     }
@@ -153,57 +163,50 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
 
         boolean isRunning = pomodoroService.isRunning();
         boolean isPaused = pomodoroService.isPaused();
+        boolean isFocus = pomodoroService.isFocusMode();
 
-        if (isRunning || isPaused) {
-            btnPrimary.setText(isRunning ? "PAUSE" : "RESUME");
-            btnSecondary.setEnabled(true);
-            btnSecondary.setAlpha(1.0f);
-            
-            boolean isFocus = pomodoroService.isFocusMode();
-            tvModeLabel.setText(isFocus ? "FOCUS" : "BREAK");
-            btnSkip.setVisibility(isFocus ? View.GONE : View.VISIBLE);
-            onTick(pomodoroService.getTimeLeft(), isFocus);
-            
-            // Set current task in spinner if not already set correctly
-            String task = pomodoroService.getCurrentTask();
-            ArrayAdapter adapter = (ArrayAdapter) spinnerTasks.getAdapter();
-            if (adapter != null) {
-                int pos = adapter.getPosition(task);
-                if (pos != -1) {
-                    spinnerTasks.setSelection(pos);
-                }
-            }
+        tvModeLabel.setText(isFocus ? "FOCUS" : "BREAK");
+        btnSkip.setVisibility(isFocus ? View.GONE : View.VISIBLE);
 
+        if (isRunning) {
             spinnerTasks.setEnabled(false);
             spinnerFocusDuration.setEnabled(false);
             spinnerBreakDuration.setEnabled(false);
 
-            // Sync spinners with service durations
+            onTick(pomodoroService.getTimeLeft(), isFocus);
             syncSpinnersWithService();
+            updateFabInMainActivity(isRunning, isPaused, isFocus);
+        } else if (isPaused) {
+            spinnerTasks.setEnabled(false);
+            spinnerFocusDuration.setEnabled(false);
+            spinnerBreakDuration.setEnabled(false);
+
+            onTick(pomodoroService.getTimeLeft(), isFocus);
+            syncSpinnersWithService();
+            updateFabInMainActivity(isRunning, isPaused, isFocus);
         } else {
-            boolean isFocus = pomodoroService.isFocusMode();
-            tvModeLabel.setText(isFocus ? "FOCUS" : "BREAK");
-            btnPrimary.setText(isFocus ? "START FOCUS" : "START BREAK");
-            btnSecondary.setEnabled(false);
-            btnSecondary.setAlpha(0.5f);
-            btnSkip.setVisibility(isFocus ? View.GONE : View.VISIBLE);
-            
             spinnerTasks.setEnabled(true);
             spinnerFocusDuration.setEnabled(true);
             spinnerBreakDuration.setEnabled(true);
-            
-            // Reset countdown text from settings if idle
+
             int mins = isFocus
                     ? (Integer) spinnerFocusDuration.getSelectedItem()
                     : (Integer) spinnerBreakDuration.getSelectedItem();
             tvCountdown.setText(String.format(Locale.US, "%02d:00", mins));
+            updateFabInMainActivity(isRunning, isPaused, isFocus);
+        }
+    }
+
+    private void updateFabInMainActivity(boolean isRunning, boolean isPaused, boolean isFocus) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateFabForPomodoro(isRunning, isPaused, isFocus);
         }
     }
 
     @SuppressWarnings("unchecked")
     private void syncSpinnersWithService() {
         if (pomodoroService == null) return;
-        
+
         ArrayAdapter<Integer> focusAdapter = (ArrayAdapter<Integer>) spinnerFocusDuration.getAdapter();
         if (focusAdapter != null) {
             int pos = focusAdapter.getPosition(pomodoroService.getFocusDuration());

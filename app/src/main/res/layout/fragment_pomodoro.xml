@@ -1,160 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bujo_background"
-    android:fillViewport="true">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center_horizontal"
+    android:background="@color/white">
 
+    <!-- Active Task Selector Section -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ACTIVE TASK"
+        android:textSize="11sp"
+        android:textColor="@color/bujo_text_secondary"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <Spinner
+        android:id="@+id/spinner_tasks"
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:layout_marginBottom="12dp"
+        android:background="@drawable/shape_bb10_dropdown"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Countdown Display Section -->
+    <TextView
+        android:id="@+id/tv_mode_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FOCUS"
+        android:textSize="13sp"
+        android:textColor="#00a8df"
+        android:textStyle="bold"
+        android:letterSpacing="0.2"
+        android:layout_marginBottom="2dp" />
+
+    <TextView
+        android:id="@+id/tv_countdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="25:00"
+        android:textSize="48sp"
+        android:textColor="#222222"
+        android:textStyle="bold"
+        android:layout_marginBottom="12dp" />
+
+    <!-- Skip Break Button (Only visible during break) -->
+    <Button
+        android:id="@+id/btn_timer_skip"
+        android:layout_width="120dp"
+        android:layout_height="36dp"
+        android:text="SKIP BREAK"
+        android:textSize="12sp"
+        android:textColor="#222222"
+        android:background="@drawable/shape_bb10_dropdown"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone" />
+
+    <!-- Timer Settings Card -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center_horizontal">
+        android:background="@drawable/shape_bb10_confirm_card"
+        android:padding="12dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ACTIVE TASK"
+            android:text="TIMER SETTINGS"
             android:textSize="11sp"
             android:textColor="@color/bujo_text_secondary"
             android:textStyle="bold"
-            android:layout_marginBottom="4dp"/>
-
-        <Spinner
-            android:id="@+id/spinner_tasks"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="12dp"
-            android:background="@drawable/shape_bujo_box"
-            android:padding="8dp" />
-
-        <TextView
-            android:id="@+id/tv_mode_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="FOCUS"
-            android:textSize="14sp"
-            android:textColor="@color/bujo_text_secondary"
-            android:letterSpacing="0.2"
-            android:layout_marginBottom="4dp"/>
-
-        <TextView
-            android:id="@+id/tv_countdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="25:00"
-            android:textSize="72sp"
-            android:textColor="@color/bujo_text"
-            android:textStyle="bold"
-            android:fontFamily="serif"
-            android:layout_marginBottom="12dp"/>
+            android:layout_marginBottom="8dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="20dp">
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
 
-            <Button
-                android:id="@+id/btn_timer_primary"
-                android:layout_width="140dp"
-                android:layout_height="50dp"
-                android:text="START FOCUS"
-                android:textSize="14sp"
-                android:textColor="@color/white"
-                android:background="@color/bujo_text"
-                android:layout_marginRight="8dp" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Focus Duration (min)"
+                android:textColor="#222222"
+                android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/btn_timer_secondary"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:text="STOP"
-                android:textSize="14sp"
-                android:textColor="@color/bujo_text"
-                android:background="@drawable/shape_bujo_box"
-                android:layout_marginRight="8dp"/>
-
-            <Button
-                android:id="@+id/btn_timer_skip"
-                android:layout_width="80dp"
-                android:layout_height="50dp"
-                android:text="SKIP"
-                android:textSize="14sp"
-                android:textColor="@color/bujo_text"
-                android:background="@drawable/shape_bujo_box"
-                android:visibility="gone"/>
+            <Spinner
+                android:id="@+id/spinner_focus_duration"
+                android:layout_width="70dp"
+                android:layout_height="34dp"
+                android:background="@drawable/shape_bb10_dropdown"
+                android:padding="4dp"
+                android:gravity="center" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@drawable/shape_bujo_box"
-            android:padding="12dp">
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="TIMER SETTINGS"
-                android:textSize="11sp"
-                android:textColor="@color/bujo_text_secondary"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp"/>
+                android:layout_weight="1"
+                android:text="Break Duration (min)"
+                android:textColor="#222222"
+                android:textSize="14sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Focus Duration (min)"
-                    android:textColor="@color/bujo_text"/>
-                <Spinner
-                    android:id="@+id/spinner_focus_duration"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/shape_bujo_box"
-                    android:padding="4dp"
-                    android:gravity="center"/>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Break Duration (min)"
-                    android:textColor="@color/bujo_text"/>
-                <Spinner
-                    android:id="@+id/spinner_break_duration"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/shape_bujo_box"
-                    android:padding="4dp"
-                    android:gravity="center"/>
-            </LinearLayout>
+            <Spinner
+                android:id="@+id/spinner_break_duration"
+                android:layout_width="70dp"
+                android:layout_height="34dp"
+                android:background="@drawable/shape_bb10_dropdown"
+                android:padding="4dp"
+                android:gravity="center" />
         </LinearLayout>
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="* Random focus checks will trigger during sessions. Respond within 3 mins to avoid point loss."
-            android:textSize="11sp"
-            android:textColor="@color/bujo_text_secondary"
-            android:layout_marginTop="12dp"
-            android:fontFamily="serif"
-            android:lineSpacingExtra="2dp"/>
-
     </LinearLayout>
-</ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="* Random focus checks trigger during sessions. Respond within 3 mins to avoid point loss."
+        android:textSize="11sp"
+        android:textColor="@color/bujo_text_secondary"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="2dp" />
+
+</LinearLayout>

@@ -51,7 +51,7 @@ public class WorkoutFragment extends Fragment {
     private AutoCompleteTextView autoExercise;
     private EditText etWeight, etReps, etNote;
     private ListView lvToday;
-    private Button btnToggle;
+    private View btnToggle; // Changed from Button to View to handle ImageView cast
     private View celebrationLayout;
 
     private List<Object> todayItems = new ArrayList<>();
@@ -88,6 +88,7 @@ public class WorkoutFragment extends Fragment {
 
         chronometer = headerView.findViewById(R.id.chronometer);
         btnToggle = headerView.findViewById(R.id.btn_timer_toggle);
+        View btnReset = headerView.findViewById(R.id.btn_timer_reset);
         autoExercise = headerView.findViewById(R.id.auto_exercise);
         etWeight = headerView.findViewById(R.id.et_weight);
         etReps = headerView.findViewById(R.id.et_reps);
@@ -128,15 +129,35 @@ public class WorkoutFragment extends Fragment {
                 if (!isTracking) {
                     chronometer.setBase(SystemClock.elapsedRealtime() - accumulatedTime);
                     chronometer.start();
-                    btnToggle.setText("STOP SESSION");
+                    if (btnToggle instanceof android.widget.ImageView) {
+                        ((android.widget.ImageView) btnToggle).setImageResource(R.drawable.ic_bb10_pause);
+                    }
                     isTracking = true;
                 } else {
                     chronometer.stop();
                     accumulatedTime = SystemClock.elapsedRealtime() - chronometer.getBase();
                     dbManager.saveSessionDuration(todayStr, accumulatedTime);
-                    btnToggle.setText("START SESSION");
+                    if (btnToggle instanceof android.widget.ImageView) {
+                        ((android.widget.ImageView) btnToggle).setImageResource(R.drawable.ic_bb10_play);
+                    }
                     isTracking = false;
                 }
+            }
+        });
+
+        btnReset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isTracking) {
+                    chronometer.stop();
+                    isTracking = false;
+                    if (btnToggle instanceof android.widget.ImageView) {
+                        ((android.widget.ImageView) btnToggle).setImageResource(R.drawable.ic_bb10_play);
+                    }
+                }
+                accumulatedTime = 0;
+                chronometer.setBase(SystemClock.elapsedRealtime());
+                dbManager.saveSessionDuration(todayStr, 0);
             }
         });
 
@@ -180,29 +201,23 @@ public class WorkoutFragment extends Fragment {
         lvToday.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Future use if needed
+            }
+        });
+
+        lvToday.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, final View view, int position, long id) {
                 int adjPos = position - lvToday.getHeaderViewsCount();
                 if (adjPos >= 0 && adjPos < todayItems.size()) {
                     Object item = todayItems.get(adjPos);
                     if (item instanceof WorkoutSet) {
                         final WorkoutSet ws = (WorkoutSet) item;
-                        new AlertDialog.Builder(getActivity())
-                                .setTitle("Manage Set")
-                                .setMessage("Delete this set?")
-                                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        int appliedPoints = dbManager.deleteWorkoutSet(ws.getId());
-                                        if (getActivity() instanceof MainActivity) {
-                                            ((MainActivity) getActivity()).animatePointsChange(appliedPoints, view);
-                                            ((MainActivity) getActivity()).refreshProfileIcon();
-                                        }
-                                        refreshUI();
-                                    }
-                                })
-                                .setNegativeButton("Cancel", null)
-                                .show();
+                        showBB10ContextMenu(ws, view);
+                        return true;
                     }
                 }
+                return false;
             }
         });
 
@@ -210,11 +225,54 @@ public class WorkoutFragment extends Fragment {
         return root;
     }
 
+    private void showBB10ContextMenu(final WorkoutSet ws, final View sourceView) {
+        final android.app.Dialog dialog = new android.app.Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_bb10_context_sidebar, null);
+        dialog.setContentView(view);
+
+        if (dialog.getWindow() != null) {
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = android.view.Gravity.END;
+            lp.windowAnimations = R.style.BB10SidebarAnimation;
+            dialog.getWindow().setAttributes(lp);
+        }
+
+        view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(v -> dialog.dismiss());
+
+        TextView tvTitle = view.findViewById(R.id.sidebar_task_title);
+        String title = ws.getExercise() + " (Set " + ws.getSetNumber() + ")";
+        tvTitle.setText(title);
+
+        ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
+        // We only have Delete, so the middle section can remain empty for now.
+        lvOptions.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, new ArrayList<String>()));
+
+        view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
+            dialog.dismiss();
+            com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Delete Set", "Are you sure you want to delete this set?", "Delete", () -> {
+                int appliedPoints = dbManager.deleteWorkoutSet(ws.getId());
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).animatePointsChange(appliedPoints, sourceView);
+                    ((MainActivity) getActivity()).refreshProfileIcon();
+                }
+                refreshUI();
+            });
+        });
+
+        dialog.show();
+    }
+
     private void refreshUI() {
-        // Efficient dataset update without re-instantiating adapters
         suggestionsList.clear();
         suggestionsList.addAll(dbManager.getUniqueExerciseNames());
-        autoAdapter.notifyDataSetChanged();
+        
+        if (getActivity() != null) {
+            autoAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, suggestionsList);
+            autoExercise.setAdapter(autoAdapter);
+        }
 
         todayItems.clear();
         todayItems.addAll(dbManager.getGroupedDailyWorkouts(todayStr));
@@ -287,7 +345,8 @@ public class WorkoutFragment extends Fragment {
                 if (convertView == null) {
                     LinearLayout ll = new LinearLayout(getActivity());
                     ll.setOrientation(LinearLayout.VERTICAL);
-                    ll.setPadding(32, 16, 16, 16);
+                    ll.setPadding(32, 24, 32, 24); // More BB10 style padding
+                    ll.setBackgroundColor(getResources().getColor(R.color.white)); // Flat white background
 
                     holder = new ItemViewHolder();
                     holder.tvLine1 = new TextView(getActivity());
@@ -297,6 +356,7 @@ public class WorkoutFragment extends Fragment {
                     holder.tvLine2 = new TextView(getActivity());
                     holder.tvLine2.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
                     holder.tvLine2.setTextSize(14);
+                    holder.tvLine2.setPadding(0, 4, 0, 0);
 
                     ll.addView(holder.tvLine1);
                     ll.addView(holder.tvLine2);

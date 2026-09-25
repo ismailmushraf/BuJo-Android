@@ -172,10 +172,14 @@ public class PomodoroService extends Service {
         if (countDownTimer != null) countDownTimer.cancel();
         isRunning = false;
         isPaused = false;
-        timeLeftInMillis = 0;
+        isFocusMode = true;
+        timeLeftInMillis = focusDuration * 60 * 1000L;
         saveState();
         stopForeground(true);
         stopCheckLogic();
+        if (tickListener != null) {
+            tickListener.onTick(timeLeftInMillis, isFocusMode);
+        }
     }
 
     public void skipTimer() {
