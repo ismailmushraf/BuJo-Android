@@ -1,287 +1,411 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/profile_scroll_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bujo_background"
     android:fillViewport="true">
 
     <LinearLayout
+        android:id="@+id/profile_root_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:minHeight="48dp" android:gravity="center_vertical" android:paddingStart="16dp"
-            android:paddingEnd="16dp" android:text="@string/profile_title" android:textSize="18sp"
-            android:textStyle="bold" android:textColor="@color/bujo_text" android:background="@color/surface" />
-        <View android:layout_width="match_parent" android:layout_height="3dp" android:background="@color/bb10_blue" />
 
-        <!-- Rank Display Box -->
+        <!-- Title Header -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/profile_title"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/bujo_text"
+            android:background="@color/surface" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/bb10_blue" />
+
+        <!-- 1. Compact Rank/Level Header Box -->
         <LinearLayout
             android:id="@+id/layout_rank_box"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:background="?attr/selectableItemBackground"
-            android:padding="16dp"
-            android:gravity="center"
+            android:background="@color/surface"
             android:clickable="true"
             android:focusable="true">
 
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/tv_rank_icon"
-                android:layout_width="48dp" android:layout_height="48dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_bb10_profile_wanderer" app:tint="@color/bb10_blue" />
-
-            <TextView
-                android:id="@+id/tv_rank_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ui_level_1_wanderer_6d5da1"
-                android:textColor="@color/bujo_text"
-                android:textStyle="bold"
-                android:textSize="20sp"
-                android:layout_marginTop="8dp"/>
-
-            <TextView
-                android:id="@+id/tv_rank_progress_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ui_0_500_xp_to_apprentice_3928be"
-                android:textColor="@color/bujo_text_secondary"
-                android:textSize="14sp"
-                android:layout_marginTop="4dp"/>
-
-            <!-- Progress Bar -->
-            <ProgressBar
-                android:id="@+id/progress_rank"
-                style="?android:attr/progressBarStyleHorizontal"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="6dp"
-                android:progressDrawable="@drawable/bb10_profile_progress"
-                android:layout_marginTop="16dp"
-                android:max="100"
-                android:progress="0" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
 
-            <!-- Points Breakdown (Hidden by default) -->
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/tv_rank_icon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bb10_profile_wanderer"
+                    app:tint="@color/bb10_blue" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_rank_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ui_level_1_wanderer_6d5da1"
+                        android:textColor="@color/bujo_text"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tv_rank_progress_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="@string/ui_0_500_xp_to_apprentice_3928be"
+                        android:textColor="@color/bujo_text_secondary"
+                        android:textSize="11sp" />
+
+                    <ProgressBar
+                        android:id="@+id/progress_rank"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="4dp"
+                        android:layout_marginTop="6dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/bb10_profile_progress" />
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iv_expand_chevron"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bb10_chevron_down"
+                    app:tint="@color/bujo_text_secondary" />
+
+            </LinearLayout>
+
+            <!-- Points Breakdown (Hidden by default, slides open) -->
             <LinearLayout
                 android:id="@+id/layout_points_breakdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_marginTop="16dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="16dp"
                 android:visibility="gone">
 
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bujo_divider" android:layout_marginBottom="12dp" />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@color/bujo_divider" />
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_tasks_mastery_4ac134" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_tasks" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ui_tasks_mastery_4ac134"
+                        android:textColor="@color/bujo_text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_breakdown_tasks"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ui_0_pts_d7d065"
+                        android:textColor="@color/bujo_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_habit_discipline_b5043d" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_habits" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ui_habit_discipline_b5043d"
+                        android:textColor="@color/bujo_text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_breakdown_habits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ui_0_pts_d7d065"
+                        android:textColor="@color/bujo_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_workout_strength_8c3841" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_workouts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ui_workout_strength_8c3841"
+                        android:textColor="@color/bujo_text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_breakdown_workouts"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ui_0_pts_d7d065"
+                        android:textColor="@color/bujo_text"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tv_expand_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/profile_show_breakdown"
-                android:minHeight="48dp"
-                android:gravity="center"
-                android:textSize="12sp"
-                android:textColor="@color/bujo_text_secondary"
-                android:layout_marginTop="8dp" />
         </LinearLayout>
 
-        <TextView style="@style/ProfileSection" android:text="@string/ui_discipline_metrics_934238" />
+        <!-- Section 1: Discipline Metrics -->
+        <TextView
+            style="@style/ProfileSection"
+            android:text="@string/ui_discipline_metrics_934238" />
 
-        <!-- Stats Grid -->
+        <!-- 2. Compact 3-Column Metrics Grid -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="@color/bujo_divider"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:orientation="horizontal">
 
             <!-- Current Streak -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
                 android:background="@color/surface"
-                android:padding="16dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                android:gravity="center">
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bb10_profile_flame"
+                    app:tint="@color/bb10_blue" />
 
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_bb10_profile_flame" app:tint="@color/bb10_blue" />
                 <TextView
                     android:id="@+id/tv_current_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="@string/ui_0_days_3f6be4"
                     android:textColor="@color/bujo_text"
-                    android:textStyle="bold"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_current_streak_031c4e"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
 
-            <View android:layout_width="1dp" android:layout_height="match_parent" android:background="@color/bujo_divider" />
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bujo_divider" />
+
             <!-- Rest Tokens -->
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
                 android:background="@color/surface"
-                android:padding="16dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
 
-                android:gravity="center">
                 <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bb10_profile_battery"
+                    app:tint="@color/bb10_blue" />
 
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_bb10_profile_battery" app:tint="@color/bb10_blue" />
                 <TextView
                     android:id="@+id/tv_rest_tokens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="@string/ui_0_2_d89626"
                     android:textColor="@color/bujo_text"
-                    android:textStyle="bold"
-                    android:layout_marginTop="4dp"/>
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_rest_tokens_ebbf06"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
-        </LinearLayout>
 
-        <!-- Longest Streak -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@color/surface"
-            android:padding="16dp"
-            android:layout_marginTop="1dp"
-            android:gravity="center_vertical">
-            <androidx.appcompat.widget.AppCompatImageView
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/bujo_divider" />
 
-                android:layout_width="28dp" android:layout_height="28dp"
-                android:importantForAccessibility="no"
-                android:src="@drawable/ic_bb10_profile_trophy" app:tint="@color/bb10_blue" />
+            <!-- Longest Streak -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:orientation="vertical">
+                android:layout_weight="1"
+                android:background="@color/surface"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:importantForAccessibility="no"
+                    android:src="@drawable/ic_bb10_profile_trophy"
+                    app:tint="@color/bb10_blue" />
+
                 <TextView
                     android:id="@+id/tv_longest_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
                     android:text="@string/ui_longest_streak_0_days_f81792"
                     android:textColor="@color/bujo_text"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ui_your_best_unbroken_run_bb8792"
+                    android:text="Best Streak"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Habit Discipline Section -->
-        <TextView style="@style/ProfileSection" android:text="@string/ui_habit_discipline_7bdd87" />
-        <TextView style="@style/ProfileCaption" android:layout_width="match_parent"
-            android:background="@color/surface" android:paddingStart="16dp"
-            android:paddingEnd="16dp" android:paddingTop="12dp" android:text="@string/profile_last_30_days" />
+        <!-- Section 2: Habit Discipline -->
+        <TextView
+            style="@style/ProfileSection"
+            android:text="@string/ui_habit_discipline_7bdd87" />
 
+        <!-- 3. Compact Habit Discipline Summary -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:background="@color/surface"
-            android:padding="16dp">
+            android:orientation="horizontal"
+            android:padding="12dp">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tv_habit_perfect_days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_0_b6589f"
                     android:textColor="@color/bujo_text"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ui_perfect_days_66075e"
+                    android:text="PERFECT DAYS (30D)"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
-                android:background="@color/bujo_divider"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp" />
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:background="@color/bujo_divider" />
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:orientation="vertical">
+
                 <TextView
                     android:id="@+id/tv_habit_completion_rate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_0_433bdb"
                     android:textColor="@color/bujo_text"
-                    android:textSize="20sp"
+                    android:textSize="16sp"
                     android:textStyle="bold" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_avg_success_b19532"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="12sp" />
+                    android:textSize="10sp" />
             </LinearLayout>
         </LinearLayout>
 
-        <TextView style="@style/ProfileSection" android:text="@string/ui_goal_efficiency_624232" />
+        <!-- Section 3: Goal Efficiency -->
+        <TextView
+            style="@style/ProfileSection"
+            android:text="@string/ui_goal_efficiency_624232" />
 
-        <TextView android:id="@+id/profile_empty_goals" style="@style/ProfileCaption"
-            android:layout_width="match_parent" android:padding="16dp"
-            android:text="@string/profile_no_goals" android:visibility="gone" />
+        <TextView
+            android:id="@+id/profile_empty_goals"
+            style="@style/ProfileCaption"
+            android:layout_width="match_parent"
+            android:background="@color/surface"
+            android:padding="16dp"
+            android:text="@string/profile_no_goals"
+            android:visibility="gone" />
+
         <LinearLayout
             android:id="@+id/layout_goal_efficiency"
             android:layout_width="match_parent"

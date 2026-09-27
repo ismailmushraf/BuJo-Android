@@ -1,21 +1,25 @@
-# UI Standardization Walkthrough
+# Profile Page BB10 Compact Redesign Walkthrough
 
-This update resolves the bottom bar label font size and standardizes all right-sidebar container widths across the app.
+The Profile page (`ProfileFragment`) has been completely redesigned to feature compact, concise BlackBerry 10 widgets, smaller typography, and smooth transition animations.
 
-## Summary of Changes
+## Key Accomplishments
 
-1. **Bottom Bar Label Text Sizes**
-   - Modified [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml) to change `android:textSize` from `12sp` to `10sp` for all bottom action bar text labels (`Projects`, `Habits`, `New Task`, `Reset`, `Workouts`, `Settings`).
-   - This restores the small, clean, native BlackBerry 10 typography for the bottom bar.
+### 1. 🥇 Compact Level & Rank Header Row
+- **Single-Row Layout**: Replaced the large vertical rank box in [fragment_profile.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/fragment_profile.xml) with a compact horizontal row:
+  - **Left**: `36dp` Rank Icon (`tv_rank_icon`).
+  - **Middle**: Stacked column with Level Title (`14sp` bold), XP Progress text (`11sp`), and slim `4dp` progress bar.
+  - **Right**: Expansion Chevron (`iv_expand_chevron`).
+- **Smooth Transition Animation**: Updated [ProfileFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/ProfileFragment.java) to trigger `TransitionManager.beginDelayedTransition(...)` when expanding/collapsing the points breakdown layout, providing a smooth slide transition.
+- **Chevron Rotation**: Replaced static text indicators with dynamic chevron toggles (`ic_bb10_chevron_down` <-> `ic_bb10_chevron_up`).
 
-2. **Sidebar Width Standardization**
-   - Standardized the container weight to `0.7` (and scrim weight to `0.3`) across all 3 right-side dialog sidebar layouts:
-     - [dialog_bb10_project_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_project_sidebar.xml)
-     - [dialog_bb10_context_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_context_sidebar.xml)
-     - [dialog_bb10_workout_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_workout_sidebar.xml)
-   - Now every sidebar occupies the exact same 70% screen width when opened.
+### 2. 📊 Compact 3-Column Discipline Metrics Bar
+- Combined **Current Streak**, **Rest Tokens**, and **Best Streak** into a single horizontal 3-column row separated by `1dp` dividers (`@color/bujo_divider`), reducing section height by over 60%.
 
-## Verification
+### 3. 🎯 Compact Habit & Goal Efficiency Lists
+- Reduced padding and font sizes across Habit Discipline (30D summary) and Goal Efficiency lists in [item_goal_efficiency.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/item_goal_efficiency.xml).
+- Slimmed project efficiency progress bars to `4dp` height with concise `14sp` project titles and `11sp` progress labels.
+
+## Verification Results
 - Executed `./gradlew assembleDebug` via Gradle - **Build finished successfully with 0 errors**.
-- All bottom bar text labels rendering crisp at 10sp.
-- Sidebars render with identical 70% width across screens.
+- All profile widgets now display in concise BB10 format.
+- Points breakdown slides open/closed smoothly on tap with chevron animation.

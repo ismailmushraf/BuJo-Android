@@ -1,5 +1,4 @@
-- [x] Update bottom bar text size in `activity_main.xml`
-- [x] Update container weight to 0.7 in `dialog_bb10_project_sidebar.xml`
-- [x] Ensure container weight is 0.7 in `dialog_bb10_context_sidebar.xml`
-- [x] Ensure container weight is 0.7 in `dialog_bb10_workout_sidebar.xml`
+- [x] Redesign `fragment_profile.xml` for compact BB10 widgets
+- [x] Redesign `item_goal_efficiency.xml` for slim goal rows
+- [x] Update `ProfileFragment.java` for slide animation and view bindings
 - [x] Verify build with Gradle

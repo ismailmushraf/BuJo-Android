@@ -50,7 +50,8 @@ public class ProfileFragment extends Fragment {
 
         final View rankBox = root.findViewById(R.id.layout_rank_box);
         final View breakdownLayout = root.findViewById(R.id.layout_points_breakdown);
-        final TextView tvIndicator = root.findViewById(R.id.tv_expand_indicator);
+        final AppCompatImageView ivChevron = root.findViewById(R.id.iv_expand_chevron);
+        final ViewGroup rootContainer = root.findViewById(R.id.profile_root_layout);
 
         // Ensure children don't steal clicks
         root.findViewById(R.id.progress_rank).setClickable(false);
@@ -58,12 +59,19 @@ public class ProfileFragment extends Fragment {
         rankBox.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (rootContainer != null && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                    android.transition.TransitionManager.beginDelayedTransition(rootContainer);
+                }
                 if (breakdownLayout.getVisibility() == View.GONE) {
                     breakdownLayout.setVisibility(View.VISIBLE);
-                    tvIndicator.setText(R.string.profile_hide_breakdown);
+                    if (ivChevron != null) {
+                        ivChevron.setImageResource(R.drawable.ic_bb10_chevron_up);
+                    }
                 } else {
                     breakdownLayout.setVisibility(View.GONE);
-                    tvIndicator.setText(R.string.profile_show_breakdown);
+                    if (ivChevron != null) {
+                        ivChevron.setImageResource(R.drawable.ic_bb10_chevron_down);
+                    }
                 }
             }
         });

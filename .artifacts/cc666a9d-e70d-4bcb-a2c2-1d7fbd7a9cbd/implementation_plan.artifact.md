@@ -1,28 +1,52 @@
-# Bottom Bar Text Size & Sidebar Width Standardization Plan
+# Profile Page Redesign: Concise BB10 Widgets
 
-I have researched your request and identified the cause of both UI issues:
-
-1. **Bottom Bar Text Size**: In `activity_main.xml`, the bottom bar labels (`Projects`, `Habits`, `New Task`, `Reset`, `Workouts`, `Settings`) are set to `12sp`. Lowering them back to `10sp` will make them smaller and match BB10 guidelines.
-2. **Sidebar Width Inconsistency**: The right-side dialog sidebars should all share an identical `0.3` (scrim) / `0.7` (container) weight ratio (70% screen width). Standardizing this across all sidebar layouts ensures every sidebar takes the exact same width.
+This plan outlines the redesign of the Profile page (`ProfileFragment` & `fragment_profile.xml`) to make all widgets short, compact, and aligned with BlackBerry 10 typography and layout standards.
 
 ## Proposed Changes
 
-Only the following **4 XML layout files** will be modified. No other code, existing functionality, or UI components will be touched:
+### 1. Compact Rank / Level Widget
+#### [fragment_profile.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/fragment_profile.xml)
+- **Compact Horizontal Layout**: Replace the current large centered vertical box with a compact, single-row container:
+  - **Far Left**: Rank Icon (`tv_rank_icon`, `36dp x 36dp`).
+  - **Center Column**:
+    - **Row 1**: Level Title (`tv_rank_title`, `14sp` bold).
+    - **Row 2**: XP Progress Text (`tv_rank_progress_text`, `11sp`).
+    - **Row 3**: Slim Level Progress Bar (`progress_rank`, `4dp` height).
+  - **Far Right**: Expansion Chevron Icon (`iv_expand_chevron`, `16dp x 16dp`, `@drawable/ic_bb10_chevron_down`).
+- **Points Breakdown Layout**: Keep `layout_points_breakdown` hidden by default directly below the rank row.
 
-### [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml)
-- Change `android:textSize` from `12sp` to `10sp` for all 6 bottom action bar text labels.
+#### [ProfileFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/ProfileFragment.java)
+- **Smooth Slide Animation**: Replace `View.GONE` / `View.VISIBLE` instant toggle with a smooth expand/collapse slide transition (`TransitionManager.beginDelayedTransition` or custom height/alpha animation).
+- **Chevron Rotation**: Flip `iv_expand_chevron` between `@drawable/ic_bb10_chevron_down` and `@drawable/ic_bb10_chevron_up` when toggled.
 
-### [dialog_bb10_project_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_project_sidebar.xml)
-- Set container `layout_weight` to `0.7` (and scrim weight to `0.3`) to match the primary context sidebar width.
+---
 
-### [dialog_bb10_context_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_context_sidebar.xml)
-- Ensure container `layout_weight` is set to `0.7` and scrim weight is `0.3`.
+### 2. Compact Discipline Metrics Row
+#### [fragment_profile.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/fragment_profile.xml)
+- Combine **Current Streak**, **Rest Tokens**, and **Longest Streak** into a single compact horizontal 3-column row separated by thin `1dp` dividers (`@color/bujo_divider`):
+  - Each item: `20dp` icon, `13sp` bold value, and `10sp` caption.
+  - Eliminates the large stacked boxes and reduces section height by over 60%.
 
-### [dialog_bb10_workout_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_workout_sidebar.xml)
-- Ensure container `layout_weight` is set to `0.7` and scrim weight is `0.3`.
+---
+
+### 3. Compact Habit Discipline Summary
+#### [fragment_profile.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/fragment_profile.xml)
+- Reduce vertical padding of the **Habit Discipline** (30-day summary) bar.
+- Format **Perfect Days** and **Avg Success** into a slim horizontal split-bar with `14sp` bold numbers and `10sp` captions.
+
+---
+
+### 4. Compact Goal Efficiency List
+#### [item_goal_efficiency.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/item_goal_efficiency.xml)
+- Reduce row height and padding (`12dp` top/bottom).
+- Slim down the goal progress bar height to `4dp` with `12sp` project names and `11sp` efficiency percentage labels.
 
 ---
 
 ## User Review Required
 
-Please review the list of **4 files to modify** above. Let me know if you approve so I can begin execution!
+### Additional Suggestions
+1. **Unified Flat Backgrounds**: Use flat white/surface backgrounds for all profile sections with standard `1dp` dividers (`@color/bujo_divider`) rather than rounded cards, matching the BB10 Settings and Workouts design.
+2. **Animation**: Use Android's native `AutoTransition` / `TransitionManager` for smooth, zero-jank slide expansion of the points breakdown.
+
+Please review this implementation plan and let me know if you approve so I can begin execution!
