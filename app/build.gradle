@@ -10,8 +10,8 @@ android {
         applicationId "com.ismailmushraf.bujo"
         minSdk 18
         targetSdk 33
-        versionCode 50
-        versionName "1.50"
+        versionCode 52
+        versionName "1.52"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
