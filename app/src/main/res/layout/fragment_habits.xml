@@ -17,10 +17,10 @@
             android:id="@+id/et_new_habit"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:hint="Add a habit..."
+            android:hint="@string/ui_add_a_habit_795e61"
             android:textColor="@color/bujo_text"
             android:textSize="14sp"
             android:singleLine="true"
@@ -45,14 +45,14 @@
             android:layout_height="match_parent"
             android:divider="@color/bujo_divider"
             android:dividerHeight="1dp"
-            android:background="@color/white" />
+            android:background="@color/surface" />
 
         <TextView
             android:id="@+id/tv_empty_habits"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="No habits tracked yet.\nStart building discipline today."
+            android:text="@string/ui_no_habits_tracked_yet_nstart_building_discipline_fcc4ea"
             android:gravity="center"
             android:textColor="@color/bujo_text_secondary"
             android:textSize="14sp"

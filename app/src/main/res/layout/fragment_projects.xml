@@ -16,10 +16,10 @@
             android:id="@+id/et_search_project"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:hint="Search projects..."
+            android:hint="@string/ui_search_projects_469d78"
             android:textSize="16sp"
             android:singleLine="true"
             android:inputType="textCapSentences" />
@@ -33,12 +33,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Task Lists"
+        android:text="@string/ui_task_lists_3465c3"
         android:padding="8dp"
         android:textStyle="bold"
         android:textColor="@color/bujo_text_secondary"
         android:textSize="16sp"
-        android:background="@color/white" />
+        android:background="@color/surface" />
 
     <View
         android:layout_width="match_parent"

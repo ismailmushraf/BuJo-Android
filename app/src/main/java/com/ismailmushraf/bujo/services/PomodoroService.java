@@ -239,7 +239,7 @@ public class PomodoroService extends Service {
 
         Intent respondIntent = new Intent(this, FocusCheckReceiver.class);
         respondIntent.setAction(FocusCheckReceiver.ACTION_RESPOND);
-        PendingIntent respondPI = PendingIntent.getBroadcast(this, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent respondPI = PendingIntent.getBroadcast(this, 0, respondIntent, PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, ALERTS_CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
@@ -280,7 +280,7 @@ public class PomodoroService extends Service {
 
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("NAVIGATE_TO", "Pomodoro");
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
 
         Notification notification = new NotificationCompat.Builder(this, ALERTS_CHANNEL_ID)
                 .setContentTitle(title)
@@ -307,7 +307,7 @@ public class PomodoroService extends Service {
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.putExtra("NAVIGATE_TO", "Pomodoro");
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(mode + " - " + currentTask)
@@ -320,7 +320,7 @@ public class PomodoroService extends Service {
         if (!isFocusMode && isRunning) {
             Intent skipIntent = new Intent(this, PomodoroService.class);
             skipIntent.setAction("SKIP_BREAK");
-            PendingIntent skipPI = PendingIntent.getService(this, 0, skipIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            PendingIntent skipPI = PendingIntent.getService(this, 0, skipIntent, PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0));
             builder.addAction(android.R.drawable.ic_media_next, "SKIP", skipPI);
         }
 

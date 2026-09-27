@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginStart="12dp"
-        android:textColor="#222222"
+        android:textColor="@color/bujo_text"
         android:textSize="15sp"
         android:textStyle="bold" />
 

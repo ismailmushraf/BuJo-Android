@@ -14,13 +14,13 @@
         android:paddingEnd="20dp"
         android:paddingTop="16dp"
         android:paddingBottom="12dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Select Project"
-            android:textColor="#222222"
+            android:text="@string/ui_select_project_71748b"
+            android:textColor="@color/bujo_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -29,36 +29,36 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="@color/bujo_divider" />
 
     <!-- Project List -->
     <ListView
         android:id="@+id/lv_project_picker"
         android:layout_width="match_parent"
         android:layout_height="220dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:divider="@color/bujo_divider"
         android:dividerHeight="1dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="@color/bujo_divider" />
 
     <!-- Bottom Section: Cancel Button -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#F2F2F2">
+        android:background="@color/bb10_dialog_footer">
 
         <TextView
             android:id="@+id/btn_project_picker_cancel"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="Cancel"
-            android:textColor="#222222"
+            android:text="@string/ui_cancel_77dfd2"
+            android:textColor="@color/bujo_text"
             android:textSize="16sp"
             android:textStyle="bold"
             android:clickable="true"

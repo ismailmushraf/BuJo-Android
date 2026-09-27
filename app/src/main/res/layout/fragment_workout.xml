@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:divider="@color/bujo_divider"
         android:dividerHeight="1dp"
-        android:background="@color/white" />
+        android:background="@color/surface" />
 
     <!-- Secret PR Celebration Overlay -->
     <LinearLayout
@@ -19,19 +19,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:background="#DDFFFFFF"
+        android:background="@color/literal_ddffffff"
         android:visibility="gone"
         android:orientation="vertical">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🏆"
+            android:text="@string/ui_symbol_9bc03d"
             android:textSize="80sp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="NEW PERSONAL RECORD!"
-            android:textColor="#D4AF37"
+            android:text="@string/ui_new_personal_record_1ee070"
+            android:textColor="@color/literal_d4af37"
             android:textStyle="bold"
             android:textSize="24sp"
             android:layout_marginTop="16dp"/>

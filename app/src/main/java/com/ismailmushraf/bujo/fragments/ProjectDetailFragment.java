@@ -231,16 +231,16 @@ public class ProjectDetailFragment extends Fragment {
 
             if (project != null && project.getCreatedAt() > 0) {
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy", java.util.Locale.US);
-                tvCreatedDate.setText("Created: " + sdf.format(new java.util.Date(project.getCreatedAt())));
+                tvCreatedDate.setText(getString(com.ismailmushraf.bujo.R.string.format_projectdetailfragment_15, String.valueOf(sdf.format(new java.util.Date(project.getCreatedAt())))));
             } else {
-                tvCreatedDate.setText("Project Goal");
+                tvCreatedDate.setText(getString(com.ismailmushraf.bujo.R.string.ui_project_goal_2e7f7b));
             }
 
             if (totalTasks > 0) {
                 int pct = (int) ((completedTasks * 100.0f) / totalTasks);
-                tvStats.setText("Completed: " + completedTasks + " of " + totalTasks + " (" + pct + "%)");
+                tvStats.setText(getString(com.ismailmushraf.bujo.R.string.format_projectdetailfragment_14, String.valueOf(completedTasks), String.valueOf(totalTasks), String.valueOf(pct)));
             } else {
-                tvStats.setText("No tasks created yet");
+                tvStats.setText(getString(com.ismailmushraf.bujo.R.string.ui_no_tasks_created_yet_42f6c5));
             }
 
             class SidebarOption {

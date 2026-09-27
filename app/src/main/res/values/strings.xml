@@ -1,4 +1,25 @@
 <resources>
+    <string name="status_completed">Completed</string>
+    <string name="status_missed">Missed</string>
+    <string name="status_pending">Pending</string>
+    <string name="dated_status">%1$s: %2$s</string>
+    <string name="history_expand">%1$s, expand</string>
+    <string name="history_collapse">%1$s, collapse</string>
+    <string name="workout_round">Round %1$d: %2$d reps</string>
+    <string name="workout_weight">%1$s @ %2$s kg</string>
+    <string name="invalid_workout_values">Enter non-negative weight and repetitions.</string>
+    <string name="workout_save_failed">Could not save this set. Your inputs have been kept so you can retry.</string>
+    <string name="history">History</string>
+    <string name="points_delta">%1$s%2$d</string>
+    <plurals name="task_count">
+        <item quantity="one">%d Task</item>
+        <item quantity="other">%d Tasks</item>
+    </plurals>
+    <plurals name="streak_days">
+        <item quantity="one">%d Day</item>
+        <item quantity="other">%d Days</item>
+    </plurals>
+    <string name="longest_streak">Longest Streak: %s</string>
     <string name="app_name">BuJo</string>
     <string name="drawer_open">Open</string>
     <string name="drawer_close">Close</string>

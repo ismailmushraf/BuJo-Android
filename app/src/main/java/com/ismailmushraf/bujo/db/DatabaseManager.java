@@ -137,24 +137,28 @@ public class DatabaseManager {
     public int deleteEntry(int id) {
         int pointsDeducted = 0;
         // Deduct reward on deletion ONLY IF NOT COMPLETED to prevent point farming
-        Cursor c = database.query(DatabaseHelper.TABLE_ENTRIES, null, 
+        Cursor c = database.query(DatabaseHelper.TABLE_ENTRIES, null,
                 DatabaseHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
-        if (c != null && c.moveToFirst()) {
-            boolean completed = c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED)) == 1;
-            
-            if (!completed) {
-                Entry e = new Entry();
-                e.setSignifier(c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE)));
-                e.setProjectId(c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID)));
-                e.setParentId(c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PARENT_ID)));
-                e.setDeadline(c.getLong(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE)));
-                
-                pointsDeducted = calculateCommitmentReward(e);
-                if (pointsDeducted > 0) {
-                    pointsDeducted = -adjustPoints(-pointsDeducted, CAT_TASKS);
+        try {
+            if (c != null && c.moveToFirst()) {
+                boolean completed = c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED)) == 1;
+
+                if (!completed) {
+                    Entry e = new Entry();
+                    e.setSignifier(c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE)));
+                    e.setProjectId(c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID)));
+                    e.setParentId(c.getInt(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PARENT_ID)));
+                    e.setDeadline(c.getLong(c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE)));
+
+                    pointsDeducted = calculateCommitmentReward(e);
+                    if (pointsDeducted > 0) {
+                        pointsDeducted = -adjustPoints(-pointsDeducted, CAT_TASKS);
+                    }
                 }
+
             }
-            c.close();
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
         }
         database.delete(DatabaseHelper.TABLE_ENTRIES, DatabaseHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
         return pointsDeducted;
@@ -179,9 +183,13 @@ public class DatabaseManager {
                 DatabaseHelper.COLUMN_COMPLETED + " = 0",
                 new String[]{String.valueOf(projectId)});
         int count = 0;
-        if (c != null && c.moveToFirst()) {
-            count = c.getInt(0);
-            c.close();
+        try {
+            if (c != null && c.moveToFirst()) {
+                count = c.getInt(0);
+
+            }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
         }
         return count;
     }
@@ -205,43 +213,47 @@ public class DatabaseManager {
     private List<Entry> getEntries(String selection, String orderBy) {
         List<Entry> entries = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, null, selection, null, null, null, orderBy);
-        if (cursor != null && cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
-            int typeIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE);
-            int contentIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTENT);
-            int contextIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTEXT);
-            int completedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED);
-            int migratedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MIGRATED);
-            int deadlineIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE);
-            int projectIdIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID);
-            int hasTimeIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_HAS_TIME);
-            int completedAtIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_COMPLETED_AT);
-            int createdAtIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CREATED_AT);
-            int parentIdIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PARENT_ID);
-            int auditedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_AUDITED);
-            int lockedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_LOCKED);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int typeIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_TYPE);
+                int contentIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTENT);
+                int contextIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_CONTEXT);
+                int completedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_COMPLETED);
+                int migratedIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_MIGRATED);
+                int deadlineIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DEADLINE);
+                int projectIdIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID);
+                int hasTimeIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_HAS_TIME);
+                int completedAtIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_COMPLETED_AT);
+                int createdAtIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_CREATED_AT);
+                int parentIdIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PARENT_ID);
+                int auditedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_AUDITED);
+                int lockedIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_IS_LOCKED);
 
-            do {
-                Entry entry = new Entry();
-                entry.setId(cursor.getInt(idIndex));
-                entry.setSignifier(cursor.getString(typeIndex));
-                entry.setContent(cursor.getString(contentIndex));
-                entry.setProjectTag(cursor.getString(contextIndex));
-                entry.setCompleted(cursor.getInt(completedIndex) == 1);
-                entry.setMigrated(cursor.getInt(migratedIndex) == 1);
-                entry.setDeadline(cursor.getLong(deadlineIndex));
-                entry.setProjectId(cursor.getInt(projectIdIndex));
+                do {
+                    Entry entry = new Entry();
+                    entry.setId(cursor.getInt(idIndex));
+                    entry.setSignifier(cursor.getString(typeIndex));
+                    entry.setContent(cursor.getString(contentIndex));
+                    entry.setProjectTag(cursor.getString(contextIndex));
+                    entry.setCompleted(cursor.getInt(completedIndex) == 1);
+                    entry.setMigrated(cursor.getInt(migratedIndex) == 1);
+                    entry.setDeadline(cursor.getLong(deadlineIndex));
+                    entry.setProjectId(cursor.getInt(projectIdIndex));
 
-                if (hasTimeIndex >= 0) entry.setHasTime(cursor.getInt(hasTimeIndex) == 1);
-                if (completedAtIndex >= 0) entry.setCompletedAt(cursor.getLong(completedAtIndex));
-                if (createdAtIndex >= 0) entry.setCreatedAt(cursor.getLong(createdAtIndex));
-                if (parentIdIndex >= 0) entry.setParentId(cursor.getInt(parentIdIndex));
-                if (auditedIndex >= 0) entry.setAudited(cursor.getInt(auditedIndex) == 1);
-                if (lockedIndex >= 0) entry.setLockedManually(cursor.getInt(lockedIndex) == 1);
+                    if (hasTimeIndex >= 0) entry.setHasTime(cursor.getInt(hasTimeIndex) == 1);
+                    if (completedAtIndex >= 0) entry.setCompletedAt(cursor.getLong(completedAtIndex));
+                    if (createdAtIndex >= 0) entry.setCreatedAt(cursor.getLong(createdAtIndex));
+                    if (parentIdIndex >= 0) entry.setParentId(cursor.getInt(parentIdIndex));
+                    if (auditedIndex >= 0) entry.setAudited(cursor.getInt(auditedIndex) == 1);
+                    if (lockedIndex >= 0) entry.setLockedManually(cursor.getInt(lockedIndex) == 1);
 
-                entries.add(entry);
-            } while (cursor.moveToNext());
-            cursor.close();
+                    entries.add(entry);
+                } while (cursor.moveToNext());
+
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) cursor.close();
         }
         return entries;
     }
@@ -334,23 +346,27 @@ public class DatabaseManager {
     public List<Project> getAllProjects() {
         List<Project> projects = new ArrayList<>();
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROJECTS, null, null, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
-            int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
-            int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
-            int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
-            int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
+                int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
+                int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
+                int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
 
-            do {
-                Project project = new Project();
-                project.setId(cursor.getInt(idIndex));
-                project.setName(cursor.getString(nameIndex));
-                if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
-                if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
-                if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
-                projects.add(project);
-            } while (cursor.moveToNext());
-            cursor.close();
+                do {
+                    Project project = new Project();
+                    project.setId(cursor.getInt(idIndex));
+                    project.setName(cursor.getString(nameIndex));
+                    if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
+                    if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
+                    if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
+                    projects.add(project);
+                } while (cursor.moveToNext());
+
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) cursor.close();
         }
         return projects;
     }
@@ -358,21 +374,25 @@ public class DatabaseManager {
     public Project getOrCreateProject(String name) {
         Cursor cursor = database.query(DatabaseHelper.TABLE_PROJECTS, null,
                 DatabaseHelper.COLUMN_PROJECT_NAME + " = ?", new String[]{name}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
-            int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
-            int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
-            int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
-            int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int nameIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_NAME);
+                int weightIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_WEIGHT);
+                int createdAtIndex = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_CREATED_AT);
+                int colorIndex = cursor.getColumnIndex(DatabaseHelper.COLUMN_PROJECT_COLOR);
 
-            Project project = new Project();
-            project.setId(cursor.getInt(idIndex));
-            project.setName(cursor.getString(nameIndex));
-            if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
-            if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
-            if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
-            cursor.close();
-            return project;
+                Project project = new Project();
+                project.setId(cursor.getInt(idIndex));
+                project.setName(cursor.getString(nameIndex));
+                if (weightIndex >= 0) project.setWeight(cursor.getInt(weightIndex));
+                if (createdAtIndex >= 0) project.setCreatedAt(cursor.getLong(createdAtIndex));
+                if (colorIndex >= 0) project.setColor(cursor.getInt(colorIndex));
+
+                return project;
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) cursor.close();
         }
         if (cursor != null) cursor.close();
 
@@ -408,9 +428,9 @@ public class DatabaseManager {
 
     public float getProjectEfficiency(int projectId) {
         long sevenDaysAgo = System.currentTimeMillis() - (7 * 24 * 60 * 60 * 1000L);
-        String selection = DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + 
+        String selection = DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId +
                 " AND " + DatabaseHelper.COLUMN_TYPE + " = '*'" +
-                " AND (" + DatabaseHelper.COLUMN_CREATED_AT + " >= " + sevenDaysAgo + 
+                " AND (" + DatabaseHelper.COLUMN_CREATED_AT + " >= " + sevenDaysAgo +
                 " OR " + DatabaseHelper.COLUMN_COMPLETED_AT + " >= " + sevenDaysAgo + ")";
         List<Entry> projectTasks = getEntries(selection, null);
         if (projectTasks.isEmpty()) return 1.0f;
@@ -448,7 +468,7 @@ public class DatabaseManager {
                 remainingBudget -= cost;
             }
         }
-        
+
         int safetyIter = 0;
         while (remainingBudget >= 1 && safetyIter < 5) {
             boolean added = false;
@@ -513,26 +533,30 @@ public class DatabaseManager {
     public List<Habit> getAllHabits() {
         List<Habit> habits = new ArrayList<>();
         Cursor c = database.query(DatabaseHelper.TABLE_HABITS, null, null, null, null, null, null);
-        if (c != null && c.moveToFirst()) {
-            int idIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
-            int nameIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_NAME);
-            int commIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_COMMITMENT);
-            int startIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_START_DATE);
-            int createIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_CREATED_AT);
-            int deadlineIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_DEADLINE_TIME);
-            int hasTimeIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_HAS_TIME);
-            do {
-                Habit h = new Habit();
-                h.setId(c.getInt(idIdx));
-                h.setName(c.getString(nameIdx));
-                h.setCommitmentDays(c.getInt(commIdx));
-                h.setStartDate(c.getString(startIdx));
-                h.setCreatedAt(c.getLong(createIdx));
-                h.setDeadlineTime(c.getLong(deadlineIdx));
-                h.setHasTime(c.getInt(hasTimeIdx) == 1);
-                habits.add(h);
-            } while (c.moveToNext());
-            c.close();
+        try {
+            if (c != null && c.moveToFirst()) {
+                int idIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int nameIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_NAME);
+                int commIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_COMMITMENT);
+                int startIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_START_DATE);
+                int createIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_CREATED_AT);
+                int deadlineIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_DEADLINE_TIME);
+                int hasTimeIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_HABIT_HAS_TIME);
+                do {
+                    Habit h = new Habit();
+                    h.setId(c.getInt(idIdx));
+                    h.setName(c.getString(nameIdx));
+                    h.setCommitmentDays(c.getInt(commIdx));
+                    h.setStartDate(c.getString(startIdx));
+                    h.setCreatedAt(c.getLong(createIdx));
+                    h.setDeadlineTime(c.getLong(deadlineIdx));
+                    h.setHasTime(c.getInt(hasTimeIdx) == 1);
+                    habits.add(h);
+                } while (c.moveToNext());
+
+            }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
         }
         return habits;
     }
@@ -582,11 +606,15 @@ public class DatabaseManager {
                 new String[]{DatabaseHelper.COLUMN_LOG_DATE, DatabaseHelper.COLUMN_LOG_COMPLETED},
                 selection, new String[]{String.valueOf(habitId), startDate, endDate},
                 null, null, null);
-        if (c != null && c.moveToFirst()) {
-            do {
-                map.put(c.getString(0), c.getInt(1) == 1);
-            } while (c.moveToNext());
-            c.close();
+        try {
+            if (c != null && c.moveToFirst()) {
+                do {
+                    map.put(c.getString(0), c.getInt(1) == 1);
+                } while (c.moveToNext());
+
+            }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
         }
         return map;
     }
@@ -628,27 +656,35 @@ public class DatabaseManager {
         String query = "SELECT " + DatabaseHelper.COLUMN_HABIT_ID + ", COUNT(*) FROM " + DatabaseHelper.TABLE_HABIT_LOGS +
                 " WHERE " + DatabaseHelper.COLUMN_LOG_COMPLETED + " = 1 GROUP BY " + DatabaseHelper.COLUMN_HABIT_ID;
         Cursor c = database.rawQuery(query, null);
-        if (c != null && c.moveToFirst()) {
-            do {
-                map.put(c.getInt(0), c.getInt(1));
-            } while (c.moveToNext());
-            c.close();
+        try {
+            if (c != null && c.moveToFirst()) {
+                do {
+                    map.put(c.getInt(0), c.getInt(1));
+                } while (c.moveToNext());
+
+            }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
         }
         return map;
     }
 
     public int getHabitTotalCompletions(int habitId) {
-        Cursor c = database.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_HABIT_LOGS + 
+        Cursor c = database.rawQuery("SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_HABIT_LOGS +
                 " WHERE " + DatabaseHelper.COLUMN_HABIT_ID + " = ? AND " + DatabaseHelper.COLUMN_LOG_COMPLETED + " = 1",
                 new String[]{String.valueOf(habitId)});
         int count = 0;
-        if (c != null && c.moveToFirst()) { count = c.getInt(0); c.close(); }
+        try {
+            if (c != null && c.moveToFirst()) { count = c.getInt(0);  }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
+        }
         return count;
     }
 
     public boolean wasProductiveOnDate(String dateStr) {
         // 1. Tasks completed on dateStr
-        String taskQuery = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_ENTRIES + 
+        String taskQuery = "SELECT COUNT(*) FROM " + DatabaseHelper.TABLE_ENTRIES +
                 " WHERE " + DatabaseHelper.COLUMN_COMPLETED + " = 1 AND " +
                 "date(" + DatabaseHelper.COLUMN_COMPLETED_AT + "/1000, 'unixepoch', 'localtime') = ? AND " +
                 DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
@@ -853,7 +889,7 @@ public class DatabaseManager {
         database.beginTransaction();
         try {
             int[] stats = getUserStats();
-            
+
             // Check if user stats record exists
             Cursor check = database.query(DatabaseHelper.TABLE_USER_STATS, null,
                     null, null, null, null, null);
@@ -901,16 +937,20 @@ public class DatabaseManager {
     }
 
     public int[] getUserStats() {
-        int[] stats = new int[7]; 
+        int[] stats = new int[7];
         Cursor cursor = database.query(DatabaseHelper.TABLE_USER_STATS,
                 new String[]{DatabaseHelper.COLUMN_POINTS, DatabaseHelper.COLUMN_CURRENT_STREAK,
                         DatabaseHelper.COLUMN_LONGEST_STREAK, DatabaseHelper.COLUMN_REST_TOKENS,
                         DatabaseHelper.COLUMN_POINTS_TASKS, DatabaseHelper.COLUMN_POINTS_HABITS,
                         DatabaseHelper.COLUMN_POINTS_WORKOUTS},
                 null, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            for (int i = 0; i < 7; i++) stats[i] = cursor.getInt(i);
-            cursor.close();
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                for (int i = 0; i < 7; i++) stats[i] = cursor.getInt(i);
+
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) cursor.close();
         }
         return stats;
     }
@@ -942,10 +982,14 @@ public class DatabaseManager {
         if (entry.getProjectId() > 0) {
             Cursor c = database.query(DatabaseHelper.TABLE_PROJECTS, new String[]{DatabaseHelper.COLUMN_PROJECT_WEIGHT},
                     DatabaseHelper.COLUMN_ID + " = ?", new String[]{String.valueOf(entry.getProjectId())}, null, null, null);
-            if (c != null && c.moveToFirst()) {
-                weight = c.getInt(0);
-                c.close();
-            }
+            try {
+                if (c != null && c.moveToFirst()) {
+                    weight = c.getInt(0);
+
+                }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
+        }
         }
         return 10 + (Math.max(1, weight) - 1) * 5;
     }
@@ -953,7 +997,7 @@ public class DatabaseManager {
     public int calculatePenalty(Entry entry) {
         if (entry.getParentId() != 0 || !"*".equals(entry.getSignifier())) return 0;
         // Total audit penalty is 10 (Commitment 5 + Extra 5)
-        return 5; 
+        return 5;
     }
 
     public static class AuditResult {
@@ -971,62 +1015,66 @@ public class DatabaseManager {
             cal.setTime(lastDate);
             while (cal.getTime().before(todayDate)) {
                 String auditDate = sdf.format(cal.getTime());
-                String query = "SELECT * FROM " + DatabaseHelper.TABLE_ENTRIES + 
+                String query = "SELECT * FROM " + DatabaseHelper.TABLE_ENTRIES +
                         " WHERE " + DatabaseHelper.COLUMN_COMPLETED + " = 0 AND " +
                         DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
                         "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
                         DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
                         DatabaseHelper.COLUMN_PARENT_ID + " = 0";
                 Cursor c = database.rawQuery(query, new String[]{auditDate});
-                if (c != null && c.moveToFirst()) {
-                    int projIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID);
-                    do {
-                        Entry e = new Entry();
-                        e.setSignifier("*");
-                        e.setProjectId(c.getInt(projIdx));
-                        int commitment = calculateCommitmentReward(e);
-                        int penalty = calculatePenalty(e);
-                        result.totalPenalty += (commitment + penalty);
-                        result.missedTasks++;
-                    } while (c.moveToNext());
-                    c.close();
-                    
-                    // 1. Migrate only UNCOMPLETED missed non-project tasks to Logbook and mark as audited
-                    ContentValues cvAudit = new ContentValues();
-                    cvAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
-                    cvAudit.put(DatabaseHelper.COLUMN_MIGRATED, 1);
-                    cvAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0); // Unlock when migrated
-                    database.update(DatabaseHelper.TABLE_ENTRIES, cvAudit, 
-                            "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
-                            DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
-                            DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
-                            DatabaseHelper.COLUMN_PROJECT_ID + " <= 0 AND " +
-                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
-                            DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
+                try {
+                    if (c != null && c.moveToFirst()) {
+                        int projIdx = c.getColumnIndexOrThrow(DatabaseHelper.COLUMN_PROJECT_ID);
+                        do {
+                            Entry e = new Entry();
+                            e.setSignifier("*");
+                            e.setProjectId(c.getInt(projIdx));
+                            int commitment = calculateCommitmentReward(e);
+                            int penalty = calculatePenalty(e);
+                            result.totalPenalty += (commitment + penalty);
+                            result.missedTasks++;
+                        } while (c.moveToNext());
 
-                    // 1b. Mark UNCOMPLETED project tasks as audited without migrating them
-                    ContentValues cvProjectAudit = new ContentValues();
-                    cvProjectAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
-                    cvProjectAudit.put(DatabaseHelper.COLUMN_MIGRATED, 0);
-                    cvProjectAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0);
-                    database.update(DatabaseHelper.TABLE_ENTRIES, cvProjectAudit, 
-                            "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
-                            DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
-                            DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
-                            DatabaseHelper.COLUMN_PROJECT_ID + " > 0 AND " +
-                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
-                            DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
 
-                    // 2. Mark COMPLETED tasks as audited so they don't get processed again (don't migrate them)
-                    ContentValues cvCompleted = new ContentValues();
-                    cvCompleted.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
-                    database.update(DatabaseHelper.TABLE_ENTRIES, cvCompleted,
-                            "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
-                            DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
-                            DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
-                            DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
-                            DatabaseHelper.COLUMN_COMPLETED + " = 1", new String[]{auditDate});
-                }
+                        // 1. Migrate only UNCOMPLETED missed non-project tasks to Logbook and mark as audited
+                        ContentValues cvAudit = new ContentValues();
+                        cvAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                        cvAudit.put(DatabaseHelper.COLUMN_MIGRATED, 1);
+                        cvAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0); // Unlock when migrated
+                        database.update(DatabaseHelper.TABLE_ENTRIES, cvAudit,
+                                "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
+                                DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
+                                DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                                DatabaseHelper.COLUMN_PROJECT_ID + " <= 0 AND " +
+                                DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                                DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
+
+                        // 1b. Mark UNCOMPLETED project tasks as audited without migrating them
+                        ContentValues cvProjectAudit = new ContentValues();
+                        cvProjectAudit.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                        cvProjectAudit.put(DatabaseHelper.COLUMN_MIGRATED, 0);
+                        cvProjectAudit.put(DatabaseHelper.COLUMN_IS_LOCKED, 0);
+                        database.update(DatabaseHelper.TABLE_ENTRIES, cvProjectAudit,
+                                "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
+                                DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
+                                DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                                DatabaseHelper.COLUMN_PROJECT_ID + " > 0 AND " +
+                                DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                                DatabaseHelper.COLUMN_COMPLETED + " = 0", new String[]{auditDate});
+
+                        // 2. Mark COMPLETED tasks as audited so they don't get processed again (don't migrate them)
+                        ContentValues cvCompleted = new ContentValues();
+                        cvCompleted.put(DatabaseHelper.COLUMN_IS_AUDITED, 1);
+                        database.update(DatabaseHelper.TABLE_ENTRIES, cvCompleted,
+                                "date(" + DatabaseHelper.COLUMN_DEADLINE + "/1000, 'unixepoch', 'localtime') = ? AND " +
+                                DatabaseHelper.COLUMN_TYPE + " = '*' AND " +
+                                DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND " +
+                                DatabaseHelper.COLUMN_IS_AUDITED + " = 0 AND " +
+                                DatabaseHelper.COLUMN_COMPLETED + " = 1", new String[]{auditDate});
+                    }
+        } finally {
+            if (c != null && !c.isClosed()) c.close();
+        }
                 cal.add(Calendar.DAY_OF_YEAR, 1);
             }
             if (result.totalPenalty > 0) result.totalPenalty = -adjustPoints(-result.totalPenalty, CAT_TASKS);
@@ -1041,37 +1089,48 @@ public class DatabaseManager {
 
     public List<Object> getGroupedDailyWorkouts(String dateStr) {
         List<Object> list = new ArrayList<>();
+        Map<String, Double> records = new HashMap<>();
+        try (Cursor recordCursor = database.rawQuery("SELECT lower(exercise), "
+                + "MAX(CASE WHEN weight <= 0 THEN reps ELSE weight * (1.0 + reps / 30.0) END) "
+                + "FROM workout_sets GROUP BY lower(exercise)", null)) {
+            while (recordCursor.moveToNext()) records.put(recordCursor.getString(0), recordCursor.getDouble(1));
+        }
         Cursor cursor = database.query(DatabaseHelper.TABLE_WORKOUT_SETS, null,
                 DatabaseHelper.COLUMN_DATE_STR + " = ?", new String[]{dateStr},
                 null, null, DatabaseHelper.COLUMN_EXERCISE + " ASC, " + DatabaseHelper.COLUMN_ID + " ASC");
-        if (cursor != null && cursor.moveToFirst()) {
-            int idIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
-            int dateIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DATE_STR);
-            int exIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_EXERCISE);
-            int weightIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_WEIGHT);
-            int repsIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_REPS);
-            int noteIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTE);
-            String currentEx = "";
-            int setNum = 1;
-            do {
-                WorkoutSet ws = new WorkoutSet();
-                ws.setId(cursor.getInt(idIdx));
-                ws.setDateStr(cursor.getString(dateIdx));
-                ws.setExercise(cursor.getString(exIdx));
-                ws.setWeight(cursor.getDouble(weightIdx));
-                ws.setReps(cursor.getInt(repsIdx));
-                ws.setNote(cursor.getString(noteIdx));
-                if (!ws.getExercise().equalsIgnoreCase(currentEx)) {
-                    currentEx = ws.getExercise();
-                    setNum = 1;
-                    double pr = getPersonalRecord(currentEx);
-                    String prText = (pr == Math.floor(pr)) ? String.valueOf((int)pr) : String.format(Locale.US, "%.1f", pr);
-                    list.add(currentEx.toUpperCase(Locale.getDefault()) + " (PR: " + prText + ")");
-                }
-                ws.setSetNumber(setNum++);
-                list.add(ws);
-            } while (cursor.moveToNext());
-            cursor.close();
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                int idIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_ID);
+                int dateIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_DATE_STR);
+                int exIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_EXERCISE);
+                int weightIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_WEIGHT);
+                int repsIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_REPS);
+                int noteIdx = cursor.getColumnIndexOrThrow(DatabaseHelper.COLUMN_NOTE);
+                String currentEx = "";
+                int setNum = 1;
+                do {
+                    WorkoutSet ws = new WorkoutSet();
+                    ws.setId(cursor.getInt(idIdx));
+                    ws.setDateStr(cursor.getString(dateIdx));
+                    ws.setExercise(cursor.getString(exIdx));
+                    ws.setWeight(cursor.getDouble(weightIdx));
+                    ws.setReps(cursor.getInt(repsIdx));
+                    ws.setNote(cursor.getString(noteIdx));
+                    if (!ws.getExercise().equalsIgnoreCase(currentEx)) {
+                        currentEx = ws.getExercise();
+                        setNum = 1;
+                        Double record = records.get(currentEx.toLowerCase(Locale.ROOT));
+                        double pr = record == null ? 0 : record;
+                        String prText = (pr == Math.floor(pr)) ? String.valueOf((int)pr) : String.format(Locale.US, "%.1f", pr);
+                        list.add(currentEx.toUpperCase(Locale.getDefault()) + " (PR: " + prText + ")");
+                    }
+                    ws.setSetNumber(setNum++);
+                    list.add(ws);
+                } while (cursor.moveToNext());
+
+            }
+        } finally {
+            if (cursor != null && !cursor.isClosed()) cursor.close();
         }
         return list;
     }
@@ -1135,5 +1194,15 @@ public class DatabaseManager {
             }
         }
         return dates;
+    }
+
+    public Map<String, Long> getWorkoutHistoryDurations() {
+        Map<String, Long> sessions = new java.util.LinkedHashMap<>();
+        try (Cursor cursor = database.rawQuery("SELECT DISTINCT w.date_str, COALESCE(s.duration_ms, 0) "
+                + "FROM workout_sets w LEFT JOIN workout_sessions s ON w.date_str=s.date_str "
+                + "ORDER BY w.date_str DESC", null)) {
+            while (cursor.moveToNext()) sessions.put(cursor.getString(0), cursor.getLong(1));
+        }
+        return sessions;
     }
 }

@@ -67,13 +67,13 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_delete"
-                app:tint="@color/bb10_sidebar_on_background" />
+                app:tint="@color/bb10_sidebar_on_background"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:text="Delete"
+                android:text="@string/ui_delete_f6fdbe"
                 android:textColor="@color/bb10_sidebar_on_background"
                 android:textSize="16sp" />
         </LinearLayout>

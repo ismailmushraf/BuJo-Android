@@ -98,17 +98,8 @@ public class WorkoutFragment extends Fragment {
         accumulatedTime = dbManager.getSessionDuration(todayStr);
         chronometer.setBase(SystemClock.elapsedRealtime() - accumulatedTime);
 
-        // --- FOCUS FIX FOR BB10 RUNTIME ---
-        autoExercise.setFocusable(false);
-        autoExercise.setFocusableInTouchMode(false);
-        autoExercise.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, android.view.MotionEvent event) {
-                autoExercise.setFocusable(true);
-                autoExercise.setFocusableInTouchMode(true);
-                return false;
-            }
-        });
+        // The header's focus anchor prevents the keyboard opening automatically;
+        // leave the input focusable for keyboard and accessibility navigation.
 
         // --- AUTOCOMPLETE SELECTION FIX ---
         autoAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, suggestionsList);
@@ -178,12 +169,20 @@ public class WorkoutFragment extends Fragment {
                     return;
                 }
                 String n = etNote.getText().toString().trim();
+                if (w < 0 || r < 0 || Double.isNaN(w) || Double.isInfinite(w)) {
+                    etWeight.setError(getString(R.string.invalid_workout_values));
+                    return;
+                }
 
                 double oldPR = dbManager.getPersonalRecord(ex);
                 double newScore = (w <= 0) ? r : (w * (1.0 + (r / 30.0)));
 
                 WorkoutSet ws = new WorkoutSet(todayStr, ex, w, r, n);
                 long insertedId = dbManager.insertWorkoutSet(ws);
+                if (insertedId == -1) {
+                    Toast.makeText(getActivity(), R.string.workout_save_failed, Toast.LENGTH_LONG).show();
+                    return;
+                }
 
                 if (insertedId != -1 && getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).animatePointsChange(com.ismailmushraf.bujo.utils.GamificationManager.POINTS_WORKOUT_SET, v);
@@ -318,7 +317,7 @@ public class WorkoutFragment extends Fragment {
                 TextView tv;
                 if (convertView == null) {
                     tv = new TextView(getActivity());
-                    tv.setPadding(16, 24, 16, 8);
+                    com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(tv, 16, 24, 16, 8);
                     tv.setTextSize(16);
                     tv.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
                     tv.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -341,14 +340,14 @@ public class WorkoutFragment extends Fragment {
                 }
 
                 WorkoutSet ws = (WorkoutSet) data;
-                String textLine1 = "Round " + ws.getSetNumber() + ": " + ws.getReps() + " reps";
-                if (ws.getWeight() > 0) textLine1 += " @ " + ws.getWeight() + " kg";
+                String textLine1 = getString(R.string.workout_round, ws.getSetNumber(), ws.getReps());
+                if (ws.getWeight() > 0) textLine1 = getString(R.string.workout_weight, textLine1, String.valueOf(ws.getWeight()));
 
                 holder.tvLine1.setText(textLine1);
 
                 if (ws.getNote() != null && !ws.getNote().isEmpty()) {
                     holder.tvLine2.setVisibility(View.VISIBLE);
-                    holder.tvLine2.setText("Note: " + ws.getNote());
+                    holder.tvLine2.setText(getString(com.ismailmushraf.bujo.R.string.format_workoutfragment_11, String.valueOf(ws.getNote())));
                 } else {
                     holder.tvLine2.setVisibility(View.GONE);
                 }

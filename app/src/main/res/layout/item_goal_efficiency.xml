@@ -23,7 +23,7 @@
             android:id="@+id/tv_project_weight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#FFCC00"
+            android:textColor="@color/literal_ffcc00"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -39,9 +39,9 @@
         android:id="@+id/tv_efficiency_percent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:gravity="end"
         android:textColor="@color/bujo_text_secondary"
-        android:textSize="10sp"
+        android:textSize="12sp"
         android:layout_marginTop="2dp"/>
 
 </LinearLayout>

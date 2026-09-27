@@ -154,31 +154,31 @@ public class HabitsFragment extends Fragment {
 
     public void showAddHabitDialog() {
         AlertDialog.Builder b = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
-        b.setTitle("New Habit Commitment");
+        b.setTitle(getString(com.ismailmushraf.bujo.R.string.ui_new_habit_commitment_42f5ae));
 
         LinearLayout layout = new LinearLayout(getActivity());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(40, 40, 40, 40);
+        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(layout, 40, 40, 40, 40);
 
         final EditText etName = new EditText(getActivity());
-        etName.setHint("Habit Name (e.g. Meditate)");
+        etName.setHint(getString(com.ismailmushraf.bujo.R.string.ui_habit_name_e_g_meditate_976cf7));
         layout.addView(etName);
 
         final TextView label = new TextView(getActivity());
-        label.setText("Commitment Duration (Days)");
-        label.setPadding(0, 20, 0, 0);
+        label.setText(getString(com.ismailmushraf.bujo.R.string.ui_commitment_duration_days_166d25));
+        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(label, 0, 20, 0, 0);
         layout.addView(label);
 
         final EditText etDays = new EditText(getActivity());
         etDays.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        etDays.setText("30");
+        etDays.setText(String.valueOf(30));
         layout.addView(etDays);
 
         final Calendar reminderTime = Calendar.getInstance();
         final boolean[] timeSet = {false};
         
         final Button btnTime = new Button(getActivity());
-        btnTime.setText("Set Goal Time (Optional)");
+        btnTime.setText(getString(com.ismailmushraf.bujo.R.string.ui_set_goal_time_optional_fb6e11));
         btnTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -188,7 +188,7 @@ public class HabitsFragment extends Fragment {
                         reminderTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                         reminderTime.set(Calendar.MINUTE, minute);
                         timeSet[0] = true;
-                        btnTime.setText("Goal: " + String.format(Locale.US, "%02d:%02d", hourOfDay, minute));
+                        btnTime.setText(getString(com.ismailmushraf.bujo.R.string.format_habitsfragment_27, String.valueOf(String.format(Locale.US, "%02d:%02d", hourOfDay, minute))));
                     }
                 }, 12, 0, false).show();
             }
@@ -228,7 +228,7 @@ public class HabitsFragment extends Fragment {
         tp.setCurrentMinute(c.get(Calendar.MINUTE));
 
         new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                .setTitle("Edit Target Time")
+                .setTitle(getString(com.ismailmushraf.bujo.R.string.ui_edit_target_time_83b4a4))
                 .setView(tp)
                 .setPositiveButton("Set Time", (dialog, which) -> {
                     c.set(Calendar.HOUR_OF_DAY, tp.getCurrentHour());
@@ -302,12 +302,12 @@ public class HabitsFragment extends Fragment {
                 }
             }
             elapsedDays = Math.max(1, Math.min(elapsedDays, h.getCommitmentDays()));
-            progressText.setText("Day " + elapsedDays + " of " + h.getCommitmentDays());
+            progressText.setText(getString(com.ismailmushraf.bujo.R.string.format_habitsfragment_26, String.valueOf(elapsedDays), String.valueOf(h.getCommitmentDays())));
 
             if (h.hasTime()) {
                 timeText.setVisibility(View.VISIBLE);
                 SimpleDateFormat tf = new SimpleDateFormat("h:mm a", Locale.US);
-                timeText.setText("Target: " + tf.format(new Date(h.getDeadlineTime())));
+                timeText.setText(getString(com.ismailmushraf.bujo.R.string.format_habitsfragment_25, String.valueOf(tf.format(new Date(h.getDeadlineTime())))));
             } else {
                 timeText.setVisibility(View.GONE);
             }
@@ -331,15 +331,15 @@ public class HabitsFragment extends Fragment {
                 boolean isToday = dateStr.equals(todayStr);
 
                 if (isCompleted) {
-                    dot.setBackgroundColor(0xFF4CAF50); // Green
+                    dot.setBackgroundColor(getResources().getColor(R.color.points_positive)); // Green
                 } else if (isBeforeStart) {
-                    dot.setBackgroundColor(0xFFE0E0E0); // Grey (habit didn't exist yet)
+                    dot.setBackgroundColor(getResources().getColor(R.color.bujo_divider)); // Grey (habit didn't exist yet)
                 } else if (!isToday) {
                     // Missed past day -> RED
-                    dot.setBackgroundColor(0xFFD32F2F); // Red
+                    dot.setBackgroundColor(getResources().getColor(R.color.bb10_folder_red)); // Red
                 } else {
                     // Today, pending -> Grey
-                    dot.setBackgroundColor(0xFFE0E0E0); // Grey
+                    dot.setBackgroundColor(getResources().getColor(R.color.bujo_divider)); // Grey
                 }
                 historyGrid.addView(dot);
             }

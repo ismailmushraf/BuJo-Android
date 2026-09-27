@@ -212,7 +212,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
             if (isDailyLog) {
                 if (entry.hasTime()) {
-                    holder.tvDeadline.setText("Time: " + formatDate(timeFormat, entry.getDeadline()));
+                    holder.tvDeadline.setText(getContext().getString(com.ismailmushraf.bujo.R.string.format_entryadapter_3, String.valueOf(formatDate(timeFormat, entry.getDeadline()))));
                     holder.tvDeadline.setTextColor(colorTextSecondary);
                 } else {
                     holder.tvDeadline.setVisibility(View.GONE);
@@ -221,7 +221,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
                 SimpleDateFormat sdf = entry.hasTime() ? dateTimeFormat : dateFormat;
                 String deadlineText = (entry.hasTime() ? "Reminder: " : "Date: ") + formatDate(sdf, entry.getDeadline());
                 if (isOverdue) {
-                    holder.tvDeadline.setText(deadlineText + " (Overdue)");
+                    holder.tvDeadline.setText(getContext().getString(com.ismailmushraf.bujo.R.string.format_entryadapter_2, String.valueOf(deadlineText)));
                     holder.tvDeadline.setTextColor(getContext().getResources().getColor(R.color.bb10_folder_red));
                 } else {
                     holder.tvDeadline.setText(deadlineText);
@@ -234,7 +234,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
         if (showTags && entry.getProjectTag() != null && !entry.getProjectTag().isEmpty()) {
             holder.tvTag.setVisibility(View.VISIBLE);
-            holder.tvTag.setText("#" + entry.getProjectTag());
+            holder.tvTag.setText(getContext().getString(com.ismailmushraf.bujo.R.string.format_entryadapter_1, String.valueOf(entry.getProjectTag())));
         } else {
             holder.tvTag.setVisibility(View.GONE);
         }

@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="surface">#000000</color>
+    <color name="bb10_section_header_bg">#222222</color>
+    <color name="bb10_section_header_text">#AAAAAA</color>
     <color name="bujo_background">#000000</color> <!-- BB10 uses pitch black -->
     <color name="bujo_text">#FFFFFF</color> <!-- Off-white text -->
     <color name="bujo_text_secondary">#AAAAAA</color> <!-- Medium grey -->

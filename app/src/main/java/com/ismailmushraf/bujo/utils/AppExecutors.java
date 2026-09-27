@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 public class AppExecutors {
 
-    private static AppExecutors instance;
+    private static volatile AppExecutors instance;
     private final Executor diskIO;
     private final Executor mainThread;
 

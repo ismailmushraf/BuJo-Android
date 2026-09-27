@@ -13,13 +13,13 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_progress_header_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HABIT PROGRESS"
+            android:text="@string/ui_habit_progress_f52d0a"
             android:textColor="@color/bujo_text"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -29,7 +29,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#00a8df" />
+        android:background="@color/bb10_blue" />
 
     <View
         android:layout_width="match_parent"
@@ -42,7 +42,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_progress_habit_name"
@@ -78,12 +78,12 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="COMMITMENT PROGRESS GRID"
+        android:text="@string/ui_commitment_progress_grid_4e24eb"
         android:padding="12dp"
         android:textStyle="bold"
         android:textColor="@color/bujo_text_secondary"
         android:textSize="14sp"
-        android:background="#F0F0F0" />
+        android:background="@color/bb10_section_header_bg" />
 
     <View
         android:layout_width="match_parent"

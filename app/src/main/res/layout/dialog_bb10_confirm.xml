@@ -11,13 +11,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="20dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_confirm_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -25,7 +25,7 @@
             android:id="@+id/tv_confirm_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#555555"
+            android:textColor="@color/bujo_text_secondary"
             android:textSize="15sp"
             android:layout_marginTop="8dp" />
 
@@ -34,14 +34,14 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="@color/bujo_divider" />
 
     <!-- Bottom Section: Light Grey Action Buttons -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#F2F2F2">
+        android:background="@color/bb10_dialog_footer">
 
         <!-- Positive Action Button (e.g. Delete / Confirm) -->
         <TextView
@@ -49,8 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="Delete"
-            android:textColor="#D32F2F"
+            android:text="@string/ui_delete_f6fdbe"
+            android:textColor="@color/literal_d32f2f"
             android:textSize="16sp"
             android:textStyle="bold"
             android:clickable="true"
@@ -60,7 +60,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E0E0E0" />
+            android:background="@color/bujo_divider" />
 
         <!-- Negative Action Button (e.g. Cancel) -->
         <TextView
@@ -68,8 +68,8 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:gravity="center"
-            android:text="Cancel"
-            android:textColor="#222222"
+            android:text="@string/ui_cancel_77dfd2"
+            android:textColor="@color/bujo_text"
             android:textSize="16sp"
             android:textStyle="bold"
             android:clickable="true"

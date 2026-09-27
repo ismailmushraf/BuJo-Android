@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/surface">
 
     <!-- Top Action Bar (BB10 Style: Cancel | Edit Project | Save) -->
     <LinearLayout
@@ -11,15 +11,15 @@
         android:layout_height="48dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/btn_cancel"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Cancel"
-            android:textColor="#00a8df"
+            android:text="@string/ui_cancel_77dfd2"
+            android:textColor="@color/bb10_blue"
             android:textSize="16sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
@@ -40,7 +40,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Edit Project"
+            android:text="@string/ui_edit_project_f2266a"
             android:textColor="@color/bujo_text"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -58,8 +58,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Save"
-            android:textColor="#A0C8E6"
+            android:text="@string/ui_save_efc007"
+            android:textColor="@color/literal_a0c8e6"
             android:textSize="16sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
@@ -74,7 +74,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#00a8df" />
+        android:background="@color/bb10_blue" />
 
     <View
         android:layout_width="match_parent"
@@ -93,7 +93,7 @@
             android:layout_height="48dp"
             android:padding="8dp"
             android:gravity="center_vertical"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <EditText
                 android:id="@+id/et_project_title"
@@ -102,7 +102,7 @@
                 android:background="@color/bb10_bottom_bar_bg"
                 android:paddingStart="8dp"
                 android:paddingEnd="8dp"
-                android:hint="Project title"
+                android:hint="@string/ui_project_title_221834"
                 android:textColor="@color/bujo_text_secondary"
                 android:textSize="14sp"
                 android:singleLine="true"
@@ -122,13 +122,13 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Folder Color"
+                android:text="@string/ui_folder_color_b4dfd2"
                 android:textColor="@color/bujo_text_secondary"
                 android:textSize="14sp" />
 
@@ -154,13 +154,13 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Priority Weight"
+                android:text="@string/ui_priority_weight_33be5f"
                 android:textColor="@color/bujo_text_secondary"
                 android:textSize="14sp" />
 
@@ -173,9 +173,9 @@
                     android:id="@+id/star_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="★"
+                    android:text="@string/ui_symbol_43ca68"
                     android:textSize="24sp"
-                    android:textColor="#00a8df"
+                    android:textColor="@color/bb10_blue"
                     android:padding="4dp"
                     android:clickable="true"
                     android:focusable="true" />
@@ -184,9 +184,9 @@
                     android:id="@+id/star_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="☆"
+                    android:text="@string/ui_symbol_7bd0a5"
                     android:textSize="24sp"
-                    android:textColor="#00a8df"
+                    android:textColor="@color/bb10_blue"
                     android:padding="4dp"
                     android:clickable="true"
                     android:focusable="true" />
@@ -195,9 +195,9 @@
                     android:id="@+id/star_3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="☆"
+                    android:text="@string/ui_symbol_7bd0a5"
                     android:textSize="24sp"
-                    android:textColor="#00a8df"
+                    android:textColor="@color/bb10_blue"
                     android:padding="4dp"
                     android:clickable="true"
                     android:focusable="true" />
@@ -206,9 +206,9 @@
                     android:id="@+id/star_4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="☆"
+                    android:text="@string/ui_symbol_7bd0a5"
                     android:textSize="24sp"
-                    android:textColor="#00a8df"
+                    android:textColor="@color/bb10_blue"
                     android:padding="4dp"
                     android:clickable="true"
                     android:focusable="true" />
@@ -217,9 +217,9 @@
                     android:id="@+id/star_5"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="☆"
+                    android:text="@string/ui_symbol_7bd0a5"
                     android:textSize="24sp"
-                    android:textColor="#00a8df"
+                    android:textColor="@color/bb10_blue"
                     android:padding="4dp"
                     android:clickable="true"
                     android:focusable="true" />

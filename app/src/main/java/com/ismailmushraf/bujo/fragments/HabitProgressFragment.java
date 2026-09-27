@@ -83,7 +83,7 @@ public class HabitProgressFragment extends Fragment {
             }
         }
         elapsedDays = Math.max(1, Math.min(elapsedDays, habit.getCommitmentDays()));
-        tvSubtitle.setText("Day " + elapsedDays + " of " + habit.getCommitmentDays());
+        tvSubtitle.setText(getString(com.ismailmushraf.bujo.R.string.format_habitprogressfragment_12, String.valueOf(elapsedDays), String.valueOf(habit.getCommitmentDays())));
 
         int totalCompleted = dbManager.getHabitTotalCompletions(habit.getId());
         String detailsStr = "Started: " + (habit.getStartDate() != null ? habit.getStartDate() : "N/A") + "  |  Total Completed: " + totalCompleted + " days";
@@ -127,18 +127,18 @@ public class HabitProgressFragment extends Fragment {
                     LinearLayout cell = new LinearLayout(getContext());
                     cell.setOrientation(LinearLayout.VERTICAL);
                     cell.setGravity(android.view.Gravity.CENTER);
-                    cell.setPadding(12, 16, 12, 16);
+                    com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(cell, 12, 16, 12, 16);
 
                     TextView tvDay = new TextView(getContext());
                     tvDay.setGravity(android.view.Gravity.CENTER);
-                    tvDay.setTextSize(10);
-                    tvDay.setTextColor(0xFFFFFFFF);
+                    tvDay.setTextSize(12);
+                    tvDay.setTextColor(getResources().getColor(R.color.on_accent));
 
                     TextView tvDate = new TextView(getContext());
                     tvDate.setGravity(android.view.Gravity.CENTER);
                     tvDate.setTextSize(12);
                     tvDate.setTypeface(null, android.graphics.Typeface.BOLD);
-                    tvDate.setTextColor(0xFFFFFFFF);
+                    tvDate.setTextColor(getResources().getColor(R.color.on_accent));
 
                     cell.addView(tvDay);
                     cell.addView(tvDate);
@@ -159,13 +159,15 @@ public class HabitProgressFragment extends Fragment {
 
                 boolean isCompleted = (logsMap != null && Boolean.TRUE.equals(logsMap.get(dateStr)));
                 boolean isPast = dateStr.compareTo(todayStr) < 0;
+                cell.setContentDescription(getString(R.string.dated_status, dateStr,
+                        getString(isCompleted ? R.string.status_completed : isPast ? R.string.status_missed : R.string.status_pending)));
 
                 if (isCompleted) {
-                    cell.setBackgroundColor(0xFF4CAF50); // Green
+                    cell.setBackgroundColor(getResources().getColor(R.color.points_positive)); // Green
                 } else if (isPast) {
-                    cell.setBackgroundColor(0xFFD32F2F); // Red
+                    cell.setBackgroundColor(getResources().getColor(R.color.bb10_folder_red)); // Red
                 } else {
-                    cell.setBackgroundColor(0xFF757575); // Grey (Today pending or Future)
+                    cell.setBackgroundColor(getResources().getColor(R.color.habit_pending)); // Grey (Today pending or Future)
                 }
 
                 return convertView;

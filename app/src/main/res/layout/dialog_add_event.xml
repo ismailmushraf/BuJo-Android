@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="SCHEDULE EVENT"
+            android:text="@string/ui_schedule_event_cf0765"
             android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="@color/bujo_text_secondary"
@@ -25,7 +25,7 @@
             android:id="@+id/et_event_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Event Name"
+            android:hint="@string/ui_event_name_8269fa"
             android:textSize="18sp"
             android:textColor="@color/bujo_text"
             android:background="@drawable/shape_bujo_box"
@@ -38,7 +38,7 @@
             android:id="@+id/et_event_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Description (Optional)"
+            android:hint="@string/ui_description_optional_f1da5c"
             android:textSize="16sp"
             android:textColor="@color/bujo_text"
             android:background="@drawable/shape_bujo_box"
@@ -60,10 +60,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="72dp"
-                android:text="Set Date"
+                android:text="@string/ui_set_date_57b42b"
                 android:textSize="12sp"
                 android:gravity="center"
-                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
                 android:background="@drawable/shape_bujo_box"
                 android:textColor="@color/bujo_text"/>
 
@@ -73,10 +73,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:minHeight="72dp"
-                android:text="Set Time"
+                android:text="@string/ui_set_time_34caeb"
                 android:textSize="12sp"
                 android:gravity="center"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:background="@drawable/shape_bujo_box"
                 android:textColor="@color/bujo_text"/>
         </LinearLayout>

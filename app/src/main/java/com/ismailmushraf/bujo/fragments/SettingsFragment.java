@@ -146,8 +146,7 @@ public class SettingsFragment extends Fragment {
         btnExport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File rootDir = Environment.getExternalStorageDirectory();
-                showExportFolderChooser(rootDir);
+                chooseBackup(false);
             }
         });
 
@@ -155,8 +154,7 @@ public class SettingsFragment extends Fragment {
         btnImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                File rootDir = Environment.getExternalStorageDirectory();
-                showImportFileChooser(rootDir);
+                chooseBackup(true);
             }
         });
 
@@ -166,8 +164,8 @@ public class SettingsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                        .setTitle("Clear Completed Tasks")
-                        .setMessage("Are you sure you want to permanently delete all completed tasks across all projects and logs?")
+                        .setTitle(getString(com.ismailmushraf.bujo.R.string.ui_clear_completed_tasks_2ee9aa))
+                        .setMessage(getString(com.ismailmushraf.bujo.R.string.ui_are_you_sure_you_want_to_permanently_delete_all__ea6d98))
                         .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -186,181 +184,116 @@ public class SettingsFragment extends Fragment {
         return root;
     }
 
-    // --- FOLDER SELECTION DIALOG FOR EXPORT ---
-    private void showExportFolderChooser(final File currentDir) {
-        File[] files = currentDir.listFiles();
-        List<String> folderNames = new ArrayList<>();
-        final List<File> folderFiles = new ArrayList<>();
+    private static final int EXPORT_BACKUP = 401;
+    private static final int IMPORT_BACKUP = 402;
 
-        folderNames.add("✔ [SAVE IN THIS FOLDER]");
-        folderFiles.add(currentDir);
-
-        if (currentDir.getParentFile() != null && currentDir.getParentFile().canRead()) {
-            folderNames.add(".. (Go Up)");
-            folderFiles.add(currentDir.getParentFile());
+    private void chooseBackup(boolean restore) {
+        if (android.os.Build.VERSION.SDK_INT < 19) {
+            // Android 4.3 predates the system document creator. Keep its file chooser.
+            if (restore) showLegacyFiles(Environment.getExternalStorageDirectory(), true);
+            else showLegacyFiles(Environment.getExternalStorageDirectory(), false);
+            return;
         }
-
-        if (files != null) {
-            List<File> subDirs = new ArrayList<>();
-            for (File f : files) {
-                if (f.isDirectory() && f.canRead()) {
-                    subDirs.add(f);
-                }
-            }
-            Collections.sort(subDirs);
-            for (File dir : subDirs) {
-                folderNames.add("/ " + dir.getName());
-                folderFiles.add(dir);
-            }
+        Intent intent = new Intent(restore ? Intent.ACTION_OPEN_DOCUMENT : Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType(restore ? "*/*" : "application/octet-stream");
+        if (!restore) intent.putExtra(Intent.EXTRA_TITLE, "BuJo_Backup.db");
+        try {
+            startActivityForResult(intent, restore ? IMPORT_BACKUP : EXPORT_BACKUP);
+        } catch (android.content.ActivityNotFoundException exception) {
+            Toast.makeText(getContext(), "No document picker is available.", Toast.LENGTH_LONG).show();
         }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
-        builder.setTitle("Select Export Location:\n" + currentDir.getAbsolutePath());
-        builder.setItems(folderNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (which == 0) {
-                    performExport(currentDir);
-                } else if (folderNames.get(which).equals(".. (Go Up)")) {
-                    showExportFolderChooser(folderFiles.get(which));
-                } else {
-                    showExportFolderChooser(folderFiles.get(which));
-                }
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.show();
     }
 
-    // --- FILE SELECTION DIALOG FOR IMPORT ---
-    private void showImportFileChooser(final File currentDir) {
-        File[] files = currentDir.listFiles();
-        List<String> displayNames = new ArrayList<>();
-        final List<File> targetFiles = new ArrayList<>();
-
-        if (currentDir.getParentFile() != null && currentDir.getParentFile().canRead()) {
-            displayNames.add(".. (Go Up)");
-            targetFiles.add(currentDir.getParentFile());
+    private void showLegacyFiles(File folder, boolean restore) {
+        List<File> targets = new ArrayList<>();
+        List<String> labels = new ArrayList<>();
+        if (!restore) { targets.add(new File(folder, "BuJo_Backup.db")); labels.add("Save here"); }
+        if (folder.getParentFile() != null && folder.getParentFile().canRead()) {
+            targets.add(folder.getParentFile()); labels.add("Go up");
         }
-
+        File[] files = folder.listFiles();
         if (files != null) {
-            List<File> subDirs = new ArrayList<>();
-            List<File> dbFiles = new ArrayList<>();
-
-            for (File f : files) {
-                if (f.isDirectory() && f.canRead()) {
-                    subDirs.add(f);
-                } else if (f.isFile() && (f.getName().endsWith(".db") || f.getName().endsWith(".bak"))) {
-                    dbFiles.add(f);
+            java.util.Arrays.sort(files);
+            for (File file : files) {
+                if (file.isDirectory() || (restore && (file.getName().endsWith(".db") || file.getName().endsWith(".bak")))) {
+                    targets.add(file); labels.add(file.getName());
                 }
-            }
-
-            Collections.sort(subDirs);
-            Collections.sort(dbFiles);
-
-            for (File dir : subDirs) {
-                displayNames.add("/ " + dir.getName());
-                targetFiles.add(dir);
-            }
-            for (File dbFile : dbFiles) {
-                displayNames.add("📄 " + dbFile.getName());
-                targetFiles.add(dbFile);
             }
         }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
-        builder.setTitle("Select Backup File:\n" + currentDir.getAbsolutePath());
-        builder.setItems(displayNames.toArray(new String[0]), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                File selected = targetFiles.get(which);
-                if (selected.isDirectory()) {
-                    showImportFileChooser(selected);
-                } else {
-                    confirmAndImport(selected);
-                }
-            }
-        });
-        builder.setNegativeButton(android.R.string.cancel, null);
-        builder.show();
+        new AlertDialog.Builder(requireContext(), R.style.BujoDialog)
+                .setTitle(folder.getPath())
+                .setItems(labels.toArray(new String[0]), (dialog, index) -> {
+                    File chosen = targets.get(index);
+                    if (chosen.isDirectory()) showLegacyFiles(chosen, restore);
+                    else confirmTransfer(android.net.Uri.fromFile(chosen), restore);
+                }).setNegativeButton(android.R.string.cancel, null).show();
     }
 
-    private void confirmAndImport(final File selectedDbFile) {
-        new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                .setTitle("Restore Backup")
-                .setMessage("Restore from " + selectedDbFile.getName() + "? This will overwrite your current journal completely.")
-                .setPositiveButton("Restore", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        performImport(selectedDbFile);
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((requestCode == IMPORT_BACKUP || requestCode == EXPORT_BACKUP)
+                && resultCode == android.app.Activity.RESULT_OK && data != null && data.getData() != null) {
+            confirmTransfer(data.getData(), requestCode == IMPORT_BACKUP);
+        }
+    }
+
+    private void confirmTransfer(android.net.Uri uri, boolean restore) {
+        if (!restore) { transferBackup(uri, false); return; }
+        new AlertDialog.Builder(requireContext(), R.style.BujoDialog)
+                .setTitle(getString(com.ismailmushraf.bujo.R.string.ui_restore_backup_cb51e4))
+                .setMessage(getString(com.ismailmushraf.bujo.R.string.ui_replace_your_current_journal_with_this_backup_f45514))
+                .setPositiveButton("Restore", (dialog, which) -> transferBackup(uri, true))
+                .setNegativeButton(android.R.string.cancel, null).show();
+    }
+
+    private void transferBackup(android.net.Uri uri, boolean restore) {
+        final android.content.Context context = requireContext().getApplicationContext();
+        com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
+            File temporary = null;
+            String message;
+            boolean success = false;
+            try {
+                temporary = File.createTempFile("journal-backup-", ".db", context.getCacheDir());
+                if (restore) {
+                    try (java.io.InputStream input = context.getContentResolver().openInputStream(uri);
+                         java.io.OutputStream output = new FileOutputStream(temporary)) {
+                        copy(input, output);
                     }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
-    }
-
-    private void performExport(File targetFolder) {
-        try {
-            File currentDB = getActivity().getDatabasePath("bujo.db");
-            File backupFile = new File(targetFolder, "BuJo_Backup.db");
-
-            if (currentDB.exists()) {
-                copyFile(currentDB, backupFile);
-                Toast.makeText(getActivity(), "Exported to: " + backupFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(getActivity(), "Database not found!", Toast.LENGTH_SHORT).show();
-            }
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void performImport(File backupFile) {
-        try {
-            File currentDB = getActivity().getDatabasePath("bujo.db");
-
-            // 1. Close open connections to prevent SQLite disk locking crash
-            DatabaseManager dbManager = new DatabaseManager(getActivity());
-            dbManager.close();
-
-            // 2. Clean up temporary journal & WAL files before replacing the DB file
-            File journal = new File(currentDB.getPath() + "-journal");
-            File wal = new File(currentDB.getPath() + "-wal");
-            File shm = new File(currentDB.getPath() + "-shm");
-            if (journal.exists()) journal.delete();
-            if (wal.exists()) wal.delete();
-            if (shm.exists()) shm.delete();
-
-            // 3. Overwrite current DB with backup
-            copyFile(backupFile, currentDB);
-
-            Toast.makeText(getActivity(), "Restore successful! Restarting...", Toast.LENGTH_SHORT).show();
-
-            // 4. Clean restart of the main activity
-            if (getActivity() != null) {
-                Intent intent = getActivity().getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage(getActivity().getBaseContext().getPackageName());
-                if (intent != null) {
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
                 }
-                getActivity().finish();
+                com.ismailmushraf.bujo.db.JournalBackup.transfer(context, temporary, restore);
+                if (!restore) {
+                    try (java.io.InputStream input = new FileInputStream(temporary);
+                         java.io.OutputStream output = context.getContentResolver().openOutputStream(uri, "wt")) {
+                        copy(input, output);
+                    }
+                }
+                success = true;
+                message = restore ? "Backup restored." : "Backup exported.";
+            } catch (Exception exception) {
+                message = "Backup failed: " + exception.getMessage();
+            } finally {
+                if (temporary != null) temporary.delete();
             }
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Restore failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+            final String result = message;
+            final boolean restored = restore && success;
+            com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
+                Toast.makeText(context, result, Toast.LENGTH_LONG).show();
+                if (restored && isAdded()) {
+                    Intent restart = new Intent(context, MainActivity.class);
+                    restart.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(restart);
+                }
+            });
+        });
     }
 
-    private void copyFile(File src, File dst) throws IOException {
-        FileInputStream inStream = new FileInputStream(src);
-        FileOutputStream outStream = new FileOutputStream(dst);
-        FileChannel inChannel = inStream.getChannel();
-        FileChannel outChannel = outStream.getChannel();
-        try {
-            inChannel.transferTo(0, inChannel.size(), outChannel);
-        } finally {
-            inStream.close();
-            outStream.close();
-        }
+    private static void copy(java.io.InputStream input, java.io.OutputStream output) throws IOException {
+        if (input == null || output == null) throw new IOException("Cannot open the selected document.");
+        byte[] buffer = new byte[8192];
+        int count;
+        while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+        output.flush();
     }
 }

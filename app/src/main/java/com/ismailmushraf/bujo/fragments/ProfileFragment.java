@@ -43,9 +43,9 @@ public class ProfileFragment extends Fragment {
         int habitPts = stats[5];
         int workoutPts = stats[6];
 
-        ((TextView)root.findViewById(R.id.tv_breakdown_tasks)).setText(taskPts + " pts");
-        ((TextView)root.findViewById(R.id.tv_breakdown_habits)).setText(habitPts + " pts");
-        ((TextView)root.findViewById(R.id.tv_breakdown_workouts)).setText(workoutPts + " pts");
+        ((TextView)root.findViewById(R.id.tv_breakdown_tasks)).setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_24, String.valueOf(taskPts)));
+        ((TextView)root.findViewById(R.id.tv_breakdown_habits)).setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_23, String.valueOf(habitPts)));
+        ((TextView)root.findViewById(R.id.tv_breakdown_workouts)).setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_22, String.valueOf(workoutPts)));
 
         final View rankBox = root.findViewById(R.id.layout_rank_box);
         final View breakdownLayout = root.findViewById(R.id.layout_points_breakdown);
@@ -59,10 +59,10 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 if (breakdownLayout.getVisibility() == View.GONE) {
                     breakdownLayout.setVisibility(View.VISIBLE);
-                    tvIndicator.setText("▲ Tap to hide breakdown");
+                    tvIndicator.setText(getString(com.ismailmushraf.bujo.R.string.ui_tap_to_hide_breakdown_5b44b6));
                 } else {
                     breakdownLayout.setVisibility(View.GONE);
-                    tvIndicator.setText("▼ Tap to see breakdown");
+                    tvIndicator.setText(getString(com.ismailmushraf.bujo.R.string.ui_tap_to_see_breakdown_465f67));
                 }
             }
         });
@@ -76,10 +76,10 @@ public class ProfileFragment extends Fragment {
         TextView tvLongestStreak = root.findViewById(R.id.tv_longest_streak);
         TextView tvRestTokens = root.findViewById(R.id.tv_rest_tokens);
 
-        tvCurrentStreak.setText(currentStreak + (currentStreak == 1 ? " Day" : " Days"));
-        tvLongestStreak.setText("Longest Streak: " + longestStreak
-                + (longestStreak == 1 ? " Day" : " Days"));
-        tvRestTokens.setText(tokens + " / 2");
+        tvCurrentStreak.setText(getResources().getQuantityString(R.plurals.streak_days, currentStreak, currentStreak));
+        tvLongestStreak.setText(getString(R.string.longest_streak,
+                getResources().getQuantityString(R.plurals.streak_days, longestStreak, longestStreak)));
+        tvRestTokens.setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_20, String.valueOf(tokens)));
 
         // Logic to define ranks
         int minPoints = 0;
@@ -88,40 +88,40 @@ public class ProfileFragment extends Fragment {
 
         if (points < 500) {
             tvRankIcon.setText("🚶");
-            tvRankTitle.setText("LEVEL 1: WANDERER");
+            tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_1_wanderer_6d5da1));
             maxPoints = 500;
             nextRank = "Apprentice";
         } else if (points < 2000) {
             tvRankIcon.setText("📖");
-            tvRankTitle.setText("LEVEL 2: APPRENTICE");
+            tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_2_apprentice_ba52e3));
             minPoints = 500;
             maxPoints = 2000;
             nextRank = "Scholar";
         } else if (points < 5000) {
             tvRankIcon.setText("🎓");
-            tvRankTitle.setText("LEVEL 3: SCHOLAR");
+            tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_3_scholar_2c2c6c));
             minPoints = 2000;
             maxPoints = 5000;
             nextRank = "Ascendant";
         } else if (points < 10000) {
             tvRankIcon.setText("⛰️");
-            tvRankTitle.setText("LEVEL 4: ASCENDANT");
+            tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_4_ascendant_6153be));
             minPoints = 5000;
             maxPoints = 10000;
             nextRank = "Monk";
         } else {
             tvRankIcon.setText("⛩️");
-            tvRankTitle.setText("LEVEL 5: MONK");
+            tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_5_monk_e0c1bb));
             minPoints = 10000;
             maxPoints = 10000;
             nextRank = "Maximum Discipline Reached";
         }
 
         if (points >= 10000) {
-            tvProgressText.setText(points + " Total Discipline XP");
+            tvProgressText.setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_19, String.valueOf(points)));
             progressBar.setProgress(100);
         } else {
-            tvProgressText.setText(points + " / " + maxPoints + " XP to " + nextRank);
+            tvProgressText.setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_18, String.valueOf(points), String.valueOf(maxPoints), String.valueOf(nextRank)));
             int progressPercent = (int) (((float) (points - minPoints) / (maxPoints - minPoints)) * 100);
             progressBar.setProgress(progressPercent);
         }
@@ -186,7 +186,7 @@ public class ProfileFragment extends Fragment {
             if (daysWithActiveHabits > 0) {
                 avgRate = (int)((totalCompletionSum / daysWithActiveHabits) * 100);
             }
-            tvCompletionRate.setText(avgRate + "%");
+            tvCompletionRate.setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_17, String.valueOf(avgRate)));
         }
 
         LinearLayout goalLayout = (LinearLayout) root.findViewById(R.id.layout_goal_efficiency);
@@ -210,7 +210,7 @@ public class ProfileFragment extends Fragment {
             float efficiency = dbManager.getProjectEfficiency(p.getId());
             int effInt = (int)(efficiency * 100);
             effProgress.setProgress(effInt);
-            effText.setText(effInt + "% Efficiency");
+            effText.setText(getString(com.ismailmushraf.bujo.R.string.format_profilefragment_16, String.valueOf(effInt)));
             
             goalLayout.addView(itemView);
         }

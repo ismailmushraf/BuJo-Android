@@ -200,7 +200,7 @@ public class EntryUIHelper {
                 context,
                 entry.getId(),
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0)
         );
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -225,7 +225,7 @@ public class EntryUIHelper {
 
         GridView gridView = new GridView(context);
         gridView.setNumColumns(5);
-        gridView.setPadding(16, 32, 16, 32);
+        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(gridView, 16, 32, 16, 32);
         gridView.setVerticalSpacing(32);
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
@@ -242,7 +242,7 @@ public class EntryUIHelper {
         gridView.setAdapter(adapter);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.BujoDialog);
-        builder.setTitle("Select Emoji");
+        builder.setTitle(context.getString(com.ismailmushraf.bujo.R.string.ui_select_emoji_ecbb9b));
         builder.setView(gridView);
         final AlertDialog dialog = builder.create();
 
@@ -288,7 +288,7 @@ public class EntryUIHelper {
         final SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy", Locale.US);
         final SimpleDateFormat tf = new SimpleDateFormat("h:mm a", Locale.US);
 
-        btnDate.setText("Date: " + df.format(selected.getTime()));
+        btnDate.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_7, String.valueOf(df.format(selected.getTime()))));
 
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -299,7 +299,7 @@ public class EntryUIHelper {
                         selected.set(Calendar.YEAR, year);
                         selected.set(Calendar.MONTH, month);
                         selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        btnDate.setText("Date: " + df.format(selected.getTime()));
+                        btnDate.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_6, String.valueOf(df.format(selected.getTime()))));
                     }
                 }, selected.get(Calendar.YEAR), selected.get(Calendar.MONTH), selected.get(Calendar.DAY_OF_MONTH)).show();
             }
@@ -315,7 +315,7 @@ public class EntryUIHelper {
                         selected.set(Calendar.MINUTE, minute);
                         selected.set(Calendar.SECOND, 0);
                         hasTime[0] = true;
-                        btnTime.setText("Time: " + tf.format(selected.getTime()));
+                        btnTime.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_5, String.valueOf(tf.format(selected.getTime()))));
                     }
                 }, selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE), false).show();
             }
@@ -399,7 +399,7 @@ public class EntryUIHelper {
                     if (sub.hasTime()) {
                         tvTime.setVisibility(View.VISIBLE);
                         SimpleDateFormat stf = new SimpleDateFormat("h:mm a", Locale.US);
-                        tvTime.setText("Target: " + stf.format(new Date(sub.getDeadline())));
+                        tvTime.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_4, String.valueOf(stf.format(new Date(sub.getDeadline())))));
                     } else {
                         tvTime.setVisibility(View.GONE);
                     }

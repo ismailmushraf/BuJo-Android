@@ -27,14 +27,14 @@
                 android:id="@+id/tv_rank_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🚶"
+                android:text="@string/ui_symbol_3656e5"
                 android:textSize="48sp" />
 
             <TextView
                 android:id="@+id/tv_rank_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="LEVEL 1: WANDERER"
+                android:text="@string/ui_level_1_wanderer_6d5da1"
                 android:textColor="@color/bujo_text"
                 android:textStyle="bold"
                 android:textSize="20sp"
@@ -44,7 +44,7 @@
                 android:id="@+id/tv_rank_progress_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0 / 500 XP to Apprentice"
+                android:text="@string/ui_0_500_xp_to_apprentice_3928be"
                 android:textColor="@color/bujo_text_secondary"
                 android:textSize="14sp"
                 android:layout_marginTop="4dp"/>
@@ -71,18 +71,18 @@
                 <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/bujo_divider" android:layout_marginBottom="12dp" />
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tasks Mastery" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_tasks" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pts" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_tasks_mastery_4ac134" android:textColor="@color/bujo_text_secondary" />
+                    <TextView android:id="@+id/tv_breakdown_tasks" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Habit Discipline" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_habits" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pts" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_habit_discipline_b5043d" android:textColor="@color/bujo_text_secondary" />
+                    <TextView android:id="@+id/tv_breakdown_habits" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
                 </LinearLayout>
 
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="8dp">
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Workout Strength" android:textColor="@color/bujo_text_secondary" />
-                    <TextView android:id="@+id/tv_breakdown_workouts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pts" android:textStyle="bold" android:textColor="@color/bujo_text" />
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="@string/ui_workout_strength_8c3841" android:textColor="@color/bujo_text_secondary" />
+                    <TextView android:id="@+id/tv_breakdown_workouts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/ui_0_pts_d7d065" android:textStyle="bold" android:textColor="@color/bujo_text" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -90,8 +90,8 @@
                 android:id="@+id/tv_expand_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="▼ Tap to see breakdown"
-                android:textSize="10sp"
+                android:text="@string/ui_tap_to_see_breakdown_465f67"
+                android:textSize="12sp"
                 android:textColor="@color/bujo_text_secondary"
                 android:layout_marginTop="8dp" />
         </LinearLayout>
@@ -99,7 +99,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="DISCIPLINE METRICS"
+            android:text="@string/ui_discipline_metrics_934238"
             android:textColor="@color/bujo_text_secondary"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -121,25 +121,25 @@
                 android:orientation="vertical"
                 android:background="@drawable/shape_bujo_box"
                 android:padding="16dp"
-                android:layout_marginRight="4dp"
+                android:layout_marginEnd="4dp"
                 android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔥"
+                    android:text="@string/ui_symbol_d8f26c"
                     android:textSize="32sp" />
                 <TextView
                     android:id="@+id/tv_current_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 Days"
+                    android:text="@string/ui_0_days_3f6be4"
                     android:textColor="@color/bujo_text"
                     android:textStyle="bold"
                     android:layout_marginTop="4dp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Current Streak"
+                    android:text="@string/ui_current_streak_031c4e"
                     android:textColor="@color/bujo_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -152,25 +152,25 @@
                 android:orientation="vertical"
                 android:background="@drawable/shape_bujo_box"
                 android:padding="16dp"
-                android:layout_marginLeft="4dp"
+                android:layout_marginStart="4dp"
                 android:gravity="center">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🔋"
+                    android:text="@string/ui_symbol_6c56d9"
                     android:textSize="32sp" />
                 <TextView
                     android:id="@+id/tv_rest_tokens"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0 / 2"
+                    android:text="@string/ui_0_2_d89626"
                     android:textColor="@color/bujo_text"
                     android:textStyle="bold"
                     android:layout_marginTop="4dp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Rest Tokens"
+                    android:text="@string/ui_rest_tokens_ebbf06"
                     android:textColor="@color/bujo_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -188,9 +188,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="🏆"
+                android:text="@string/ui_symbol_9bc03d"
                 android:textSize="24sp"
-                android:paddingRight="16dp"/>
+                android:paddingEnd="16dp"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -199,13 +199,13 @@
                     android:id="@+id/tv_longest_streak"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Longest Streak: 0 Days"
+                    android:text="@string/ui_longest_streak_0_days_f81792"
                     android:textColor="@color/bujo_text"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Your best unbroken run"
+                    android:text="@string/ui_your_best_unbroken_run_bb8792"
                     android:textColor="@color/bujo_text_secondary"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -215,7 +215,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="HABIT DISCIPLINE"
+            android:text="@string/ui_habit_discipline_7bdd87"
             android:textColor="@color/bujo_text_secondary"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -239,24 +239,24 @@
                     android:id="@+id/tv_habit_perfect_days"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
+                    android:text="@string/ui_0_b6589f"
                     android:textColor="@color/bujo_text"
                     android:textSize="20sp"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PERFECT DAYS"
+                    android:text="@string/ui_perfect_days_66075e"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="10sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
                 android:background="@color/bujo_divider"
-                android:layout_marginLeft="16dp"
-                android:layout_marginRight="16dp" />
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -268,23 +268,23 @@
                     android:id="@+id/tv_habit_completion_rate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0%"
+                    android:text="@string/ui_0_433bdb"
                     android:textColor="@color/bujo_text"
                     android:textSize="20sp"
                     android:textStyle="bold" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="AVG SUCCESS"
+                    android:text="@string/ui_avg_success_b19532"
                     android:textColor="@color/bujo_text_secondary"
-                    android:textSize="10sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
         </LinearLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="GOAL EFFICIENCY"
+            android:text="@string/ui_goal_efficiency_624232"
             android:textColor="@color/bujo_text_secondary"
             android:textSize="14sp"
             android:textStyle="bold"

@@ -42,7 +42,7 @@
         android:id="@+id/btn_detail_add_subtask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+ Add Sub-task"
+        android:text="@string/ui_add_sub_task_8a91f5"
         android:textSize="14sp"
         android:minHeight="0dp"
         android:minWidth="0dp"

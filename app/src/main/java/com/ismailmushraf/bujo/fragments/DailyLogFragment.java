@@ -47,7 +47,7 @@ public class DailyLogFragment extends Fragment {
 
         if (getActivity() instanceof MainActivity) {
             SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
-            ((MainActivity) getActivity()).setToolbarTitle(sdf.format(new Date()).toUpperCase());
+            ((MainActivity) getActivity()).setToolbarTitle(sdf.format(new Date()).toUpperCase(Locale.getDefault()));
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 
@@ -130,7 +130,7 @@ public class DailyLogFragment extends Fragment {
             public void run() {
                 boolean isToday = rgTarget.getCheckedRadioButtonId() == R.id.rb_today;
                 int hours = calculateAvailableHours(isToday);
-                tvHours.setText("Available working hours: " + hours + "h");
+                tvHours.setText(getString(com.ismailmushraf.bujo.R.string.format_dailylogfragment_31, String.valueOf(hours)));
                 currentRecs.clear();
                 currentRecs.addAll(dbManager.getSmartRecommendations(hours));
                 adapterRecs.clear();

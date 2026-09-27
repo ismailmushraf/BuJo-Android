@@ -448,7 +448,7 @@ public class EditTaskFragment extends Fragment {
                 return;
             }
         }
-        tvSelectedProjectName.setText("Unfiled");
+        tvSelectedProjectName.setText(getString(com.ismailmushraf.bujo.R.string.ui_unfiled_c1aca7));
         selectedProjectTag = "";
         setProjectColorBlock(getResources().getColor(R.color.bujo_divider));
     }
@@ -468,7 +468,7 @@ public class EditTaskFragment extends Fragment {
         boolean enable = isValid && hasChanged;
 
         btnSave.setEnabled(enable);
-        btnSave.setTextColor(enable ? android.graphics.Color.parseColor("#00a8df") : android.graphics.Color.parseColor("#A0C8E6"));
+        btnSave.setTextColor(enable ? getResources().getColor(R.color.bb10_blue) : getResources().getColor(R.color.literal_a0c8e6));
     }
 
     private void showDatePickerForDueDate() {

@@ -13,15 +13,15 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="🎯"
+        android:text="@string/ui_symbol_ee3533"
         android:textSize="40sp" />
 
     <TextView
         android:id="@+id/bonus_points_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+0 pts"
-        android:textColor="#4CAF50"
+        android:text="@string/ui_0_pts_959ddf"
+        android:textColor="@color/literal_4caf50"
         android:textSize="28sp"
         android:textStyle="bold"
         android:layout_marginTop="8dp" />
@@ -29,7 +29,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Commitment Bonus Added!"
+        android:text="@string/ui_commitment_bonus_added_9da085"
         android:textColor="@color/bujo_text"
         android:textSize="18sp"
         android:gravity="center"
@@ -38,7 +38,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Your commitment points are already recorded."
+        android:text="@string/ui_your_commitment_points_are_already_recorded_024dc2"
         android:textColor="@color/bujo_text_secondary"
         android:textSize="12sp"
         android:gravity="center"
@@ -48,7 +48,7 @@
         android:id="@+id/btn_bonus_collect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Continue"
+        android:text="@string/ui_continue_2e0262"
         android:layout_marginTop="20dp"
         android:background="@drawable/shape_bujo_box"
         android:textColor="@color/bujo_text"

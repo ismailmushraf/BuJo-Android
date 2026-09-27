@@ -22,8 +22,8 @@ import java.util.Set;
 
 public class WorkoutHistoryFragment extends Fragment {
 
-    private DatabaseManager dbManager;
-    private List<Object> historyItems; // Holds HeaderItems and WorkoutSets
+    private int loadGeneration;
+    private List<Object> historyItems = new ArrayList<>(); // Holds HeaderItems and WorkoutSets
     private Set<String> expandedDates; // Keeps track of which dates are currently open
     private HistoryAdapter adapter;
 
@@ -45,9 +45,6 @@ public class WorkoutHistoryFragment extends Fragment {
             ((MainActivity) getActivity()).setToolbarTitle("WORKOUT HISTORY");
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
-
-        dbManager = new DatabaseManager(getActivity());
-        dbManager.open();
 
         expandedDates = new HashSet<>();
         refreshData();
@@ -75,32 +72,34 @@ public class WorkoutHistoryFragment extends Fragment {
     }
 
     private void refreshData() {
-        if (historyItems == null) {
-            historyItems = new ArrayList<>();
-        }
-        historyItems.clear();
-        
-        List<String> dates = dbManager.getAllWorkoutDatesDescending();
-
-        for (String date : dates) {
-            long durationMs = dbManager.getSessionDuration(date);
-            long minutes = (durationMs / 1000) / 60;
-            
-            HeaderItem header = new HeaderItem(date, date + " (Duration: " + minutes + " min)");
-            historyItems.add(header);
-
-            // Only add the workout items if this date is expanded
-            if (expandedDates.contains(date)) {
-                List<Object> items = dbManager.getGroupedDailyWorkouts(date);
-                historyItems.addAll(items);
+        final int generation = ++loadGeneration;
+        final Set<String> expanded = new HashSet<>(expandedDates);
+        final android.content.Context context = requireContext().getApplicationContext();
+        com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
+            List<Object> result = new ArrayList<>();
+            DatabaseManager dbManager = new DatabaseManager(context);
+            try {
+                dbManager.open();
+                for (java.util.Map.Entry<String, Long> session : dbManager.getWorkoutHistoryDurations().entrySet()) {
+                    String date = session.getKey();
+                    result.add(new HeaderItem(date, date + " (Duration: " + session.getValue() / 60000 + " min)"));
+                    if (expanded.contains(date)) result.addAll(dbManager.getGroupedDailyWorkouts(date));
+                }
+            } finally {
+                dbManager.close();
             }
-        }
+            com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
+                if (generation != loadGeneration || getView() == null) return;
+                historyItems = result;
+                adapter.notifyDataSetChanged();
+            });
+        });
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        dbManager.close();
+    public void onDestroyView() {
+        ++loadGeneration;
+        super.onDestroyView();
     }
 
     private class HistoryAdapter extends BaseAdapter {
@@ -134,6 +133,8 @@ public class WorkoutHistoryFragment extends Fragment {
                 android.widget.ImageView iv = convertView.findViewById(R.id.iv_history_chevron);
                 
                 tv.setText(header.displayText);
+                convertView.setContentDescription(getString(expandedDates.contains(header.dateStr)
+                        ? R.string.history_collapse : R.string.history_expand, header.displayText));
                 
                 if (expandedDates.contains(header.dateStr)) {
                     iv.setImageResource(R.drawable.ic_bb10_chevron_up);
@@ -144,7 +145,7 @@ public class WorkoutHistoryFragment extends Fragment {
                 // Exercise Name Sub-Header (e.g. "PULL-UPS (PR: 20)")
                 if (convertView == null) {
                     TextView tv = new TextView(getActivity());
-                    tv.setPadding(32, 16, 16, 8);
+                    com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(tv, 32, 16, 16, 8);
                     tv.setTextSize(14);
                     tv.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
                     tv.setTypeface(null, android.graphics.Typeface.BOLD);
@@ -158,8 +159,8 @@ public class WorkoutHistoryFragment extends Fragment {
                 }
 
                 WorkoutSet ws = (WorkoutSet) data;
-                String line1 = "Round " + ws.getSetNumber() + ": " + ws.getReps() + " reps";
-                if (ws.getWeight() > 0) line1 += " @ " + ws.getWeight() + " kg";
+                String line1 = getString(R.string.workout_round, ws.getSetNumber(), ws.getReps());
+                if (ws.getWeight() > 0) line1 = getString(R.string.workout_weight, line1, String.valueOf(ws.getWeight()));
 
                 TextView tvLine1 = convertView.findViewById(R.id.tv_set_title);
                 TextView noteView = convertView.findViewById(R.id.tv_set_note);
@@ -168,7 +169,7 @@ public class WorkoutHistoryFragment extends Fragment {
 
                 if (ws.getNote() != null && !ws.getNote().isEmpty()) {
                     noteView.setVisibility(View.VISIBLE);
-                    noteView.setText("Note: " + ws.getNote());
+                    noteView.setText(getString(com.ismailmushraf.bujo.R.string.format_workouthistoryfragment_13, String.valueOf(ws.getNote())));
                 } else {
                     noteView.setVisibility(View.GONE);
                 }

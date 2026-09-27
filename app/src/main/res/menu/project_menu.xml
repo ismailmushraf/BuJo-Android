@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_project_history"
-        android:title="History"
+        android:title="@string/history"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:orderInCategory="90"
         app:showAsAction="always" />

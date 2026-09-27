@@ -37,7 +37,10 @@ public class SoundHelper {
     }
 
     private static void playAndRelease(final ToneGenerator generator, int tone, int durationMs) {
-        generator.startTone(tone, durationMs);
-        MAIN_HANDLER.postDelayed(generator::release, durationMs + 50L);
+        try {
+            generator.startTone(tone, durationMs);
+        } finally {
+            MAIN_HANDLER.postDelayed(generator::release, durationMs + 50L);
+        }
     }
 }

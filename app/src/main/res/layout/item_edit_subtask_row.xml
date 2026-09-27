@@ -6,7 +6,7 @@
     android:gravity="center_vertical"
     android:paddingStart="12dp"
     android:paddingEnd="12dp"
-    android:background="@color/white">
+    android:background="@color/surface">
 
     <TextView
         android:id="@+id/subtask_tick"
@@ -14,7 +14,7 @@
         android:layout_height="22dp"
         android:gravity="center"
         android:textSize="13sp"
-        android:textColor="@color/white"
+        android:textColor="@color/on_accent"
         android:background="@drawable/bb10_checkbox_unchecked_bg"
         android:clickable="true"
         android:focusable="true" />
@@ -26,7 +26,7 @@
         android:layout_weight="1"
         android:layout_marginStart="10dp"
         android:background="@android:color/transparent"
-        android:hint="Add subtask..."
+        android:hint="@string/ui_add_subtask_75bd7d"
         android:textColor="@color/bujo_text"
         android:textColorHint="@color/bujo_text_secondary"
         android:textSize="14sp"
@@ -39,7 +39,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:gravity="center"
-        android:text="×"
+        android:text="@string/ui_symbol_67fba2"
         android:textColor="@color/bujo_text_secondary"
         android:textSize="18sp"
         android:clickable="true"

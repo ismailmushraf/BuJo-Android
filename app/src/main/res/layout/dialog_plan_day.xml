@@ -14,12 +14,12 @@
         android:paddingEnd="16dp"
         android:paddingTop="16dp"
         android:paddingBottom="12dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Plan Sessions"
+            android:text="@string/ui_plan_sessions_7efc64"
             android:textColor="@color/bujo_text"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -37,7 +37,7 @@
         android:layout_height="200dp"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <RadioGroup
             android:id="@+id/rg_plan_target"
@@ -50,7 +50,7 @@
                 android:id="@+id/rb_today"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Today"
+                android:text="@string/ui_today_24345a"
                 android:checked="true"
                 android:textColor="@color/bujo_text"
                 android:layout_marginEnd="24dp"/>
@@ -59,14 +59,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@color/bujo_text"
-                android:text="Tomorrow"/>
+                android:text="@string/ui_tomorrow_1948bf"/>
         </RadioGroup>
 
         <TextView
             android:id="@+id/tv_available_hours"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Available working hours: 0h"
+            android:text="@string/ui_available_working_hours_0h_a5d615"
             android:textSize="12sp"
             android:textColor="@color/bujo_text_secondary"
             android:paddingBottom="6dp"
@@ -110,7 +110,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Cancel"
+            android:text="@string/ui_cancel_77dfd2"
             android:textColor="@color/bujo_text"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -129,8 +129,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Add to Log"
-            android:textColor="#00a8df"
+            android:text="@string/ui_add_to_log_a68591"
+            android:textColor="@color/bb10_blue"
             android:textSize="15sp"
             android:textStyle="bold"
             android:clickable="true"

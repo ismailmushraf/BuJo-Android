@@ -184,11 +184,11 @@ public class EditProjectFragment extends Fragment {
 
         android.widget.LinearLayout layout = new android.widget.LinearLayout(getActivity());
         layout.setOrientation(android.widget.LinearLayout.HORIZONTAL);
-        layout.setPadding(32, 32, 32, 32);
+        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(layout, 32, 32, 32, 32);
         layout.setGravity(android.view.Gravity.CENTER);
 
         final AlertDialog dialog = new AlertDialog.Builder(getActivity(), R.style.BujoDialog)
-                .setTitle("Select Folder Color")
+                .setTitle(getString(com.ismailmushraf.bujo.R.string.ui_select_folder_color_ee4b92))
                 .setView(layout)
                 .create();
 
@@ -246,7 +246,7 @@ public class EditProjectFragment extends Fragment {
         boolean enable = isValid && hasChanged;
 
         btnSave.setEnabled(enable);
-        btnSave.setTextColor(enable ? android.graphics.Color.parseColor("#00a8df") : android.graphics.Color.parseColor("#A0C8E6"));
+        btnSave.setTextColor(enable ? getResources().getColor(R.color.bb10_blue) : getResources().getColor(R.color.literal_a0c8e6));
     }
 
     @Override

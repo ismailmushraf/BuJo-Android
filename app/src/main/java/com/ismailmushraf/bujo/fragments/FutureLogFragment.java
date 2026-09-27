@@ -40,7 +40,7 @@ import java.util.Map;
 /** Calendar view with a full-month overview and a compact, actionable day agenda. */
 public class FutureLogFragment extends Fragment {
 
-    private GridView monthGrid;
+    private com.ismailmushraf.bujo.utils.CalendarGridView monthGrid;
     private GridView weekGrid;
     private View monthControls;
     private View monthSelectedBar;
@@ -64,7 +64,7 @@ public class FutureLogFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_future_log, container, false);
-        monthGrid = (GridView) root.findViewById(R.id.grid_calendar);
+        monthGrid = root.findViewById(R.id.grid_calendar);
         weekGrid = (GridView) root.findViewById(R.id.grid_week);
         monthControls = root.findViewById(R.id.month_controls);
         monthSelectedBar = root.findViewById(R.id.month_selected_bar);
@@ -146,7 +146,11 @@ public class FutureLogFragment extends Fragment {
             }
         });
 
-        monthGrid.setOnTouchListener((v, event) -> gestureDetector.onTouchEvent(event));
+        monthGrid.setOnTouchListener((v, event) -> {
+            boolean handled = gestureDetector.onTouchEvent(event);
+            if (!handled && event.getAction() == MotionEvent.ACTION_UP) v.performClick();
+            return handled;
+        });
 
         showMonth();
         return root;
@@ -185,7 +189,7 @@ public class FutureLogFragment extends Fragment {
 
         monthTitle.setText(new SimpleDateFormat("MMMM yyyy", Locale.US).format(currentMonth.getTime()));
         monthSelectedDateTitle.setText(new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US).format(selectedDate.getTime()));
-        weekNumberTitle.setText("Week " + selectedDate.get(Calendar.WEEK_OF_YEAR));
+        weekNumberTitle.setText(getString(com.ismailmushraf.bujo.R.string.format_futurelogfragment_30, String.valueOf(selectedDate.get(Calendar.WEEK_OF_YEAR))));
 
         monthAdapter = new MonthAdapter(getActivity(), currentMonth);
         monthGrid.setAdapter(monthAdapter);
@@ -216,7 +220,7 @@ public class FutureLogFragment extends Fragment {
         selectedDateTitle.setText(new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US).format(selectedDate.getTime()));
         TextView tvWeekNumberBanner = getView() != null ? getView().findViewById(R.id.tv_week_number_banner) : null;
         if (tvWeekNumberBanner != null) {
-            tvWeekNumberBanner.setText("Week " + selectedDate.get(Calendar.WEEK_OF_YEAR));
+            tvWeekNumberBanner.setText(getString(com.ismailmushraf.bujo.R.string.format_futurelogfragment_29, String.valueOf(selectedDate.get(Calendar.WEEK_OF_YEAR))));
         }
 
         loadEntriesForSelectedDate();
@@ -292,7 +296,7 @@ public class FutureLogFragment extends Fragment {
                 if (entry.hasTime() && entry.getDeadline() > 0) {
                     tvTimeDue.setText(timeFormat.format(new Date(entry.getDeadline())));
                 } else {
-                    tvTimeDue.setText("Due");
+                    tvTimeDue.setText(getString(com.ismailmushraf.bujo.R.string.ui_due_145caf));
                 }
 
                 String content = entry.getContent() != null ? entry.getContent() : "";
@@ -310,7 +314,7 @@ public class FutureLogFragment extends Fragment {
 
                 if (entry.getProjectTag() != null && !entry.getProjectTag().trim().isEmpty()) {
                     tvTaskProject.setVisibility(View.VISIBLE);
-                    tvTaskProject.setText("#" + entry.getProjectTag().trim());
+                    tvTaskProject.setText(getString(com.ismailmushraf.bujo.R.string.format_futurelogfragment_28, String.valueOf(entry.getProjectTag().trim())));
                 } else {
                     tvTaskProject.setVisibility(View.GONE);
                 }
@@ -425,14 +429,14 @@ public class FutureLogFragment extends Fragment {
         number.setText(String.valueOf(date.get(Calendar.DAY_OF_MONTH)));
 
         if (selected) {
-            convertView.setBackgroundColor(Color.parseColor("#769A30"));
-            number.setTextColor(Color.WHITE);
+            convertView.setBackgroundColor(getResources().getColor(R.color.literal_769a30));
+            number.setTextColor(getResources().getColor(R.color.on_accent));
         } else if (muted) {
-            convertView.setBackgroundColor(Color.parseColor("#F4F4F4"));
-            number.setTextColor(Color.parseColor("#777777"));
+            convertView.setBackgroundColor(getResources().getColor(R.color.bujo_background));
+            number.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
         } else {
-            convertView.setBackgroundColor(Color.WHITE);
-            number.setTextColor(Color.parseColor("#222222"));
+            convertView.setBackgroundColor(getResources().getColor(R.color.on_accent));
+            number.setTextColor(getResources().getColor(R.color.bujo_text));
         }
 
         long start = startOfDay(date);
@@ -449,7 +453,7 @@ public class FutureLogFragment extends Fragment {
         List<Project> allProjects = dbManager != null ? dbManager.getAllProjects() : new ArrayList<>();
         Map<Integer, Integer> projectColorMap = new HashMap<>();
         for (Project p : allProjects) {
-            projectColorMap.put(p.getId(), p.getColor() != 0 ? p.getColor() : Color.parseColor("#00a8df"));
+            projectColorMap.put(p.getId(), p.getColor() != 0 ? p.getColor() : getResources().getColor(R.color.bb10_blue));
         }
 
         int maxIndicators = Math.min(dayEntries.size(), 3);
@@ -464,8 +468,8 @@ public class FutureLogFragment extends Fragment {
             square.setLayoutParams(lp);
 
             Integer mappedColor = projectColorMap.get(e.getProjectId());
-            int color = (mappedColor != null) ? mappedColor : Color.parseColor("#00a8df");
-            square.setBackgroundColor(selected ? Color.WHITE : color);
+            int color = (mappedColor != null) ? mappedColor : getResources().getColor(R.color.bb10_blue);
+            square.setBackgroundColor(selected ? getResources().getColor(R.color.on_accent) : color);
             dots.addView(square);
         }
 

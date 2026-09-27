@@ -25,6 +25,6 @@
         android:layout_width="16dp"
         android:layout_height="16dp"
         android:src="@drawable/ic_bb10_chevron_down"
-        app:tint="@color/bujo_text_secondary" />
+        app:tint="@color/bujo_text_secondary"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
 </LinearLayout>

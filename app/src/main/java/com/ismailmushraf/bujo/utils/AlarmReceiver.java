@@ -23,7 +23,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 context,
                 0,
                 mainIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT | (android.os.Build.VERSION.SDK_INT >= 23 ? PendingIntent.FLAG_IMMUTABLE : 0)
         );
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "bujo_channel")

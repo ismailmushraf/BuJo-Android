@@ -13,13 +13,13 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_project_history_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="22sp"
             android:textStyle="bold"
             android:singleLine="true"
@@ -30,7 +30,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#00a8df" />
+        android:background="@color/bb10_blue" />
 
     <ListView
         android:id="@+id/lv_project_history"

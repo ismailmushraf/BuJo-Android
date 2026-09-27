@@ -1,0 +1,33 @@
+<resources>
+    <string name="format_entryadapter_1">#%1$s</string>
+    <string name="format_entryadapter_2">%1$s (Overdue)</string>
+    <string name="format_entryadapter_3">Time: %1$s</string>
+    <string name="format_entryuihelper_4">Target: %1$s</string>
+    <string name="format_entryuihelper_5">Time: %1$s</string>
+    <string name="format_entryuihelper_6">Date: %1$s</string>
+    <string name="format_entryuihelper_7">Date: %1$s</string>
+    <string name="format_mainactivity_8">+%1$s pts</string>
+    <string name="format_mainactivity_9">You missed %1$s tasks recently.\nKeep up the discipline today!</string>
+    <string name="format_mainactivity_10">-%1$s pts</string>
+    <string name="format_workoutfragment_11">Note: %1$s</string>
+    <string name="format_habitprogressfragment_12">Day %1$s of %2$s</string>
+    <string name="format_workouthistoryfragment_13">Note: %1$s</string>
+    <string name="format_projectdetailfragment_14">Completed: %1$s of %2$s (%3$s%%)</string>
+    <string name="format_projectdetailfragment_15">Created: %1$s</string>
+    <string name="format_profilefragment_16">%1$s%% Efficiency</string>
+    <string name="format_profilefragment_17">%1$s%%</string>
+    <string name="format_profilefragment_18">%1$s / %2$s XP to %3$s</string>
+    <string name="format_profilefragment_19">%1$s Total Discipline XP</string>
+    <string name="format_profilefragment_20">%1$s / 2</string>
+    <string name="format_profilefragment_21">Longest Streak: %1$s%2$s</string>
+    <string name="format_profilefragment_22">%1$s pts</string>
+    <string name="format_profilefragment_23">%1$s pts</string>
+    <string name="format_profilefragment_24">%1$s pts</string>
+    <string name="format_habitsfragment_25">Target: %1$s</string>
+    <string name="format_habitsfragment_26">Day %1$s of %2$s</string>
+    <string name="format_habitsfragment_27">Goal: %1$s</string>
+    <string name="format_futurelogfragment_28">#%1$s</string>
+    <string name="format_futurelogfragment_29">Week %1$s</string>
+    <string name="format_futurelogfragment_30">Week %1$s</string>
+    <string name="format_dailylogfragment_31">Available working hours: %1$sh</string>
+</resources>

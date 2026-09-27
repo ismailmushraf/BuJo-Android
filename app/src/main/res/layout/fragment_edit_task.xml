@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/surface">
 
     <!-- Top Action Bar (BB10 Style: Cancel | Edit Task | Save) -->
     <LinearLayout
@@ -12,15 +12,15 @@
         android:layout_height="44dp"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/btn_cancel_task"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Cancel"
-            android:textColor="#00a8df"
+            android:text="@string/ui_cancel_77dfd2"
+            android:textColor="@color/bb10_blue"
             android:textSize="15sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
@@ -41,7 +41,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Edit Task"
+            android:text="@string/ui_edit_task_9d0e05"
             android:textColor="@color/bujo_text"
             android:textSize="17sp"
             android:textStyle="bold"
@@ -59,8 +59,8 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="Save"
-            android:textColor="#A0C8E6"
+            android:text="@string/ui_save_efc007"
+            android:textColor="@color/literal_a0c8e6"
             android:enabled="false"
             android:textSize="15sp"
             android:textStyle="bold"
@@ -75,7 +75,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#00a8df" />
+        android:background="@color/bb10_blue" />
 
     <View
         android:layout_width="match_parent"
@@ -101,7 +101,7 @@
                 android:gravity="center_vertical"
                 android:paddingStart="12dp"
                 android:paddingEnd="12dp"
-                android:background="@color/white">
+                android:background="@color/surface">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -112,7 +112,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Title"
+                        android:text="@string/ui_title_768e0c"
                         android:textColor="@color/bujo_text_secondary"
                         android:textSize="11sp"
                         android:layout_marginBottom="4dp"
@@ -120,6 +120,7 @@
 
                     <EditText
                         android:id="@+id/et_edit_task_title"
+                        android:hint="@string/ui_title_768e0c"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
@@ -136,7 +137,7 @@
                     android:layout_height="26dp"
                     android:gravity="center"
                     android:textSize="15sp"
-                    android:textColor="@color/white"
+                    android:textColor="@color/on_accent"
                     android:background="@drawable/bb10_checkbox_unchecked_bg"
                     android:clickable="true"
                     android:focusable="true" />
@@ -160,7 +161,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@color/white">
+                android:background="@color/surface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -173,8 +174,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Due Date"
-                        android:textColor="#222222"
+                        android:text="@string/ui_due_date_a1b308"
+                        android:textColor="@color/bujo_text"
                         android:textSize="15sp" />
 
                     <com.ismailmushraf.bujo.utils.BB10ToggleSwitch
@@ -203,8 +204,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Date"
-                        android:textColor="#333333"
+                        android:text="@string/ui_date_eb9a4b"
+                        android:textColor="@color/bujo_text"
                         android:textSize="13sp" />
 
                     <TextView
@@ -213,7 +214,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:textColor="#333333"
+                        android:textColor="@color/bujo_text"
                         android:textSize="13sp"
                         android:paddingEnd="8dp" />
 
@@ -221,7 +222,7 @@
                         android:layout_width="12dp"
                         android:layout_height="12dp"
                         android:src="@drawable/ic_bb10_dropdown_arrow"
-                        app:tint="#333333" />
+                        app:tint="@color/bujo_text"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
                 </LinearLayout>
 
@@ -237,7 +238,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="@color/white">
+                android:background="@color/surface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -250,8 +251,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Reminder"
-                        android:textColor="#222222"
+                        android:text="@string/ui_reminder_b87a19"
+                        android:textColor="@color/bujo_text"
                         android:textSize="15sp" />
 
                     <com.ismailmushraf.bujo.utils.BB10ToggleSwitch
@@ -280,8 +281,8 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Date"
-                        android:textColor="#333333"
+                        android:text="@string/ui_date_eb9a4b"
+                        android:textColor="@color/bujo_text"
                         android:textSize="13sp" />
 
                     <TextView
@@ -290,7 +291,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="end"
-                        android:textColor="#333333"
+                        android:textColor="@color/bujo_text"
                         android:textSize="13sp"
                         android:paddingEnd="8dp" />
 
@@ -298,7 +299,7 @@
                         android:layout_width="12dp"
                         android:layout_height="12dp"
                         android:src="@drawable/ic_bb10_dropdown_arrow"
-                        app:tint="#333333" />
+                        app:tint="@color/bujo_text"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
                 </LinearLayout>
 
@@ -306,8 +307,8 @@
                     android:id="@+id/tv_reminder_past_warning"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="This reminder occurs in the past"
-                    android:textColor="#D32F2F"
+                    android:text="@string/ui_this_reminder_occurs_in_the_past_f5e52b"
+                    android:textColor="@color/literal_d32f2f"
                     android:textSize="12sp"
                     android:paddingStart="12dp"
                     android:paddingEnd="12dp"
@@ -348,14 +349,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:layout_marginStart="9dp"
-                    android:text="Unfiled"
-                    android:textColor="#222222"
+                    android:text="@string/ui_unfiled_c1aca7"
+                    android:textColor="@color/bujo_text"
                     android:textSize="17sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="›"
+                    android:text="@string/ui_symbol_60ecbc"
                     android:textColor="@color/bujo_text_secondary"
                     android:textSize="20sp" />
 

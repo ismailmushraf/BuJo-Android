@@ -1,0 +1,14 @@
+<resources>
+    <color name="literal_f44336">#F44336</color>
+    <color name="literal_d32f2f">#D32F2F</color>
+    <color name="literal_4caf50">#4CAF50</color>
+    <color name="literal_a0c8e6">#A0C8E6</color>
+    <color name="literal_769a30">#769A30</color>
+    <color name="literal_ddffffff">#DDFFFFFF</color>
+    <color name="literal_d4af37">#D4AF37</color>
+    <color name="literal_888888">#888888</color>
+    <color name="literal_0066cc">#0066CC</color>
+    <color name="literal_e6f2ff">#E6F2FF</color>
+    <color name="literal_ffcc00">#FFCC00</color>
+    <color name="literal_cc0000">#CC0000</color>
+</resources>

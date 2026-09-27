@@ -39,7 +39,7 @@ public class ProjectFolderAdapter extends ArrayAdapter<Project> {
         
         // Count tasks in project
         int count = dbManager.getTaskCountForProject(project.getId());
-        tvCount.setText(count + (count == 1 ? " Task" : " Tasks"));
+        tvCount.setText(getContext().getResources().getQuantityString(R.plurals.task_count, count, count));
         
         // Cycle colors dynamically using a single bb10_folder.xml template
         int[] colors = {
@@ -53,7 +53,7 @@ public class ProjectFolderAdapter extends ArrayAdapter<Project> {
         int selectedColor = (project != null && project.getColor() != 0) ? project.getColor() : colors[position % colors.length];
 
         android.graphics.drawable.LayerDrawable folderDrawable = 
-                (android.graphics.drawable.LayerDrawable) getContext().getResources().getDrawable(R.drawable.bb10_folder).mutate();
+                (android.graphics.drawable.LayerDrawable) androidx.appcompat.content.res.AppCompatResources.getDrawable(getContext(), R.drawable.bb10_folder).mutate();
         
         android.graphics.drawable.GradientDrawable body = 
                 (android.graphics.drawable.GradientDrawable) folderDrawable.findDrawableByLayerId(R.id.folder_body);

@@ -18,12 +18,12 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Settings"
+                android:text="@string/ui_settings_c7f73b"
                 android:textColor="@color/bujo_text"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -43,7 +43,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Preferences"
+            android:text="@string/ui_preferences_9dfd34"
             android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -66,11 +66,11 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
+                android:layout_height="48dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
@@ -80,7 +80,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Theme Preference"
+                    android:text="@string/ui_theme_preference_c61fb7"
                     android:textColor="@color/bujo_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -98,7 +98,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    app:tint="@color/bujo_text" />
+                    app:tint="@color/bujo_text"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
             </LinearLayout>
         </LinearLayout>
@@ -116,11 +116,11 @@
             android:paddingEnd="8dp"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="38dp"
+                android:layout_height="48dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
@@ -130,7 +130,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Default Startup Screen"
+                    android:text="@string/ui_default_startup_screen_a3a979"
                     android:textColor="@color/bujo_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -148,7 +148,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    app:tint="@color/bujo_text" />
+                    app:tint="@color/bujo_text"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
             </LinearLayout>
         </LinearLayout>
@@ -162,7 +162,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Gamification &amp; Feedback"
+            android:text="@string/ui_gamification_feedback_3b31d0"
             android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -183,13 +183,13 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Enable Sound Effects"
+                android:text="@string/ui_enable_sound_effects_59d787"
                 android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
 
@@ -210,13 +210,13 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white">
+            android:background="@color/surface">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Enable Points Animation"
+                android:text="@string/ui_enable_points_animation_8f77b4"
                 android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
 
@@ -236,7 +236,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Data Management"
+            android:text="@string/ui_data_management_d5d83b"
             android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -258,14 +258,14 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:clickable="true"
             android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Export Backup to Device"
+                android:text="@string/ui_export_backup_to_device_1cd548"
                 android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -282,14 +282,14 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:clickable="true"
             android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Restore Backup from Device"
+                android:text="@string/ui_restore_backup_from_device_712cab"
                 android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
         </LinearLayout>
@@ -306,14 +306,14 @@
             android:gravity="center_vertical"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:clickable="true"
             android:focusable="true">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Delete All Completed Tasks"
+                android:text="@string/ui_delete_all_completed_tasks_796eab"
                 android:textColor="@color/bb10_folder_red"
                 android:textSize="14sp" />
         </LinearLayout>

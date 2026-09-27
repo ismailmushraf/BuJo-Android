@@ -44,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
+                checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                        != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 501);
+        }
 
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerList = findViewById(R.id.nav_drawer_list);
@@ -148,7 +153,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
-            DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
+            DatabaseManager workerDatabase = new DatabaseManager(getApplicationContext());
+            DatabaseManager.AuditResult audit;
+            try {
+                workerDatabase.open();
+                audit = workerDatabase.evaluateDailyStreak();
+            } finally {
+                workerDatabase.close();
+            }
             if (audit != null && audit.totalPenalty > 0) {
                 com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
                     if (!isFinishing() && !isDestroyed()) {
@@ -242,41 +254,6 @@ public class MainActivity extends AppCompatActivity {
         // No top toolbar anymore
     }
 
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
-        // BlackBerry's Android 4.3 runtime can retain GradientDrawable color data
-        // after recreation. Text uses the new resources, but boxed controls may not.
-        // Reapply the active theme colors to the already-inflated large box controls.
-        getWindow().getDecorView().post(new Runnable() {
-            @Override
-            public void run() {
-                refreshLegacyBoxColors(getWindow().getDecorView());
-            }
-        });
-    }
-
-    private void refreshLegacyBoxColors(View view) {
-        if (view.getId() == R.id.bb10_fab) {
-            return; // Skip the BB10 FAB so it retains its blue color
-        }
-
-        Drawable background = view.getBackground();
-        int boxThreshold = (int) (48 * getResources().getDisplayMetrics().density);
-        if (background instanceof GradientDrawable
-                && (view.getWidth() >= boxThreshold || view.getHeight() >= boxThreshold)) {
-            GradientDrawable box = (GradientDrawable) background.mutate();
-            box.setColor(getResources().getColor(R.color.bujo_background));
-            box.setStroke((int) (2 * getResources().getDisplayMetrics().density),
-                    getResources().getColor(R.color.bujo_box_border));
-        }
-        if (view instanceof ViewGroup) {
-            ViewGroup group = (ViewGroup) view;
-            for (int i = 0; i < group.getChildCount(); i++) {
-                refreshLegacyBoxColors(group.getChildAt(i));
-            }
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -298,8 +275,8 @@ public class MainActivity extends AppCompatActivity {
         TextView tvPenalty = v.findViewById(R.id.audit_penalty_text);
         TextView tvReason = v.findViewById(R.id.audit_reason_text);
         
-        tvPenalty.setText("-" + result.totalPenalty + " pts");
-        tvReason.setText("You missed " + result.missedTasks + " tasks recently.\nKeep up the discipline today!");
+        tvPenalty.setText(getString(com.ismailmushraf.bujo.R.string.format_mainactivity_10, String.valueOf(result.totalPenalty)));
+        tvReason.setText(getString(com.ismailmushraf.bujo.R.string.format_mainactivity_9, String.valueOf(result.missedTasks)));
         
         b.setView(v);
         final android.app.AlertDialog dialog = b.create();
@@ -335,7 +312,7 @@ public class MainActivity extends AppCompatActivity {
         final View v = getLayoutInflater().inflate(R.layout.dialog_planning_bonus, null);
         
         TextView tvPoints = v.findViewById(R.id.bonus_points_text);
-        tvPoints.setText("+" + totalPoints + " pts");
+        tvPoints.setText(getString(com.ismailmushraf.bujo.R.string.format_mainactivity_8, String.valueOf(totalPoints)));
         
         b.setView(v);
         final android.app.AlertDialog dialog = b.create();
@@ -389,7 +366,7 @@ public class MainActivity extends AppCompatActivity {
         }
         
         final TextView floatText = new TextView(this);
-        floatText.setText((amount > 0 ? "+" : "") + amount);
+        floatText.setText(getString(R.string.points_delta, amount > 0 ? "+" : "", amount));
         int colorRes = amount > 0 ? R.color.points_positive : R.color.points_negative;
         floatText.setTextColor(getResources().getColor(colorRes));
         floatText.setTextSize(20);
@@ -493,6 +470,12 @@ public class MainActivity extends AppCompatActivity {
         View btnWorkouts = findViewById(R.id.btn_bb10_workouts);
         View btnSettings = findViewById(R.id.btn_bb10_settings);
         TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
+        boolean timerScreen = fragment instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment;
+        for (int id : new int[]{R.id.btn_bb10_reset, R.id.space_bb10_pomodoro_1,
+                R.id.space_bb10_pomodoro_2, R.id.space_bb10_pomodoro_5}) {
+            findViewById(id).setVisibility(timerScreen ? View.VISIBLE : View.GONE);
+        }
+        if (timerScreen && btnFab != null) btnFab.setVisibility(View.VISIBLE);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.EditProjectFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.EditTaskFragment) {
@@ -568,19 +551,19 @@ public class MainActivity extends AppCompatActivity {
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
             if (tvFabText != null) {
-                tvFabText.setText("New Habit");
+                tvFabText.setText(getString(com.ismailmushraf.bujo.R.string.ui_new_habit_bc5fea));
                 tvFabText.setVisibility(View.VISIBLE);
             }
         } else if (fragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
             if (tvFabText != null) {
-                tvFabText.setText("Create Project");
+                tvFabText.setText(getString(com.ismailmushraf.bujo.R.string.ui_create_project_1cab44));
                 tvFabText.setVisibility(View.VISIBLE);
             }
         } else if (hideFab) {
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);
         } else {
             if (tvFabText != null) {
-                tvFabText.setText("New Task");
+                tvFabText.setText(getString(com.ismailmushraf.bujo.R.string.ui_new_task_cc3dbd));
                 tvFabText.setVisibility(View.VISIBLE);
             }
         }
@@ -601,13 +584,14 @@ public class MainActivity extends AppCompatActivity {
 
         if (tvFabText != null) {
             if (isRunning) {
-                tvFabText.setText("Pause");
+                tvFabText.setText(getString(com.ismailmushraf.bujo.R.string.ui_pause_781961));
             } else if (isPaused) {
-                tvFabText.setText("Resume");
+                tvFabText.setText(getString(com.ismailmushraf.bujo.R.string.ui_resume_b3bd0b));
             } else {
                 tvFabText.setText(isFocus ? "Start" : "Start Break");
             }
             tvFabText.setVisibility(View.VISIBLE);
+            if (fab != null) fab.setContentDescription(tvFabText.getText());
         }
 
         if (btnResetBar != null) {

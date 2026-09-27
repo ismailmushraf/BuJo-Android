@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/surface"
     android:animateLayoutChanges="true">
 
     <!-- Top Month Header Bar -->
@@ -14,16 +14,16 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_calendar_month"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="22sp"
-            android:text="September 2026" />
+            android:text="@string/ui_september_2026_f17bba" />
 
     </LinearLayout>
 
@@ -31,22 +31,22 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#769A30" />
+        android:background="@color/literal_769a30" />
 
     <!-- Days of Week Header Bar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="28dp"
         android:gravity="center_vertical"
-        android:background="@color/white">
+        android:background="@color/surface">
 
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Mon" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Tue" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Wed" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Thu" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Fri" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sat" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
-        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="Sun" android:textStyle="bold" android:textColor="#222222" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_mon_24b2a0" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_tue_529541" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_wed_23408b" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_thu_3593cc" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_fri_bbd6e3" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_sat_6b782d" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/ui_sun_48c98c" android:textStyle="bold" android:textColor="@color/bujo_text" android:textSize="12sp" />
     </LinearLayout>
 
     <View
@@ -55,7 +55,7 @@
         android:background="@color/bujo_divider" />
 
     <!-- Full Month Calendar Grid (Stretches to fill 100% of available height) -->
-    <GridView
+    <com.ismailmushraf.bujo.utils.CalendarGridView
         android:id="@+id/grid_calendar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -64,7 +64,7 @@
         android:numColumns="7"
         android:verticalSpacing="0dp"
         android:scrollbars="none"
-        android:background="@color/white" />
+        android:background="@color/surface" />
 
     <!-- Month View Bottom Selected Date Bar (Sits directly underneath Row 6) -->
     <LinearLayout
@@ -74,7 +74,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white"
+        android:background="@color/surface"
         android:clickable="true"
         android:focusable="true">
 
@@ -83,7 +83,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="13sp"
             android:textStyle="bold" />
 
@@ -91,7 +91,7 @@
             android:id="@+id/tv_week_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="#555555"
+            android:textColor="@color/bujo_text_secondary"
             android:textSize="12sp" />
 
         <ImageView
@@ -99,7 +99,7 @@
             android:layout_width="14dp"
             android:layout_height="14dp"
             android:layout_marginStart="6dp"
-            android:src="@drawable/ic_bb10_chevron_up" />
+            android:src="@drawable/ic_bb10_chevron_up"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
     </LinearLayout>
 
@@ -121,7 +121,7 @@
             android:numColumns="7"
             android:scrollbars="none"
             android:verticalSpacing="0dp"
-            android:background="@color/white" />
+            android:background="@color/surface" />
 
         <View
             android:layout_width="match_parent"
@@ -146,7 +146,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="#222222"
+                android:textColor="@color/bujo_text"
                 android:textSize="13sp"
                 android:textStyle="bold" />
 
@@ -154,7 +154,7 @@
                 android:id="@+id/tv_week_number_banner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#555555"
+                android:textColor="@color/bujo_text_secondary"
                 android:textSize="12sp" />
 
             <ImageView
@@ -162,7 +162,7 @@
                 android:layout_width="14dp"
                 android:layout_height="14dp"
                 android:layout_marginStart="6dp"
-                android:src="@drawable/ic_bb10_chevron_down" />
+                android:src="@drawable/ic_bb10_chevron_down"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
         </LinearLayout>
 

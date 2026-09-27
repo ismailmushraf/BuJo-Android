@@ -16,7 +16,7 @@
     <!-- 1. Top Bar: Search / Add Bar (BB10 Style) -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="64dp"
         android:padding="8dp"
         android:gravity="center_vertical"
         android:background="@color/bb10_bottom_bar_bg">
@@ -26,10 +26,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/white"
+            android:background="@color/surface"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
-            android:hint="Add a workout or search"
+            android:hint="@string/ui_add_a_workout_or_search_efc9eb"
             android:textSize="16sp"
             android:imeOptions="actionDone"
             android:inputType="textCapWords"
@@ -41,10 +41,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="8dp"
-            android:minHeight="0dp"
+            android:minHeight="48dp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:text="Log Set"
+            android:text="@string/ui_log_set_94de29"
             android:textSize="12sp"
             android:textColor="@color/bujo_text"
             android:background="@drawable/shape_bb10_btn_layer"
@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:baselineAligned="false"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <EditText
             android:id="@+id/et_weight"
@@ -71,7 +71,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:inputType="numberDecimal"
-            android:hint="Weight"
+            android:hint="@string/ui_weight_69c0b8"
             android:textSize="14sp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
@@ -85,7 +85,7 @@
             android:layout_height="40dp"
             android:layout_weight="1"
             android:inputType="number"
-            android:hint="Reps"
+            android:hint="@string/ui_reps_702045"
             android:textSize="14sp"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
@@ -103,12 +103,12 @@
         android:id="@+id/et_note"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:hint="Notes..."
+        android:hint="@string/ui_notes_fee3c9"
         android:textSize="14sp"
         android:inputType="textCapSentences"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:background="@color/white"/>
+        android:background="@color/surface"/>
 
     <View
         android:layout_width="match_parent"
@@ -133,7 +133,7 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <!-- Timer Label/Value on the left -->
         <LinearLayout
@@ -145,7 +145,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Session Timer"
+                android:text="@string/ui_session_timer_e59efe"
                 android:textColor="@color/bujo_text"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -172,7 +172,7 @@
                 android:src="@drawable/ic_bb10_play"
                 app:tint="@color/bujo_text"
                 android:background="?android:attr/selectableItemBackground"
-                android:padding="4dp" />
+                android:padding="4dp"  android:contentDescription="@string/ui_start_or_pause_workout_timer_1b78ac" />
 
             <ImageView
                 android:id="@+id/btn_timer_reset"
@@ -182,7 +182,7 @@
                 android:src="@drawable/ic_bb10_reset"
                 app:tint="@color/bujo_text_secondary"
                 android:background="?android:attr/selectableItemBackground"
-                android:padding="4dp" />
+                android:padding="4dp"  android:contentDescription="@string/ui_reset_workout_timer_91aa67" />
 
         </LinearLayout>
     </LinearLayout>
@@ -206,7 +206,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Today's Log"
+        android:text="@string/ui_today_s_log_273b2f"
         android:textColor="@color/bb10_section_header_text"
         android:textSize="11sp"
         android:textStyle="bold"

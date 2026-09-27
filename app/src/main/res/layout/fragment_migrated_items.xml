@@ -13,14 +13,14 @@
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:background="@color/white">
+        android:background="@color/surface">
 
         <TextView
             android:id="@+id/tv_logbook_header_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Logbook"
-            android:textColor="#222222"
+            android:text="@string/ui_logbook_a24404"
+            android:textColor="@color/bujo_text"
             android:textSize="22sp"
             android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="#00a8df" />
+        android:background="@color/bb10_blue" />
 
     <ListView
         android:id="@+id/lv_migrated_items"

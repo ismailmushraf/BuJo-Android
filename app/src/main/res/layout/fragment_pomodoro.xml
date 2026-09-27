@@ -5,13 +5,13 @@
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center_horizontal"
-    android:background="@color/white">
+    android:background="@color/surface">
 
     <!-- Active Task Selector Section -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="ACTIVE TASK"
+        android:text="@string/ui_active_task_bc6dce"
         android:textSize="11sp"
         android:textColor="@color/bujo_text_secondary"
         android:textStyle="bold"
@@ -37,9 +37,9 @@
         android:id="@+id/tv_mode_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="FOCUS"
+        android:text="@string/ui_focus_de5b5c"
         android:textSize="13sp"
-        android:textColor="#00a8df"
+        android:textColor="@color/bb10_blue"
         android:textStyle="bold"
         android:letterSpacing="0.2"
         android:layout_marginBottom="2dp" />
@@ -48,9 +48,9 @@
         android:id="@+id/tv_countdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="25:00"
+        android:text="@string/ui_25_00_155130"
         android:textSize="48sp"
-        android:textColor="#222222"
+        android:textColor="@color/bujo_text"
         android:textStyle="bold"
         android:layout_marginBottom="12dp" />
 
@@ -59,9 +59,9 @@
         android:id="@+id/btn_timer_skip"
         android:layout_width="120dp"
         android:layout_height="36dp"
-        android:text="SKIP BREAK"
+        android:text="@string/ui_skip_break_7a0d58"
         android:textSize="12sp"
-        android:textColor="#222222"
+        android:textColor="@color/bujo_text"
         android:background="@drawable/shape_bb10_dropdown"
         android:layout_marginBottom="16dp"
         android:visibility="gone" />
@@ -77,7 +77,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TIMER SETTINGS"
+            android:text="@string/ui_timer_settings_191858"
             android:textSize="11sp"
             android:textColor="@color/bujo_text_secondary"
             android:textStyle="bold"
@@ -94,8 +94,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Focus Duration (min)"
-                android:textColor="#222222"
+                android:text="@string/ui_focus_duration_min_bd9529"
+                android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
 
             <Spinner
@@ -117,8 +117,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Break Duration (min)"
-                android:textColor="#222222"
+                android:text="@string/ui_break_duration_min_91728f"
+                android:textColor="@color/bujo_text"
                 android:textSize="14sp" />
 
             <Spinner
@@ -135,7 +135,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="* Random focus checks trigger during sessions. Respond within 3 mins to avoid point loss."
+        android:text="@string/ui_random_focus_checks_trigger_during_sessions_resp_acf26b"
         android:textSize="11sp"
         android:textColor="@color/bujo_text_secondary"
         android:layout_marginTop="12dp"

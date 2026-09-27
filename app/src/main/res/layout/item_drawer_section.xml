@@ -3,11 +3,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="16dp"
+    android:paddingStart="16dp"
     android:paddingTop="20dp"
-    android:paddingRight="16dp"
+    android:paddingEnd="16dp"
     android:paddingBottom="8dp"
-    android:background="#000000">
+    android:background="@color/sidebar_surface">
 
     <TextView
         android:id="@+id/drawer_section_title"
@@ -15,6 +15,6 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textStyle="bold"
-        android:textColor="#888888" />
+        android:textColor="@color/literal_888888" />
 
 </LinearLayout>

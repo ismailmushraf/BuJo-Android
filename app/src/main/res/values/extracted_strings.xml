@@ -1,0 +1,146 @@
+<resources>
+    <string name="ui_projects_53e890" formatted="false">Projects</string>
+    <string name="ui_habits_45ab39" formatted="false">Habits</string>
+    <string name="ui_new_task_cc3dbd" formatted="false">New Task</string>
+    <string name="ui_reset_44c57a" formatted="false">Reset</string>
+    <string name="ui_workouts_ccb58b" formatted="false">Workouts</string>
+    <string name="ui_settings_c7f73b" formatted="false">Settings</string>
+    <string name="ui_schedule_event_cf0765" formatted="false">SCHEDULE EVENT</string>
+    <string name="ui_event_name_8269fa" formatted="false">Event Name</string>
+    <string name="ui_description_optional_f1da5c" formatted="false">Description (Optional)</string>
+    <string name="ui_set_date_57b42b" formatted="false">Set Date</string>
+    <string name="ui_set_time_34caeb" formatted="false">Set Time</string>
+    <string name="ui_symbol_9b0a15" formatted="false">📉</string>
+    <string name="ui_0_pts_d8f144" formatted="false">-0 pts</string>
+    <string name="ui_discipline_penalty_a31ece" formatted="false">Discipline Penalty</string>
+    <string name="ui_every_task_added_is_a_commitment_points_are_dedu_8e1f6e" formatted="false">Every task added is a commitment. Points are deducted for uncompleted tasks at the end of each day.</string>
+    <string name="ui_i_will_do_better_8a29d9" formatted="false">I will do better</string>
+    <string name="ui_delete_f6fdbe" formatted="false">Delete</string>
+    <string name="ui_cancel_77dfd2" formatted="false">Cancel</string>
+    <string name="ui_select_project_71748b" formatted="false">Select Project</string>
+    <string name="ui_plan_sessions_7efc64" formatted="false">Plan Sessions</string>
+    <string name="ui_today_24345a" formatted="false">Today</string>
+    <string name="ui_tomorrow_1948bf" formatted="false">Tomorrow</string>
+    <string name="ui_available_working_hours_0h_a5d615" formatted="false">Available working hours: 0h</string>
+    <string name="ui_add_to_log_a68591" formatted="false">Add to Log</string>
+    <string name="ui_symbol_ee3533" formatted="false">🎯</string>
+    <string name="ui_0_pts_959ddf" formatted="false">+0 pts</string>
+    <string name="ui_commitment_bonus_added_9da085" formatted="false">Commitment Bonus Added!</string>
+    <string name="ui_your_commitment_points_are_already_recorded_024dc2" formatted="false">Your commitment points are already recorded.</string>
+    <string name="ui_continue_2e0262" formatted="false">Continue</string>
+    <string name="ui_add_sub_task_8a91f5" formatted="false">+ Add Sub-task</string>
+    <string name="ui_add_a_task_or_search_71bb11" formatted="false">Add a task or search</string>
+    <string name="ui_edit_project_f2266a" formatted="false">Edit Project</string>
+    <string name="ui_save_efc007" formatted="false">Save</string>
+    <string name="ui_project_title_221834" formatted="false">Project title</string>
+    <string name="ui_folder_color_b4dfd2" formatted="false">Folder Color</string>
+    <string name="ui_priority_weight_33be5f" formatted="false">Priority Weight</string>
+    <string name="ui_symbol_43ca68" formatted="false">★</string>
+    <string name="ui_symbol_7bd0a5" formatted="false">☆</string>
+    <string name="ui_edit_task_9d0e05" formatted="false">Edit Task</string>
+    <string name="ui_title_768e0c" formatted="false">Title</string>
+    <string name="ui_due_date_a1b308" formatted="false">Due Date</string>
+    <string name="ui_date_eb9a4b" formatted="false">Date</string>
+    <string name="ui_reminder_b87a19" formatted="false">Reminder</string>
+    <string name="ui_this_reminder_occurs_in_the_past_f5e52b" formatted="false">This reminder occurs in the past</string>
+    <string name="ui_unfiled_c1aca7" formatted="false">Unfiled</string>
+    <string name="ui_symbol_60ecbc" formatted="false">›</string>
+    <string name="ui_september_2026_f17bba" formatted="false">September 2026</string>
+    <string name="ui_mon_24b2a0" formatted="false">Mon</string>
+    <string name="ui_tue_529541" formatted="false">Tue</string>
+    <string name="ui_wed_23408b" formatted="false">Wed</string>
+    <string name="ui_thu_3593cc" formatted="false">Thu</string>
+    <string name="ui_fri_bbd6e3" formatted="false">Fri</string>
+    <string name="ui_sat_6b782d" formatted="false">Sat</string>
+    <string name="ui_sun_48c98c" formatted="false">Sun</string>
+    <string name="ui_habit_progress_f52d0a" formatted="false">HABIT PROGRESS</string>
+    <string name="ui_commitment_progress_grid_4e24eb" formatted="false">COMMITMENT PROGRESS GRID</string>
+    <string name="ui_add_a_habit_795e61" formatted="false">Add a habit...</string>
+    <string name="ui_no_habits_tracked_yet_nstart_building_discipline_fcc4ea" formatted="false">No habits tracked yet.\nStart building discipline today.</string>
+    <string name="ui_logbook_a24404" formatted="false">Logbook</string>
+    <string name="ui_active_task_bc6dce" formatted="false">ACTIVE TASK</string>
+    <string name="ui_focus_de5b5c" formatted="false">FOCUS</string>
+    <string name="ui_25_00_155130" formatted="false">25:00</string>
+    <string name="ui_skip_break_7a0d58" formatted="false">SKIP BREAK</string>
+    <string name="ui_timer_settings_191858" formatted="false">TIMER SETTINGS</string>
+    <string name="ui_focus_duration_min_bd9529" formatted="false">Focus Duration (min)</string>
+    <string name="ui_break_duration_min_91728f" formatted="false">Break Duration (min)</string>
+    <string name="ui_random_focus_checks_trigger_during_sessions_resp_acf26b" formatted="false">* Random focus checks trigger during sessions. Respond within 3 mins to avoid point loss.</string>
+    <string name="ui_symbol_3656e5" formatted="false">🚶</string>
+    <string name="ui_level_1_wanderer_6d5da1" formatted="false">LEVEL 1: WANDERER</string>
+    <string name="ui_0_500_xp_to_apprentice_3928be" formatted="false">0 / 500 XP to Apprentice</string>
+    <string name="ui_tasks_mastery_4ac134" formatted="false">Tasks Mastery</string>
+    <string name="ui_0_pts_d7d065" formatted="false">0 pts</string>
+    <string name="ui_habit_discipline_b5043d" formatted="false">Habit Discipline</string>
+    <string name="ui_workout_strength_8c3841" formatted="false">Workout Strength</string>
+    <string name="ui_tap_to_see_breakdown_465f67" formatted="false">▼ Tap to see breakdown</string>
+    <string name="ui_discipline_metrics_934238" formatted="false">DISCIPLINE METRICS</string>
+    <string name="ui_symbol_d8f26c" formatted="false">🔥</string>
+    <string name="ui_0_days_3f6be4" formatted="false">0 Days</string>
+    <string name="ui_current_streak_031c4e" formatted="false">Current Streak</string>
+    <string name="ui_symbol_6c56d9" formatted="false">🔋</string>
+    <string name="ui_0_2_d89626" formatted="false">0 / 2</string>
+    <string name="ui_rest_tokens_ebbf06" formatted="false">Rest Tokens</string>
+    <string name="ui_symbol_9bc03d" formatted="false">🏆</string>
+    <string name="ui_longest_streak_0_days_f81792" formatted="false">Longest Streak: 0 Days</string>
+    <string name="ui_your_best_unbroken_run_bb8792" formatted="false">Your best unbroken run</string>
+    <string name="ui_habit_discipline_7bdd87" formatted="false">HABIT DISCIPLINE</string>
+    <string name="ui_0_b6589f" formatted="false">0</string>
+    <string name="ui_perfect_days_66075e" formatted="false">PERFECT DAYS</string>
+    <string name="ui_0_433bdb" formatted="false">0%</string>
+    <string name="ui_avg_success_b19532" formatted="false">AVG SUCCESS</string>
+    <string name="ui_goal_efficiency_624232" formatted="false">GOAL EFFICIENCY</string>
+    <string name="ui_project_entries_60ec5a" formatted="false">PROJECT ENTRIES</string>
+    <string name="ui_search_projects_469d78" formatted="false">Search projects...</string>
+    <string name="ui_task_lists_3465c3" formatted="false">Task Lists</string>
+    <string name="ui_preferences_9dfd34" formatted="false">Preferences</string>
+    <string name="ui_theme_preference_c61fb7" formatted="false">Theme Preference</string>
+    <string name="ui_default_startup_screen_a3a979" formatted="false">Default Startup Screen</string>
+    <string name="ui_gamification_feedback_3b31d0" formatted="false">Gamification &amp; Feedback</string>
+    <string name="ui_enable_sound_effects_59d787" formatted="false">Enable Sound Effects</string>
+    <string name="ui_enable_points_animation_8f77b4" formatted="false">Enable Points Animation</string>
+    <string name="ui_data_management_d5d83b" formatted="false">Data Management</string>
+    <string name="ui_export_backup_to_device_1cd548" formatted="false">Export Backup to Device</string>
+    <string name="ui_restore_backup_from_device_712cab" formatted="false">Restore Backup from Device</string>
+    <string name="ui_delete_all_completed_tasks_796eab" formatted="false">Delete All Completed Tasks</string>
+    <string name="ui_new_personal_record_1ee070" formatted="false">NEW PERSONAL RECORD!</string>
+    <string name="ui_add_a_workout_or_search_efc9eb" formatted="false">Add a workout or search</string>
+    <string name="ui_log_set_94de29" formatted="false">Log Set</string>
+    <string name="ui_weight_69c0b8" formatted="false">Weight</string>
+    <string name="ui_reps_702045" formatted="false">Reps</string>
+    <string name="ui_notes_fee3c9" formatted="false">Notes...</string>
+    <string name="ui_session_timer_e59efe" formatted="false">Session Timer</string>
+    <string name="ui_today_s_log_273b2f" formatted="false">Today\'s Log</string>
+    <string name="ui_add_subtask_75bd7d" formatted="false">Add subtask...</string>
+    <string name="ui_symbol_67fba2" formatted="false">×</string>
+    <string name="ui_new_sub_task_2eaf6f" formatted="false">New sub-task...</string>
+    <string name="ui_symbol_0951b9" formatted="false">✕</string>
+    <string name="ui_back_b52b36" formatted="false">Back</string>
+    <string name="ui_more_options_86c0a3" formatted="false">More options</string>
+    <string name="ui_start_or_pause_workout_timer_1b78ac" formatted="false">Start or pause workout timer</string>
+    <string name="ui_reset_workout_timer_91aa67" formatted="false">Reset workout timer</string>
+    <string name="ui_new_task_17b2b8" formatted="false">New task</string>
+    <string name="ui_new_habit_bc5fea" formatted="false">New Habit</string>
+    <string name="ui_create_project_1cab44" formatted="false">Create Project</string>
+    <string name="ui_pause_781961" formatted="false">Pause</string>
+    <string name="ui_resume_b3bd0b" formatted="false">Resume</string>
+    <string name="ui_due_145caf" formatted="false">Due</string>
+    <string name="ui_new_habit_commitment_42f5ae" formatted="false">New Habit Commitment</string>
+    <string name="ui_habit_name_e_g_meditate_976cf7" formatted="false">Habit Name (e.g. Meditate)</string>
+    <string name="ui_commitment_duration_days_166d25" formatted="false">Commitment Duration (Days)</string>
+    <string name="ui_set_goal_time_optional_fb6e11" formatted="false">Set Goal Time (Optional)</string>
+    <string name="ui_edit_target_time_83b4a4" formatted="false">Edit Target Time</string>
+    <string name="ui_tap_to_hide_breakdown_5b44b6" formatted="false">▲ Tap to hide breakdown</string>
+    <string name="ui_level_2_apprentice_ba52e3" formatted="false">LEVEL 2: APPRENTICE</string>
+    <string name="ui_level_3_scholar_2c2c6c" formatted="false">LEVEL 3: SCHOLAR</string>
+    <string name="ui_level_4_ascendant_6153be" formatted="false">LEVEL 4: ASCENDANT</string>
+    <string name="ui_level_5_monk_e0c1bb" formatted="false">LEVEL 5: MONK</string>
+    <string name="ui_project_goal_2e7f7b" formatted="false">Project Goal</string>
+    <string name="ui_no_tasks_created_yet_42f6c5" formatted="false">No tasks created yet</string>
+    <string name="ui_clear_completed_tasks_2ee9aa" formatted="false">Clear Completed Tasks</string>
+    <string name="ui_are_you_sure_you_want_to_permanently_delete_all__ea6d98" formatted="false">Are you sure you want to permanently delete all completed tasks across all projects and logs?</string>
+    <string name="ui_restore_backup_cb51e4" formatted="false">Restore Backup</string>
+    <string name="ui_replace_your_current_journal_with_this_backup_f45514" formatted="false">Replace your current journal with this backup?</string>
+    <string name="ui_select_folder_color_ee4b92" formatted="false">Select Folder Color</string>
+    <string name="ui_select_emoji_ecbb9b" formatted="false">Select Emoji</string>
+</resources>

@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        android:layout_marginLeft="16dp">
+        android:layout_marginStart="16dp">
 
         <EditText
             android:id="@+id/subtask_content"
@@ -31,7 +31,7 @@
             android:background="@android:color/transparent"
             android:textColor="@color/bujo_text"
             android:textSize="18sp"
-            android:hint="New sub-task..."
+            android:hint="@string/ui_new_sub_task_2eaf6f"
             android:singleLine="true"
             android:imeOptions="actionDone"
             android:inputType="textCapSentences"
@@ -42,7 +42,7 @@
             android:id="@+id/subtask_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="10sp"
+            android:textSize="12sp"
             android:textColor="@color/bujo_text_secondary"
             android:visibility="gone" />
     </LinearLayout>
@@ -51,9 +51,9 @@
         android:id="@+id/subtask_delete"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="✕"
+        android:text="@string/ui_symbol_0951b9"
         android:textSize="18sp"
-        android:textColor="#CC0000"
+        android:textColor="@color/literal_cc0000"
         android:padding="8dp" />
 
 </LinearLayout>
