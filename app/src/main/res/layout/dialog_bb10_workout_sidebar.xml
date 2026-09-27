@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
 
-    <!-- Left 30% Dimmed Scrim (Click to dismiss) -->
+    <!-- Left Dimmed Scrim -->
     <View
         android:id="@+id/sidebar_dim_scrim"
         android:layout_width="0dp"
@@ -14,31 +14,31 @@
         android:clickable="true"
         android:focusable="true" />
 
-    <!-- Right 70% BB10 Sidebar Container -->
+    <!-- Right Container -->
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
+        android:layout_weight="0.7"
         android:background="@color/bb10_sidebar_dark_bg">
 
-        <!-- 1. TOP SECTION: Task / Item Title -->
+        <!-- Top Fixed Header -->
         <LinearLayout
             android:id="@+id/sidebar_top_section"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
+            android:orientation="vertical"
             android:padding="16dp"
             android:background="@color/bb10_sidebar_header_bg">
 
             <TextView
-                android:id="@+id/sidebar_task_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="Workouts"
                 android:textColor="@color/white"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:maxLines="2"
-                android:ellipsize="end" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <View
@@ -48,48 +48,11 @@
             android:layout_below="@id/sidebar_top_section"
             android:background="@color/bb10_sidebar_divider" />
 
-        <!-- 3. BOTTOM SECTION: Fixed Delete Button -->
-        <LinearLayout
-            android:id="@+id/sidebar_bottom_delete"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_menu_delete"
-                android:tint="@color/white" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Delete"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <View
-            android:id="@+id/bottom_divider"
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_above="@id/sidebar_bottom_delete"
-            android:background="@color/bb10_sidebar_divider" />
-
-        <!-- 2. MIDDLE SECTION: Options List (Except Delete) -->
+        <!-- Centered Options List -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/top_divider"
-            android:layout_above="@id/bottom_divider">
+            android:layout_below="@id/top_divider">
 
             <ListView
                 android:id="@+id/lv_sidebar_options"

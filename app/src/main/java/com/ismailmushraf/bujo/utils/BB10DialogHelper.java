@@ -101,4 +101,38 @@ public class BB10DialogHelper {
 
         dialog.show();
     }
+
+    public interface OnSidebarInflatedListener {
+        void onSidebarInflated(android.app.Dialog dialog, View view);
+    }
+
+    public static android.app.Dialog showSidebar(Context context, int layoutResId, OnSidebarInflatedListener listener) {
+        if (context == null) return null;
+
+        final android.app.Dialog dialog = new android.app.Dialog(context, android.R.style.Theme_Translucent_NoTitleBar);
+        View view = LayoutInflater.from(context).inflate(layoutResId, null);
+        dialog.setContentView(view);
+
+        if (dialog.getWindow() != null) {
+            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
+            lp.copyFrom(dialog.getWindow().getAttributes());
+            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
+            lp.gravity = android.view.Gravity.END;
+            lp.windowAnimations = R.style.BB10SidebarAnimation;
+            dialog.getWindow().setAttributes(lp);
+        }
+
+        View scrim = view.findViewById(R.id.sidebar_dim_scrim);
+        if (scrim != null) {
+            scrim.setOnClickListener(v -> dialog.dismiss());
+        }
+
+        if (listener != null) {
+            listener.onSidebarInflated(dialog, view);
+        }
+
+        dialog.show();
+        return dialog;
+    }
 }

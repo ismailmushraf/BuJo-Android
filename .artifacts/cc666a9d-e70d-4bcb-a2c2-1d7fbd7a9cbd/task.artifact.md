@@ -1,5 +1,7 @@
-- [x] Hide FAB in WorkoutFragment (`MainActivity.java`)
-- [x] Remove "Journal Index" from Navigation Drawer (`MainActivity.java`)
-- [x] Center options in Context Sidebar (`dialog_bb10_context_sidebar.xml`)
-- [x] Center options in Project Sidebar (`dialog_bb10_project_sidebar.xml`)
-- [x] Center options in Navigation Drawer (`activity_main.xml`)
+- [x] Create `GamificationManager.java` & refactor points award logic
+- [x] Create `AppPreferences.java` & refactor `SharedPreferences` usage
+- [x] Optimize `EntryAdapter.java` `getView()` allocations
+- [x] Centralize fragment navigation with `pushFragment(...)` in `MainActivity.java`
+- [x] Create `AppExecutors.java` & offload heavy DB tasks off main thread
+- [x] Harden `DatabaseManager.java` cursor cleanup & `SoundHelper.java`
+- [x] Verify build with Gradle

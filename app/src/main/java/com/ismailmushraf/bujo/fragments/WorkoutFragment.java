@@ -178,7 +178,7 @@ public class WorkoutFragment extends Fragment {
                 long insertedId = dbManager.insertWorkoutSet(ws);
 
                 if (insertedId != -1 && getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).animatePointsChange(10, v);
+                    ((MainActivity) getActivity()).animatePointsChange(com.ismailmushraf.bujo.utils.GamificationManager.POINTS_WORKOUT_SET, v);
                 }
 
                 etReps.setText("");
@@ -226,43 +226,26 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void showBB10ContextMenu(final WorkoutSet ws, final View sourceView) {
-        final android.app.Dialog dialog = new android.app.Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_bb10_context_sidebar, null);
-        dialog.setContentView(view);
+        com.ismailmushraf.bujo.utils.BB10DialogHelper.showSidebar(getActivity(), R.layout.dialog_bb10_context_sidebar, (dialog, view) -> {
+            TextView tvTitle = view.findViewById(R.id.sidebar_task_title);
+            String title = ws.getExercise() + " (Set " + ws.getSetNumber() + ")";
+            tvTitle.setText(title);
 
-        if (dialog.getWindow() != null) {
-            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
-            lp.copyFrom(dialog.getWindow().getAttributes());
-            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
-            lp.gravity = android.view.Gravity.END;
-            lp.windowAnimations = R.style.BB10SidebarAnimation;
-            dialog.getWindow().setAttributes(lp);
-        }
+            ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
+            lvOptions.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, new ArrayList<String>()));
 
-        view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(v -> dialog.dismiss());
-
-        TextView tvTitle = view.findViewById(R.id.sidebar_task_title);
-        String title = ws.getExercise() + " (Set " + ws.getSetNumber() + ")";
-        tvTitle.setText(title);
-
-        ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
-        // We only have Delete, so the middle section can remain empty for now.
-        lvOptions.setAdapter(new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_1, new ArrayList<String>()));
-
-        view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
-            dialog.dismiss();
-            com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Delete Set", "Are you sure you want to delete this set?", "Delete", () -> {
-                int appliedPoints = dbManager.deleteWorkoutSet(ws.getId());
-                if (getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).animatePointsChange(appliedPoints, sourceView);
-                    ((MainActivity) getActivity()).refreshProfileIcon();
-                }
-                refreshUI();
+            view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
+                dialog.dismiss();
+                com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Delete Set", "Are you sure you want to delete this set?", "Delete", () -> {
+                    int appliedPoints = dbManager.deleteWorkoutSet(ws.getId());
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).animatePointsChange(appliedPoints, sourceView);
+                        ((MainActivity) getActivity()).refreshProfileIcon();
+                    }
+                    refreshUI();
+                });
             });
         });
-
-        dialog.show();
     }
 
     private void refreshUI() {
@@ -343,25 +326,10 @@ public class WorkoutFragment extends Fragment {
             } else {
                 ItemViewHolder holder;
                 if (convertView == null) {
-                    LinearLayout ll = new LinearLayout(getActivity());
-                    ll.setOrientation(LinearLayout.VERTICAL);
-                    ll.setPadding(32, 24, 32, 24); // More BB10 style padding
-                    ll.setBackgroundColor(getResources().getColor(R.color.white)); // Flat white background
-
+                    convertView = LayoutInflater.from(getActivity()).inflate(R.layout.item_workout_set_row, parent, false);
                     holder = new ItemViewHolder();
-                    holder.tvLine1 = new TextView(getActivity());
-                    holder.tvLine1.setTextColor(getResources().getColor(R.color.bujo_text));
-                    holder.tvLine1.setTextSize(16);
-
-                    holder.tvLine2 = new TextView(getActivity());
-                    holder.tvLine2.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
-                    holder.tvLine2.setTextSize(14);
-                    holder.tvLine2.setPadding(0, 4, 0, 0);
-
-                    ll.addView(holder.tvLine1);
-                    ll.addView(holder.tvLine2);
-
-                    convertView = ll;
+                    holder.tvLine1 = convertView.findViewById(R.id.tv_set_title);
+                    holder.tvLine2 = convertView.findViewById(R.id.tv_set_note);
                     convertView.setTag(holder);
                 } else {
                     holder = (ItemViewHolder) convertView.getTag();
@@ -384,21 +352,48 @@ public class WorkoutFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        MenuItem item = menu.add("History");
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        item.setIcon(android.R.drawable.ic_menu_recent_history);
-        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                if (isTracking) btnToggle.performClick();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.fragment_container, new WorkoutHistoryFragment());
-                ft.addToBackStack(null);
-                ft.commit();
-                return true;
+    public void openRightSidebar() {
+        com.ismailmushraf.bujo.utils.BB10DialogHelper.showSidebar(getActivity(), R.layout.dialog_bb10_workout_sidebar, (dialog, view) -> {
+            class SidebarOption {
+                final String title;
+                final int iconResId;
+                SidebarOption(String title, int iconResId) {
+                    this.title = title;
+                    this.iconResId = iconResId;
+                }
             }
+
+            List<SidebarOption> optionsList = new ArrayList<>();
+            optionsList.add(new SidebarOption("History", R.drawable.ic_bb10_history));
+
+            ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
+            android.widget.ArrayAdapter<SidebarOption> adapter = new android.widget.ArrayAdapter<SidebarOption>(getActivity(), R.layout.item_sidebar_option, optionsList) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    if (convertView == null) {
+                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parent, false);
+                    }
+                    SidebarOption option = getItem(position);
+                    TextView tv = convertView.findViewById(R.id.tv_option_title);
+                    android.widget.ImageView iv = convertView.findViewById(R.id.iv_option_icon);
+                    if (option != null) {
+                        tv.setText(option.title);
+                        iv.setImageResource(option.iconResId);
+                    }
+                    return convertView;
+                }
+            };
+            lvOptions.setAdapter(adapter);
+
+            lvOptions.setOnItemClickListener((parent, v, position, id) -> {
+                dialog.dismiss();
+                if (optionsList.get(position).title.equals("History")) {
+                    if (isTracking) btnToggle.performClick();
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).pushFragment(new WorkoutHistoryFragment());
+                    }
+                }
+            });
         });
     }
 

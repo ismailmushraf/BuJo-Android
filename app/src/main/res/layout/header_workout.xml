@@ -153,7 +153,7 @@
                 android:id="@+id/chronometer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#0066CC"
+                android:textColor="@color/bb10_folder_blue"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -206,14 +206,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Today's Log"
-        android:textColor="#666666"
+        android:textColor="@color/bb10_section_header_text"
         android:textSize="11sp"
         android:textStyle="bold"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="6dp"
         android:paddingBottom="6dp"
-        android:background="#F0F0F0" />
+        android:background="@color/bb10_section_header_bg" />
 
     <View
         android:layout_width="match_parent"

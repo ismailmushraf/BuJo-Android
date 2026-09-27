@@ -24,4 +24,13 @@
     <color name="bb10_folder_green">#6b8e23</color>
     <color name="bb10_folder_purple">#a6338b</color>
     <color name="bb10_folder_red">#d32f2f</color>
+
+    <!-- BB10 Sidebar & Header colors -->
+    <color name="bb10_sidebar_dark_bg">#000000</color>
+    <color name="bb10_sidebar_header_bg">#111111</color>
+    <color name="bb10_sidebar_divider">#222222</color>
+    <color name="bb10_sidebar_subtext">#AAAAAA</color>
+    <color name="bb10_sidebar_scrim">#60000000</color>
+    <color name="bb10_section_header_bg">#F0F0F0</color>
+    <color name="bb10_section_header_text">#666666</color>
 </resources>

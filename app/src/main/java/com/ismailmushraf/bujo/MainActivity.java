@@ -3,13 +3,8 @@ package com.ismailmushraf.bujo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -23,16 +18,11 @@ import com.ismailmushraf.bujo.adapters.DrawerAdapter;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.fragments.DailyLogFragment;
 import com.ismailmushraf.bujo.fragments.FutureLogFragment;
-import com.ismailmushraf.bujo.fragments.HabitsFragment;
 import com.ismailmushraf.bujo.fragments.InboxFragment;
 import com.ismailmushraf.bujo.fragments.MigratedItemsFragment;
-import com.ismailmushraf.bujo.fragments.ProfileFragment;
 import com.ismailmushraf.bujo.fragments.ProjectDetailFragment;
-import com.ismailmushraf.bujo.fragments.ProjectsFragment;
 import com.ismailmushraf.bujo.fragments.SettingsFragment;
-import com.ismailmushraf.bujo.fragments.WorkoutFragment;
 import com.ismailmushraf.bujo.models.DrawerItem;
-import com.ismailmushraf.bujo.models.Project;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,8 +45,8 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.nav_drawer_list);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerList = findViewById(R.id.nav_drawer_list);
         drawerView = findViewById(R.id.nav_drawer_container);
 
         // Header view matching screenshot with back arrow
@@ -91,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
                 Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
                 if (current instanceof ProjectDetailFragment) {
                     ((ProjectDetailFragment) current).openRightSidebar();
+                } else if (current instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment) {
+                    ((com.ismailmushraf.bujo.fragments.WorkoutFragment) current).openRightSidebar();
                 } else if (drawerLayout.isDrawerOpen(drawerView)) {
                     drawerLayout.closeDrawer(drawerView);
                 } else {
@@ -155,10 +147,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
-        if (audit != null && audit.totalPenalty > 0) {
-            showAuditModal(audit);
-        }
+        com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
+            if (audit != null && audit.totalPenalty > 0) {
+                com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> showAuditModal(audit));
+            }
+        });
 
         refreshDrawer();
 
@@ -167,8 +161,7 @@ public class MainActivity extends AppCompatActivity {
             if ("Pomodoro".equals(navigateTo)) {
                 selectItem(3); 
             } else {
-                android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-                String startup = prefs.getString("startup_screen", "Today");
+                String startup = com.ismailmushraf.bujo.utils.AppPreferences.getStartupScreen(this);
 
                 int startupIndex = 1; // Default to Today
                 if ("Inbox".equals(startup)) {
@@ -188,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", R.drawable.ic_calendar));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", R.drawable.ic_bb10_timer));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", R.drawable.ic_bb10_logbook));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Profile", R.drawable.ic_today));
         drawerAdapter.notifyDataSetChanged();
     }
 
@@ -215,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new MigratedItemsFragment();
             } else if ("Focus Timer".equals(item.title)) {
                 fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment();
+            } else if ("Profile".equals(item.title)) {
+                fragment = new com.ismailmushraf.bujo.fragments.ProfileFragment();
             }
         }
 
@@ -369,13 +365,12 @@ public class MainActivity extends AppCompatActivity {
     public void animatePointsChange(final int amount, View sourceView) {
         if (amount == 0) return;
 
-        android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
         if (amount > 0) com.ismailmushraf.bujo.utils.SoundHelper.playSuccess(this);
         else com.ismailmushraf.bujo.utils.SoundHelper.playPenalty(this);
 
         refreshProfileIcon(); // Immediate refresh
 
-        if (!prefs.getBoolean("enable_animations", true)) {
+        if (!com.ismailmushraf.bujo.utils.AppPreferences.isAnimationsEnabled(this)) {
             return;
         }
 
@@ -439,8 +434,7 @@ public class MainActivity extends AppCompatActivity {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         // Fetch the user's preferred startup screen from Settings
-        android.content.SharedPreferences prefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        String startup = prefs.getString("startup_screen", "Today");
+        String startup = com.ismailmushraf.bujo.utils.AppPreferences.getStartupScreen(this);
 
         // Check if we are already on the default screen
         boolean isDefaultScreen = false;
@@ -467,13 +461,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void navigateToFragment(Fragment fragment) {
+    public void pushFragment(Fragment fragment) {
+        if (fragment == null) return;
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
         ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
         ft.commit();
         updateBottomBarButtons(fragment);
+    }
+
+    private void navigateToFragment(Fragment fragment) {
+        pushFragment(fragment);
     }
 
     public void updateBottomBarButtons(Fragment fragment) {
@@ -524,9 +523,7 @@ public class MainActivity extends AppCompatActivity {
             fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.ProjectHistoryFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutHistoryFragment) {
+            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment) {
             if (btnFab != null) btnFab.setVisibility(View.GONE);
             if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);
@@ -555,8 +552,14 @@ public class MainActivity extends AppCompatActivity {
             if (fabView != null) fabView.setImageResource(R.drawable.ic_bb10_compose);
         }
 
-        boolean isOverflowVisible = isPrimaryScreen || (fragment instanceof ProjectDetailFragment);
-        if (btnFab != null) btnFab.setVisibility(View.VISIBLE);
+        boolean isOverflowVisible = isPrimaryScreen || 
+                                    (fragment instanceof ProjectDetailFragment) || 
+                                    (fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment);
+                                    
+        boolean hideFab = (fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment) || 
+                          (fragment instanceof com.ismailmushraf.bujo.fragments.WorkoutHistoryFragment);
+
+        if (btnFab != null) btnFab.setVisibility(hideFab ? View.GONE : View.VISIBLE);
         if (btnOverflow != null) btnOverflow.setVisibility(isOverflowVisible ? View.VISIBLE : View.INVISIBLE);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
@@ -569,6 +572,8 @@ public class MainActivity extends AppCompatActivity {
                 tvFabText.setText("Create Project");
                 tvFabText.setVisibility(View.VISIBLE);
             }
+        } else if (hideFab) {
+            if (tvFabText != null) tvFabText.setVisibility(View.GONE);
         } else {
             if (tvFabText != null) {
                 tvFabText.setText("New Task");

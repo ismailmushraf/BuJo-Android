@@ -36,6 +36,8 @@ public class EntryAdapter extends ArrayAdapter<Object> {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy", Locale.US);
     private final int colorText;
     private final int colorTextSecondary;
+    private final Date reusableDate = new Date();
+    private final com.ismailmushraf.bujo.utils.CustomStrikethroughSpan strikethroughSpan;
 
     public EntryAdapter(Context context, List<Object> entries, boolean showTags, boolean isDailyLog) {
         super(context, 0, entries);
@@ -43,19 +45,29 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         this.isDailyLog = isDailyLog;
         this.colorText = context.getResources().getColor(R.color.bujo_text);
         this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
+        this.strikethroughSpan = new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(colorTextSecondary, context.getResources().getColor(R.color.bb10_folder_red));
     }
 
     public EntryAdapter(Context context, List<Object> entries, boolean showTags) {
-        super(context, 0, entries);
-        this.showTags = showTags;
-        this.colorText = context.getResources().getColor(R.color.bujo_text);
-        this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
+        this(context, entries, showTags, false);
     }
 
     public EntryAdapter(Context context, List<Object> entries) {
-        super(context, 0, entries);
-        this.colorText = context.getResources().getColor(R.color.bujo_text);
-        this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
+        this(context, entries, true, false);
+    }
+
+    private long getStartOfToday() {
+        java.util.Calendar todayCal = java.util.Calendar.getInstance();
+        todayCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        todayCal.set(java.util.Calendar.MINUTE, 0);
+        todayCal.set(java.util.Calendar.SECOND, 0);
+        todayCal.set(java.util.Calendar.MILLISECOND, 0);
+        return todayCal.getTimeInMillis();
+    }
+
+    private synchronized String formatDate(SimpleDateFormat sdf, long timeMs) {
+        reusableDate.setTime(timeMs);
+        return sdf.format(reusableDate);
     }
 
     public void setOnEntryInteractionListener(OnEntryInteractionListener listener) {
@@ -184,7 +196,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         String content = entry.getContent() != null ? entry.getContent() : "";
         if (entry.isCompleted()) {
             android.text.SpannableString spannable = new android.text.SpannableString(content);
-            spannable.setSpan(new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(colorTextSecondary, getContext().getResources().getColor(R.color.bb10_folder_red)), 0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            spannable.setSpan(strikethroughSpan, 0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             holder.tvContent.setText(spannable);
         } else {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
@@ -195,25 +207,19 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         if (entry.getDeadline() > 0) {
             holder.tvDeadline.setVisibility(View.VISIBLE);
 
-            java.util.Calendar todayCal = java.util.Calendar.getInstance();
-            todayCal.set(java.util.Calendar.HOUR_OF_DAY, 0);
-            todayCal.set(java.util.Calendar.MINUTE, 0);
-            todayCal.set(java.util.Calendar.SECOND, 0);
-            todayCal.set(java.util.Calendar.MILLISECOND, 0);
-            long startOfToday = todayCal.getTimeInMillis();
-
+            long startOfToday = getStartOfToday();
             boolean isOverdue = !entry.isCompleted() && entry.getDeadline() < startOfToday;
 
             if (isDailyLog) {
                 if (entry.hasTime()) {
-                    holder.tvDeadline.setText("Time: " + timeFormat.format(new Date(entry.getDeadline())));
+                    holder.tvDeadline.setText("Time: " + formatDate(timeFormat, entry.getDeadline()));
                     holder.tvDeadline.setTextColor(colorTextSecondary);
                 } else {
                     holder.tvDeadline.setVisibility(View.GONE);
                 }
             } else {
                 SimpleDateFormat sdf = entry.hasTime() ? dateTimeFormat : dateFormat;
-                String deadlineText = (entry.hasTime() ? "Reminder: " : "Date: ") + sdf.format(new Date(entry.getDeadline()));
+                String deadlineText = (entry.hasTime() ? "Reminder: " : "Date: ") + formatDate(sdf, entry.getDeadline());
                 if (isOverdue) {
                     holder.tvDeadline.setText(deadlineText + " (Overdue)");
                     holder.tvDeadline.setTextColor(getContext().getResources().getColor(R.color.bb10_folder_red));

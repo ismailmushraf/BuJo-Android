@@ -214,131 +214,98 @@ public class ProjectDetailFragment extends Fragment {
     public void openRightSidebar() {
         if (getActivity() == null) return;
 
-        final android.app.Dialog dialog = new android.app.Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
-        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_bb10_project_sidebar, null);
-        dialog.setContentView(view);
+        com.ismailmushraf.bujo.utils.BB10DialogHelper.showSidebar(getActivity(), R.layout.dialog_bb10_project_sidebar, (dialog, view) -> {
+            TextView tvProjectName = view.findViewById(R.id.sidebar_project_name);
+            TextView tvCreatedDate = view.findViewById(R.id.sidebar_project_created_date);
+            TextView tvStats = view.findViewById(R.id.sidebar_project_stats);
 
-        if (dialog.getWindow() != null) {
-            android.view.WindowManager.LayoutParams lp = new android.view.WindowManager.LayoutParams();
-            lp.copyFrom(dialog.getWindow().getAttributes());
-            lp.width = android.view.WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = android.view.WindowManager.LayoutParams.MATCH_PARENT;
-            lp.gravity = android.view.Gravity.END;
-            lp.windowAnimations = R.style.BB10SidebarAnimation;
-            dialog.getWindow().setAttributes(lp);
-        }
+            tvProjectName.setText(projectName);
 
-        view.findViewById(R.id.sidebar_dim_scrim).setOnClickListener(v -> dialog.dismiss());
-
-        TextView tvProjectName = view.findViewById(R.id.sidebar_project_name);
-        TextView tvCreatedDate = view.findViewById(R.id.sidebar_project_created_date);
-        TextView tvStats = view.findViewById(R.id.sidebar_project_stats);
-
-        tvProjectName.setText(projectName);
-
-        Project project = dbManager.getOrCreateProject(projectName);
-        List<Entry> allEntries = dbManager.getEntriesForProject(projectId);
-        int totalTasks = allEntries.size();
-        int completedTasks = 0;
-        for (Entry e : allEntries) {
-            if (e.isCompleted()) completedTasks++;
-        }
-
-        if (project != null && project.getCreatedAt() > 0) {
-            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy", java.util.Locale.US);
-            tvCreatedDate.setText("Created: " + sdf.format(new java.util.Date(project.getCreatedAt())));
-        } else {
-            tvCreatedDate.setText("Project Goal");
-        }
-
-        if (totalTasks > 0) {
-            int pct = (int) ((completedTasks * 100.0f) / totalTasks);
-            tvStats.setText("Completed: " + completedTasks + " of " + totalTasks + " (" + pct + "%)");
-        } else {
-            tvStats.setText("No tasks created yet");
-        }
-
-        class SidebarOption {
-            String title;
-            int iconResId;
-            SidebarOption(String title, int iconResId) {
-                this.title = title;
-                this.iconResId = iconResId;
+            Project project = dbManager.getOrCreateProject(projectName);
+            List<Entry> allEntries = dbManager.getEntriesForProject(projectId);
+            int totalTasks = allEntries.size();
+            int completedTasks = 0;
+            for (Entry e : allEntries) {
+                if (e.isCompleted()) completedTasks++;
             }
-        }
 
-        List<SidebarOption> optionsList = new ArrayList<>();
-        optionsList.add(new SidebarOption("History", R.drawable.ic_bb10_history));
-        optionsList.add(new SidebarOption("Edit", android.R.drawable.ic_menu_edit));
-
-        ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
-        android.widget.ArrayAdapter<SidebarOption> adapter = new android.widget.ArrayAdapter<SidebarOption>(getActivity(), R.layout.item_sidebar_option, optionsList) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                if (convertView == null) {
-                    convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parent, false);
-                }
-                SidebarOption option = getItem(position);
-                TextView tv = convertView.findViewById(R.id.tv_option_title);
-                android.widget.ImageView iv = convertView.findViewById(R.id.iv_option_icon);
-                if (option != null) {
-                    tv.setText(option.title);
-                    iv.setImageResource(option.iconResId);
-                }
-                return convertView;
+            if (project != null && project.getCreatedAt() > 0) {
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy", java.util.Locale.US);
+                tvCreatedDate.setText("Created: " + sdf.format(new java.util.Date(project.getCreatedAt())));
+            } else {
+                tvCreatedDate.setText("Project Goal");
             }
-        };
-        lvOptions.setAdapter(adapter);
 
-        lvOptions.setOnItemClickListener((parent, v, position, id) -> {
-            dialog.dismiss();
-            SidebarOption option = optionsList.get(position);
-            if ("History".equals(option.title)) {
-                if (getFragmentManager() != null) {
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, ProjectHistoryFragment.newInstance(projectId, projectName));
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
-            } else if ("Edit".equals(option.title)) {
-                if (getFragmentManager() != null) {
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, EditProjectFragment.newInstance(projectId, projectName));
-                    ft.addToBackStack(null);
-                    ft.commit();
+            if (totalTasks > 0) {
+                int pct = (int) ((completedTasks * 100.0f) / totalTasks);
+                tvStats.setText("Completed: " + completedTasks + " of " + totalTasks + " (" + pct + "%)");
+            } else {
+                tvStats.setText("No tasks created yet");
+            }
+
+            class SidebarOption {
+                final String title;
+                final int iconResId;
+                SidebarOption(String title, int iconResId) {
+                    this.title = title;
+                    this.iconResId = iconResId;
                 }
             }
-        });
 
-        view.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(v -> {
-            dialog.dismiss();
-            showDeleteProjectConfirmation();
-        });
+            List<SidebarOption> optionsList = new ArrayList<>();
+            optionsList.add(new SidebarOption("History", R.drawable.ic_bb10_history));
+            optionsList.add(new SidebarOption("Edit", android.R.drawable.ic_menu_edit));
 
-        dialog.show();
-    }
+            ListView lvOptions = view.findViewById(R.id.lv_sidebar_options);
+            android.widget.ArrayAdapter<SidebarOption> adapter = new android.widget.ArrayAdapter<SidebarOption>(getActivity(), R.layout.item_sidebar_option, optionsList) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    if (convertView == null) {
+                        convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_sidebar_option, parent, false);
+                    }
+                    SidebarOption option = getItem(position);
+                    TextView tv = convertView.findViewById(R.id.tv_option_title);
+                    android.widget.ImageView iv = convertView.findViewById(R.id.iv_option_icon);
+                    if (option != null) {
+                        tv.setText(option.title);
+                        iv.setImageResource(option.iconResId);
+                    }
+                    return convertView;
+                }
+            };
+            lvOptions.setAdapter(adapter);
 
-    private void showDeleteProjectConfirmation() {
-        if (getActivity() == null) return;
-        com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(
-                getActivity(),
-                "Delete Project",
-                "Are you sure you want to delete '" + projectName + "' and all its tasks?",
-                "Delete",
-                () -> {
-                    int pointsDeducted = dbManager.deleteProjectAndAllEntries(projectId);
+            lvOptions.setOnItemClickListener((parent, v, position, id) -> {
+                dialog.dismiss();
+                SidebarOption selected = optionsList.get(position);
+                if ("History".equals(selected.title)) {
                     if (getActivity() instanceof MainActivity) {
-                        MainActivity main = (MainActivity) getActivity();
-                        if (pointsDeducted > 0) {
-                            main.animatePointsChange(-pointsDeducted, main.getWindow().getDecorView());
-                        }
-                        main.refreshDrawer();
-                        main.showDailyLog();
+                        ((MainActivity) getActivity()).pushFragment(ProjectHistoryFragment.newInstance(projectId, projectName));
+                    }
+                } else if ("Edit".equals(selected.title)) {
+                    if (getActivity() instanceof MainActivity) {
+                        ((MainActivity) getActivity()).pushFragment(EditProjectFragment.newInstance(projectId, projectName));
                     }
                 }
-        );
+            });
+
+            View btnDelete = view.findViewById(R.id.sidebar_bottom_delete);
+            if (btnDelete != null) {
+                btnDelete.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    com.ismailmushraf.bujo.utils.BB10DialogHelper.showConfirmDialog(getActivity(), "Delete Project", 
+                        "Are you sure you want to delete '" + projectName + "'? This will remove all tasks inside this project.", "Delete", () -> {
+                        dbManager.deleteProjectAndAllEntries(projectId);
+                        if (getActivity() instanceof MainActivity) {
+                            ((MainActivity) getActivity()).refreshDrawer();
+                        }
+                        if (getFragmentManager() != null) {
+                            getFragmentManager().popBackStack();
+                        }
+                    });
+                });
+            }
+        });
     }
 
     public int getProjectId() {

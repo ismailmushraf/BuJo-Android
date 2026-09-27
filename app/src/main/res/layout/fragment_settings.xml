@@ -31,7 +31,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="3dp"
-            android:background="#00a8df" />
+            android:background="@color/bb10_blue" />
 
         <View
             android:layout_width="match_parent"
@@ -43,14 +43,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Preferences"
-            android:textColor="#666666"
+            android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:background="#F0F0F0" />
+            android:background="@color/bb10_section_header_bg" />
 
         <View
             android:layout_width="match_parent"
@@ -80,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Theme Preference"
-                    android:textColor="#222222"
+                    android:textColor="@color/bujo_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -97,7 +97,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    android:tint="#333333" />
+                    android:tint="@color/bujo_text" />
 
             </LinearLayout>
         </LinearLayout>
@@ -130,7 +130,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Default Startup Screen"
-                    android:textColor="#222222"
+                    android:textColor="@color/bujo_text"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -147,7 +147,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    android:tint="#333333" />
+                    android:tint="@color/bujo_text" />
 
             </LinearLayout>
         </LinearLayout>
@@ -162,14 +162,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Gamification &amp; Feedback"
-            android:textColor="#666666"
+            android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:background="#F0F0F0" />
+            android:background="@color/bb10_section_header_bg" />
 
         <View
             android:layout_width="match_parent"
@@ -236,14 +236,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Data Management"
-            android:textColor="#666666"
+            android:textColor="@color/bb10_section_header_text"
             android:textSize="11sp"
             android:textStyle="bold"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:background="#F0F0F0" />
+            android:background="@color/bb10_section_header_bg" />
 
         <View
             android:layout_width="match_parent"
@@ -313,7 +313,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Delete All Completed Tasks"
-                android:textColor="#D32F2F"
+                android:textColor="@color/bb10_folder_red"
                 android:textSize="14sp" />
         </LinearLayout>
 

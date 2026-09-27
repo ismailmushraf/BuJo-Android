@@ -1062,12 +1062,17 @@ public class DatabaseManager {
         names.add("Mobility Flow"); names.add("Yoga");
         Cursor cursor = database.query(true, DatabaseHelper.TABLE_WORKOUT_SETS,
                 new String[]{DatabaseHelper.COLUMN_EXERCISE}, null, null, null, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                String name = cursor.getString(0);
-                if (!names.contains(name)) names.add(name);
-            } while (cursor.moveToNext());
-            cursor.close();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    do {
+                        String name = cursor.getString(0);
+                        if (!names.contains(name)) names.add(name);
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                cursor.close();
+            }
         }
         return names;
     }
@@ -1083,9 +1088,14 @@ public class DatabaseManager {
         long duration = 0;
         Cursor cursor = database.query(DatabaseHelper.TABLE_SESSIONS, new String[]{DatabaseHelper.COLUMN_DURATION},
                 DatabaseHelper.COLUMN_DATE_STR + " = ?", new String[]{dateStr}, null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            duration = cursor.getLong(0);
-            cursor.close();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    duration = cursor.getLong(0);
+                }
+            } finally {
+                cursor.close();
+            }
         }
         return duration;
     }
@@ -1095,9 +1105,14 @@ public class DatabaseManager {
         Cursor cursor = database.query(true, DatabaseHelper.TABLE_WORKOUT_SETS,
                 new String[]{DatabaseHelper.COLUMN_DATE_STR},
                 null, null, null, null, DatabaseHelper.COLUMN_DATE_STR + " DESC", null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do { dates.add(cursor.getString(0)); } while (cursor.moveToNext());
-            cursor.close();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    do { dates.add(cursor.getString(0)); } while (cursor.moveToNext());
+                }
+            } finally {
+                cursor.close();
+            }
         }
         return dates;
     }

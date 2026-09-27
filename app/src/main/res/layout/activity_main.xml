@@ -302,14 +302,14 @@
         android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
-        android:background="#000000">
+        android:background="@color/bb10_sidebar_dark_bg">
 
         <ListView
             android:id="@+id/nav_drawer_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:divider="#222222"
+            android:divider="@color/bb10_sidebar_divider"
             android:dividerHeight="1dp" />
     </RelativeLayout>
 
