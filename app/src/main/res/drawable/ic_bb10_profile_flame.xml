@@ -1,5 +1,59 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp" android:height="24dp"
-    android:viewportWidth="24" android:viewportHeight="24">
-    <path android:fillColor="#FF000000" android:pathData="M13,1c2,6 -4,7 -1,11 2,-1 3,-3 3,-5 5,5 7,9 4,13 -4,5 -14,3 -14,-4 0,-5 5,-7 8,-15zM12,14c-4,4 -3,7 0,7 3,0 4,-3 0,-7z" />
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Outer Fiery Red/Orange Tip & Wings -->
+    <path android:pathData="M13.5,0.67C13.5,0.67 14.24,3.32 14.24,5.47C14.24,7.53 12.89,9.2 10.83,9.2C8.76,9.2 7.2,7.53 7.2,5.47L7.23,5.11C5.21,7.51 4,10.62 4,14C4,18.42 7.58,22 12,22C16.42,22 20,18.42 20,14C20,7.8 15.18,3.13 13.5,0.67Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="12"
+                android:startY="22"
+                android:endX="12"
+                android:endY="0.67"
+                android:type="linear">
+                <item android:color="#FFFF2A00" android:offset="0.0" />
+                <item android:color="#FFFF5722" android:offset="0.6" />
+                <item android:color="#FFFF8A65" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Middle Golden Orange Body (Shifted slightly left and down) -->
+    <group
+        android:translateX="-0.8"
+        android:translateY="0.8">
+        <path android:pathData="M12,20C8.69,20 6,17.31 6,14C6,12.47 6.61,10.17 7.73,8.7C7.88,9.07 8.07,9.43 8.31,9.77C9.25,11.15 10.81,12 12.5,12C15.26,12 17.5,9.31 17.5,6.54C17.5,6.2 17.46,5.87 17.4,5.54C19.16,7.61 20,10.18 20,13C20,16.31 15.31,20 12,20Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="12"
+                    android:startY="20"
+                    android:endX="12"
+                    android:endY="5.54"
+                    android:type="linear">
+                    <item android:color="#FFFF8F00" android:offset="0.0" />
+                    <item android:color="#FFFFB300" android:offset="0.7" />
+                    <item android:color="#FFFFC107" android:offset="1.0" />
+                </gradient>
+            </aapt:attr>
+        </path>
+    </group>
+
+    <!-- Inner Hot Yellow Core -->
+    <path android:pathData="M12,20.5C10.35,20.5 9,19.15 9,17.5C9,16.48 9.28,15.57 9.87,14.99L12,12.9L14.13,14.99C14.72,15.57 15,16.48 15,17.5C15,19.15 13.65,20.5 12,20.5Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="12"
+                android:startY="20.5"
+                android:endX="12"
+                android:endY="12.9"
+                android:type="linear">
+                <item android:color="#FFFFEE58" android:offset="0.0" />
+                <item android:color="#FFFFFFFF" android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
 </vector>
