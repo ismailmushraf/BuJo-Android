@@ -1,0 +1,27 @@
+<resources>
+    <string name="profile_title">PROFILE</string>
+    <string name="profile_show_breakdown">Show points breakdown</string>
+    <string name="profile_hide_breakdown">Hide points breakdown</string>
+    <string name="profile_rank_apprentice">Apprentice</string>
+    <string name="profile_rank_scholar">Scholar</string>
+    <string name="profile_rank_ascendant">Ascendant</string>
+    <string name="profile_rank_monk">Monk</string>
+    <string name="profile_goal_weight">Weight: %1$d</string>
+    <string name="profile_no_goals">No goals yet. Your goal efficiency will appear here.</string>
+    <string name="profile_last_30_days">Last 30 days</string>
+    <style name="ProfileSection">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/bb10_section_header_text</item>
+        <item name="android:background">@color/bb10_section_header_bg</item>
+    </style>
+    <style name="ProfileCaption">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/bujo_text_secondary</item>
+    </style>
+</resources>

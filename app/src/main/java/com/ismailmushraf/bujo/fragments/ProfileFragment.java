@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import androidx.appcompat.widget.AppCompatImageView;
 
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
@@ -27,7 +28,7 @@ public class ProfileFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_profile, container, false);
 
         if (getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).setToolbarTitle("PROFILE");
+            ((MainActivity) getActivity()).setToolbarTitle(getString(R.string.profile_title));
             ((MainActivity) getActivity()).setToolbarSubtitle("");
         }
 
@@ -59,15 +60,15 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 if (breakdownLayout.getVisibility() == View.GONE) {
                     breakdownLayout.setVisibility(View.VISIBLE);
-                    tvIndicator.setText(getString(com.ismailmushraf.bujo.R.string.ui_tap_to_hide_breakdown_5b44b6));
+                    tvIndicator.setText(R.string.profile_hide_breakdown);
                 } else {
                     breakdownLayout.setVisibility(View.GONE);
-                    tvIndicator.setText(getString(com.ismailmushraf.bujo.R.string.ui_tap_to_see_breakdown_465f67));
+                    tvIndicator.setText(R.string.profile_show_breakdown);
                 }
             }
         });
 
-        TextView tvRankIcon = root.findViewById(R.id.tv_rank_icon);
+        AppCompatImageView tvRankIcon = root.findViewById(R.id.tv_rank_icon);
         TextView tvRankTitle = root.findViewById(R.id.tv_rank_title);
         TextView tvProgressText = root.findViewById(R.id.tv_rank_progress_text);
         ProgressBar progressBar = root.findViewById(R.id.progress_rank);
@@ -84,37 +85,36 @@ public class ProfileFragment extends Fragment {
         // Logic to define ranks
         int minPoints = 0;
         int maxPoints = 500;
-        String nextRank = "Apprentice";
+        String nextRank = getString(R.string.profile_rank_apprentice);
 
         if (points < 500) {
-            tvRankIcon.setText("🚶");
+            tvRankIcon.setImageResource(R.drawable.ic_bb10_profile_wanderer);
             tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_1_wanderer_6d5da1));
             maxPoints = 500;
-            nextRank = "Apprentice";
+            nextRank = getString(R.string.profile_rank_apprentice);
         } else if (points < 2000) {
-            tvRankIcon.setText("📖");
+            tvRankIcon.setImageResource(R.drawable.ic_bb10_profile_book);
             tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_2_apprentice_ba52e3));
             minPoints = 500;
             maxPoints = 2000;
-            nextRank = "Scholar";
+            nextRank = getString(R.string.profile_rank_scholar);
         } else if (points < 5000) {
-            tvRankIcon.setText("🎓");
+            tvRankIcon.setImageResource(R.drawable.ic_bb10_profile_scholar);
             tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_3_scholar_2c2c6c));
             minPoints = 2000;
             maxPoints = 5000;
-            nextRank = "Ascendant";
+            nextRank = getString(R.string.profile_rank_ascendant);
         } else if (points < 10000) {
-            tvRankIcon.setText("⛰️");
+            tvRankIcon.setImageResource(R.drawable.ic_bb10_profile_mountain);
             tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_4_ascendant_6153be));
             minPoints = 5000;
             maxPoints = 10000;
-            nextRank = "Monk";
+            nextRank = getString(R.string.profile_rank_monk);
         } else {
-            tvRankIcon.setText("⛩️");
+            tvRankIcon.setImageResource(R.drawable.ic_bb10_profile_temple);
             tvRankTitle.setText(getString(com.ismailmushraf.bujo.R.string.ui_level_5_monk_e0c1bb));
             minPoints = 10000;
             maxPoints = 10000;
-            nextRank = "Maximum Discipline Reached";
         }
 
         if (points >= 10000) {
@@ -191,6 +191,7 @@ public class ProfileFragment extends Fragment {
 
         LinearLayout goalLayout = (LinearLayout) root.findViewById(R.id.layout_goal_efficiency);
         List<Project> projects = dbManager.getAllProjects();
+        root.findViewById(R.id.profile_empty_goals).setVisibility(projects.isEmpty() ? View.VISIBLE : View.GONE);
         
         LayoutInflater inf = LayoutInflater.from(getActivity());
         for (Project p : projects) {
@@ -203,9 +204,7 @@ public class ProfileFragment extends Fragment {
             
             name.setText(p.getName());
             
-            StringBuilder stars = new StringBuilder();
-            for (int i = 0; i < p.getWeight(); i++) stars.append("★");
-            weight.setText(stars.toString());
+            weight.setText(getString(R.string.profile_goal_weight, p.getWeight()));
             
             float efficiency = dbManager.getProjectEfficiency(p.getId());
             int effInt = (int)(efficiency * 100);

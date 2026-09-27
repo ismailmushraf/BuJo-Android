@@ -35,6 +35,22 @@ public class ThemeResourcesTest {
                 assertNotEquals(textColor, context.getResources().getColor(R.color.bb10_button_background));
                 inflater.inflate(R.layout.fragment_settings, null);
                 inflater.inflate(R.layout.dialog_plan_day, null);
+                View profile = inflater.inflate(R.layout.fragment_profile, null);
+                assertEquals(textColor, ((TextView) profile.findViewById(R.id.tv_rank_title)).getCurrentTextColor());
+                androidx.appcompat.widget.AppCompatImageView rank = profile.findViewById(R.id.tv_rank_icon);
+                for (int icon : new int[]{R.drawable.ic_bb10_profile_wanderer,
+                        R.drawable.ic_bb10_profile_book, R.drawable.ic_bb10_profile_scholar,
+                        R.drawable.ic_bb10_profile_mountain, R.drawable.ic_bb10_profile_temple,
+                        R.drawable.ic_bb10_profile_flame, R.drawable.ic_bb10_profile_battery,
+                        R.drawable.ic_bb10_profile_trophy, R.drawable.ic_bb10_profile_star}) {
+                    rank.setImageResource(icon);
+                    assertNotNull(rank.getDrawable());
+                }
+                assertEquals(context.getResources().getColor(R.color.bb10_blue),
+                        androidx.core.widget.ImageViewCompat.getImageTintList(rank).getDefaultColor());
+                assertEquals(View.GONE, profile.findViewById(R.id.layout_points_breakdown).getVisibility());
+                View goal = inflater.inflate(R.layout.item_goal_efficiency, null);
+                assertEquals(textColor, ((TextView) goal.findViewById(R.id.tv_project_name)).getCurrentTextColor());
             }
         });
     }

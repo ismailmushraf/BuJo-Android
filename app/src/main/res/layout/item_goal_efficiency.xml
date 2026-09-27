@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/shape_bujo_box"
-    android:padding="12dp"
-    android:layout_marginBottom="8dp">
+    android:background="@color/surface"
+    android:padding="16dp"
+    android:layout_marginBottom="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,19 +20,34 @@
             android:textColor="@color/bujo_text"
             android:textStyle="bold"
             android:textSize="16sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp">
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_bb10_profile_star"
+            app:tint="@color/bb10_blue" />
         <TextView
             android:id="@+id/tv_project_weight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/literal_ffcc00"
-            android:textSize="16sp" />
+            android:layout_marginStart="6dp"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="12sp" />
     </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progress_efficiency"
         style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="8dp"
+        android:layout_height="4dp"
+        android:progressDrawable="@drawable/bb10_profile_progress"
         android:layout_marginTop="8dp"
         android:max="100" />
 
