@@ -24,8 +24,7 @@ public class ProfileScreenTest {
                     assertEquals(View.GONE, breakdown.getVisibility());
                     root.findViewById(R.id.layout_rank_box).performClick();
                     assertEquals(View.VISIBLE, breakdown.getVisibility());
-                    assertEquals(activity.getString(R.string.profile_hide_breakdown),
-                            ((TextView) root.findViewById(R.id.tv_expand_indicator)).getText().toString());
+                    assertNotNull(root.findViewById(R.id.iv_expand_chevron));
                     root.findViewById(R.id.layout_rank_box).performClick();
                     assertEquals(View.GONE, breakdown.getVisibility());
                 }

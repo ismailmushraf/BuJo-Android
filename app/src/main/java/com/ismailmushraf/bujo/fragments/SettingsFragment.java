@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -24,6 +25,11 @@ import android.widget.Toast;
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
+import com.ismailmushraf.bujo.coach.CoachApiKey;
+import com.ismailmushraf.bujo.coach.CoachEngine;
+import com.ismailmushraf.bujo.coach.CoachPreferences;
+import com.ismailmushraf.bujo.coach.CoachScheduler;
+import com.ismailmushraf.bujo.utils.BB10DialogHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,10 +44,13 @@ public class SettingsFragment extends Fragment {
 
     private SharedPreferences prefs;
     private boolean isSpinnerInitialized = false;
+    private CoachEngine coachEngine;
+    private Runnable coachListener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        bindCoachSettings(root);
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setToolbarTitle("SETTINGS");
@@ -182,6 +191,59 @@ public class SettingsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private void bindCoachSettings(View root) {
+        final CoachEngine coach=CoachEngine.get(requireContext());
+        coachEngine=coach;
+        final SharedPreferences coachPrefs=CoachPreferences.get(requireContext());
+        EditText key=root.findViewById(R.id.coach_api_key), model=root.findViewById(R.id.coach_model);
+        EditText start=root.findViewById(R.id.coach_start), end=root.findViewById(R.id.coach_end);
+        key.setText(coachPrefs.getString("key", ""));
+        key.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance());
+        model.setText(CoachPreferences.model(requireContext())); start.setText(String.valueOf(coachPrefs.getInt("start",8))); end.setText(String.valueOf(coachPrefs.getInt("end",20)));
+        int[] ids={R.id.coach_consent,R.id.coach_share_tasks,R.id.coach_share_habits,R.id.coach_enabled}; String[] names={"consent","share_tasks","share_habits","enabled"};
+        for(int i=0;i<ids.length;i++) ((CheckBox)root.findViewById(ids[i])).setChecked(coachPrefs.getBoolean(names[i],false));
+        View.OnClickListener save=v -> {
+            String clean=CoachApiKey.normalize(key.getText().toString());
+            if(!CoachApiKey.valid(clean)){ key.setError(getString(R.string.coach_invalid_key)); return; }
+            String selectedModel=model.getText().toString().trim();
+            if(!CoachPreferences.validModel(selectedModel)){ model.setError("Enter a valid Gemini model ID."); return; }
+            try { int from=Integer.parseInt(start.getText().toString()), to=Integer.parseInt(end.getText().toString()); if(from<0||to>23||from>=to) throw new IllegalArgumentException(); SharedPreferences.Editor edit=coachPrefs.edit().putString("key",clean).putString("model",selectedModel).putInt("start",from).putInt("end",to).remove("snooze"); for(int i=0;i<ids.length;i++) edit.putBoolean(names[i],((CheckBox)root.findViewById(ids[i])).isChecked()); edit.apply(); key.setText(clean); CoachScheduler.schedule(requireContext()); setCoachStatus(root,getString(R.string.coach_saved)); } catch(Exception error) { end.setError(getString(R.string.coach_invalid_settings)); }
+        };
+        root.findViewById(R.id.coach_save_settings).setOnClickListener(save);
+        root.findViewById(R.id.coach_test).setOnClickListener(v -> {
+            // A connection test must not depend on optional reminder hours or sharing choices.
+            String clean=CoachApiKey.normalize(key.getText().toString());
+            if(!CoachApiKey.valid(clean)) { key.setError(getString(R.string.coach_invalid_key)); return; }
+            String selectedModel=model.getText().toString().trim();
+            if(!CoachPreferences.validModel(selectedModel)) { model.setError("Enter a valid Gemini model ID."); return; }
+            coachPrefs.edit().putString("key",clean).putString("model",selectedModel).apply();
+            key.setText(clean);
+            setCoachStatus(root,getString(R.string.coach_working));
+            coach.testConnection();
+        });
+        root.findViewById(R.id.coach_forget).setOnClickListener(v -> { coachPrefs.edit().remove("key").putBoolean("consent",false).apply(); key.setText(""); ((CheckBox)root.findViewById(R.id.coach_consent)).setChecked(false); });
+        root.findViewById(R.id.coach_delete).setOnClickListener(v -> BB10DialogHelper.showConfirmDialog(requireContext(),getString(R.string.coach_delete),getString(R.string.coach_delete_confirm),getString(R.string.coach_delete),()->coach.clear(true)));
+        coachListener=() -> {
+            View screen=getView();
+            if(screen==null || !isAdded()) return;
+            android.widget.TextView status=screen.findViewById(R.id.coach_settings_status);
+            if(status!=null) { status.setText(coach.notice()); status.setVisibility(View.VISIBLE); }
+        };
+        coach.listen(coachListener);
+    }
+
+    private void setCoachStatus(View root, String message) {
+        android.widget.TextView status=root.findViewById(R.id.coach_settings_status);
+        if(status!=null) { status.setText(message); status.setVisibility(View.VISIBLE); }
+    }
+
+    @Override public void onDestroyView() {
+        if(coachEngine!=null && coachListener!=null) coachEngine.unlisten(coachListener);
+        coachListener=null;
+        coachEngine=null;
+        super.onDestroyView();
     }
 
     private static final int EXPORT_BACKUP = 401;

@@ -16,5 +16,6 @@ public class BuJoApp extends Application {
         int themeMode = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
 
         AppCompatDelegate.setDefaultNightMode(themeMode);
+        com.ismailmushraf.bujo.coach.CoachEngine.initialize(this);
     }
 }

@@ -42,11 +42,6 @@
             android:focusable="true" />
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/bujo_divider"/>
-
     <!-- Main Active List Window -->
     <ListView
         android:id="@+id/lv_daily_bullets"

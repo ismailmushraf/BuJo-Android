@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/coach_api_key"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:hint="@string/coach_key"
+            android:inputType="textVisiblePassword|textNoSuggestions"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:singleLine="true"
+            android:textColor="@color/bujo_text"
+            android:textColorHint="@color/bujo_text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/coach_model"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:hint="@string/coach_model"
+            android:inputType="textNoSuggestions"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:singleLine="true"
+            android:textColor="@color/bujo_text"
+            android:textColorHint="@color/bujo_text_secondary"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/coach_consent"
+            android:textColor="@color/bujo_text"
+            android:textSize="14sp" />
+
+        <CheckBox
+            android:id="@+id/coach_consent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/coach_share_tasks"
+            android:textColor="@color/bujo_text"
+            android:textSize="14sp" />
+
+        <CheckBox
+            android:id="@+id/coach_share_tasks"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/coach_share_habits"
+            android:textColor="@color/bujo_text"
+            android:textSize="14sp" />
+
+        <CheckBox
+            android:id="@+id/coach_share_habits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bb10_section_header_bg"
+        android:padding="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/coach_reminders_section"
+        android:textColor="@color/bb10_section_header_text"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/coach_enabled"
+            android:textColor="@color/bujo_text"
+            android:textSize="14sp" />
+
+        <CheckBox
+            android:id="@+id/coach_enabled"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/coach_start"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:hint="@string/coach_start"
+            android:inputType="number"
+            android:maxLength="2"
+            android:paddingStart="8dp"
+            android:textColor="@color/bujo_text"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="8dp">
+
+        <EditText
+            android:id="@+id/coach_end"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:hint="@string/coach_end"
+            android:inputType="number"
+            android:maxLength="2"
+            android:paddingStart="8dp"
+            android:textColor="@color/bujo_text"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/coach_settings_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:textColor="@color/bujo_text_secondary"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <Button
+            android:id="@+id/coach_save_settings"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_bb10_compact_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/coach_save"
+            android:textColor="@color/bujo_text"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/coach_test"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_bb10_compact_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/coach_test"
+            android:textColor="@color/bujo_text"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/coach_forget"
+            android:layout_width="0dp"
+            android:layout_marginStart="4dp"
+            android:layout_height="24dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_bb10_compact_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/coach_forget"
+            android:textColor="@color/bujo_text"
+            android:textSize="10sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <Button
+            android:id="@+id/coach_delete"
+            android:layout_width="0dp"
+            android:layout_height="24dp"
+            android:layout_weight="1"
+            android:background="@drawable/shape_bb10_compact_button"
+            android:clickable="true"
+            android:focusable="true"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:text="@string/coach_delete"
+            android:textColor="@color/bb10_folder_red"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>
