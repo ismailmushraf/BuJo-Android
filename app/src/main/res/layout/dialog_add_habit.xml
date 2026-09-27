@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/shape_bb10_confirm_card">
+
+    <!-- Header Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@color/surface">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ui_new_habit_commitment_42f5ae"
+            android:textColor="@color/bujo_text"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider" />
+
+    <!-- Content Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@color/bb10_bottom_bar_bg">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Habit Name"
+            android:textSize="12sp"
+            android:textColor="@color/bujo_text_secondary"
+            android:layout_marginBottom="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/et_habit_name"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/surface"
+                android:hint="@string/ui_habit_name_e_g_meditate_976cf7"
+                android:textSize="13sp"
+                android:textColor="@color/bujo_text"
+                android:textColorHint="@color/bujo_text_secondary"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:inputType="textCapSentences"
+                android:singleLine="true"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/ui_commitment_duration_days_166d25"
+            android:textSize="12sp"
+            android:textColor="@color/bujo_text_secondary"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/et_habit_days"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/surface"
+                android:text="30"
+                android:inputType="number"
+                android:textSize="13sp"
+                android:textColor="@color/bujo_text"
+                android:textColorHint="@color/bujo_text_secondary"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:singleLine="true"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btn_habit_time"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            android:text="@string/ui_set_goal_time_optional_fb6e11"
+            android:textSize="13sp"
+            android:textColor="@color/bb10_blue"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/bujo_divider" />
+
+    <!-- Bottom Buttons Section (Horizontal Side-by-Side) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:background="@color/bb10_dialog_footer">
+
+        <TextView
+            android:id="@+id/btn_habit_cancel"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="@string/ui_cancel_77dfd2"
+            android:textColor="@color/bujo_text"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:background="@color/bujo_divider" />
+
+        <TextView
+            android:id="@+id/btn_habit_commit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Commit"
+            android:textColor="@color/bb10_blue"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?android:attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+</LinearLayout>

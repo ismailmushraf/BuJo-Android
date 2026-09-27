@@ -1,4 +1,3 @@
-- [x] Redesign `fragment_profile.xml` for compact BB10 widgets
-- [x] Redesign `item_goal_efficiency.xml` for slim goal rows
-- [x] Update `ProfileFragment.java` for slide animation and view bindings
+- [x] Create `dialog_add_habit.xml` layout
+- [x] Refactor `showAddHabitDialog()` in `HabitsFragment.java`
 - [x] Verify build with Gradle

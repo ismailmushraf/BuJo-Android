@@ -153,70 +153,59 @@ public class HabitsFragment extends Fragment {
     }
 
     public void showAddHabitDialog() {
-        AlertDialog.Builder b = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
-        b.setTitle(getString(com.ismailmushraf.bujo.R.string.ui_new_habit_commitment_42f5ae));
+        if (getActivity() == null) return;
 
-        LinearLayout layout = new LinearLayout(getActivity());
-        layout.setOrientation(LinearLayout.VERTICAL);
-        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(layout, 40, 40, 40, 40);
-
-        final EditText etName = new EditText(getActivity());
-        etName.setHint(getString(com.ismailmushraf.bujo.R.string.ui_habit_name_e_g_meditate_976cf7));
-        layout.addView(etName);
-
-        final TextView label = new TextView(getActivity());
-        label.setText(getString(com.ismailmushraf.bujo.R.string.ui_commitment_duration_days_166d25));
-        com.ismailmushraf.bujo.utils.ViewDimensions.setPaddingDp(label, 0, 20, 0, 0);
-        layout.addView(label);
-
-        final EditText etDays = new EditText(getActivity());
-        etDays.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
-        etDays.setText(String.valueOf(30));
-        layout.addView(etDays);
+        View view = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_add_habit, null);
+        final EditText etName = view.findViewById(R.id.et_habit_name);
+        final EditText etDays = view.findViewById(R.id.et_habit_days);
+        final TextView btnTime = view.findViewById(R.id.btn_habit_time);
 
         final Calendar reminderTime = Calendar.getInstance();
         final boolean[] timeSet = {false};
-        
-        final Button btnTime = new Button(getActivity());
-        btnTime.setText(getString(com.ismailmushraf.bujo.R.string.ui_set_goal_time_optional_fb6e11));
-        btnTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new android.app.TimePickerDialog(getActivity(), new android.app.TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(android.widget.TimePicker view, int hourOfDay, int minute) {
-                        reminderTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        reminderTime.set(Calendar.MINUTE, minute);
-                        timeSet[0] = true;
-                        btnTime.setText(getString(com.ismailmushraf.bujo.R.string.format_habitsfragment_27, String.valueOf(String.format(Locale.US, "%02d:%02d", hourOfDay, minute))));
-                    }
-                }, 12, 0, false).show();
-            }
-        });
-        layout.addView(btnTime);
 
-        b.setView(layout);
-        b.setPositiveButton("Commit", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String name = etName.getText().toString().trim();
-                String daysStr = etDays.getText().toString().trim();
-                if (!name.isEmpty() && !daysStr.isEmpty()) {
-                    Habit h = new Habit();
-                    h.setName(name);
-                    h.setCommitmentDays(Integer.parseInt(daysStr));
-                    h.setStartDate(new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date()));
-                    if (timeSet[0]) {
-                        h.setHasTime(true);
-                        h.setDeadlineTime(reminderTime.getTimeInMillis());
-                    }
-                    dbManager.insertHabit(h);
-                    loadHabits();
+        btnTime.setOnClickListener(v -> {
+            new android.app.TimePickerDialog(getActivity(), (timePicker, hourOfDay, minute) -> {
+                reminderTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                reminderTime.set(Calendar.MINUTE, minute);
+                timeSet[0] = true;
+                btnTime.setText(getString(com.ismailmushraf.bujo.R.string.format_habitsfragment_27,
+                        String.valueOf(String.format(Locale.US, "%02d:%02d", hourOfDay, minute))));
+            }, 12, 0, false).show();
+        });
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
+        builder.setView(view);
+        final AlertDialog dialog = builder.create();
+
+        view.findViewById(R.id.btn_habit_cancel).setOnClickListener(v -> dialog.dismiss());
+
+        view.findViewById(R.id.btn_habit_commit).setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String daysStr = etDays.getText().toString().trim();
+            if (!name.isEmpty() && !daysStr.isEmpty()) {
+                dialog.dismiss();
+                Habit h = new Habit();
+                h.setName(name);
+                h.setCommitmentDays(Integer.parseInt(daysStr));
+                h.setStartDate(new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date()));
+                if (timeSet[0]) {
+                    h.setHasTime(true);
+                    h.setDeadlineTime(reminderTime.getTimeInMillis());
                 }
+                dbManager.insertHabit(h);
+                loadHabits();
             }
         });
-        b.setNegativeButton(android.R.string.cancel, null);
-        b.show();
+
+        dialog.setOnShowListener(d -> {
+            if (dialog.getWindow() != null) {
+                android.util.DisplayMetrics metrics = getResources().getDisplayMetrics();
+                int width = (int) (metrics.widthPixels * 0.88);
+                dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+        });
+
+        dialog.show();
     }
 
     private void showEditHabitTimeDialog(final Habit h) {

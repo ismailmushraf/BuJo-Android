@@ -1,25 +1,24 @@
-# Profile Page BB10 Compact Redesign Walkthrough
+# New Habit Modal BB10 Redesign Walkthrough
 
-The Profile page (`ProfileFragment`) has been completely redesigned to feature compact, concise BlackBerry 10 widgets, smaller typography, and smooth transition animations.
+The "New Habit" creation dialog has been refactored from a native Android `AlertDialog` to a BlackBerry 10 styled card modal matching the structure of `dialog_plan_day.xml`.
 
 ## Key Accomplishments
 
-### 1. 🥇 Compact Level & Rank Header Row
-- **Single-Row Layout**: Replaced the large vertical rank box in [fragment_profile.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/fragment_profile.xml) with a compact horizontal row:
-  - **Left**: `36dp` Rank Icon (`tv_rank_icon`).
-  - **Middle**: Stacked column with Level Title (`14sp` bold), XP Progress text (`11sp`), and slim `4dp` progress bar.
-  - **Right**: Expansion Chevron (`iv_expand_chevron`).
-- **Smooth Transition Animation**: Updated [ProfileFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/ProfileFragment.java) to trigger `TransitionManager.beginDelayedTransition(...)` when expanding/collapsing the points breakdown layout, providing a smooth slide transition.
-- **Chevron Rotation**: Replaced static text indicators with dynamic chevron toggles (`ic_bb10_chevron_down` <-> `ic_bb10_chevron_up`).
+### 1. Created BB10 Dialog Layout (`dialog_add_habit.xml`)
+- Built a card modal using the `@drawable/shape_bb10_confirm_card` background.
+- Added a bold header section with the title `"New Habit Commitment"`.
+- Content section includes:
+  - **Habit Name** `EditText` (`@drawable/shape_bujo_box`).
+  - **Commitment Duration (Days)** `EditText` defaulting to 30 days.
+  - **Set Target Time** action button (`@color/bb10_blue`).
+- Bottom footer with horizontal side-by-side **Cancel** and **Commit** action buttons separated by a `1dp` vertical divider.
 
-### 2. 📊 Compact 3-Column Discipline Metrics Bar
-- Combined **Current Streak**, **Rest Tokens**, and **Best Streak** into a single horizontal 3-column row separated by `1dp` dividers (`@color/bujo_divider`), reducing section height by over 60%.
-
-### 3. 🎯 Compact Habit & Goal Efficiency Lists
-- Reduced padding and font sizes across Habit Discipline (30D summary) and Goal Efficiency lists in [item_goal_efficiency.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/item_goal_efficiency.xml).
-- Slimmed project efficiency progress bars to `4dp` height with concise `14sp` project titles and `11sp` progress labels.
+### 2. Refactored Habits Fragment (`HabitsFragment.java`)
+- Updated `showAddHabitDialog()` to inflate `dialog_add_habit.xml`.
+- Connected time picker dialog to the target time button.
+- Configured **Cancel** and **Commit** button click handlers.
+- Applied `onShowListener` to enforce the standard `88%` screen width sizing (`metrics.widthPixels * 0.88`).
 
 ## Verification Results
-- Executed `./gradlew assembleDebug` via Gradle - **Build finished successfully with 0 errors**.
-- All profile widgets now display in concise BB10 format.
-- Points breakdown slides open/closed smoothly on tap with chevron animation.
+- Executed `./gradlew assembleDebug` - **Build finished successfully with 0 errors**.
+- Opening "New Habit" from the Habits screen or bottom FAB now presents the BB10 styled card dialog.
