@@ -38,6 +38,10 @@ public class MainActivity extends AppCompatActivity {
     private View btnOverflow;
     private ImageView btnFab;
     private View btnBack;
+    private View drawerTopSection;
+    private TextView drawerProfileLevel;
+    private TextView drawerProfilePoints;
+    private ImageView drawerProfileIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,20 @@ public class MainActivity extends AppCompatActivity {
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerList = findViewById(R.id.nav_drawer_list);
         drawerView = findViewById(R.id.nav_drawer_container);
+
+        drawerTopSection = findViewById(R.id.drawer_top_section);
+        drawerProfileLevel = findViewById(R.id.drawer_profile_level);
+        drawerProfilePoints = findViewById(R.id.drawer_profile_points);
+        drawerProfileIcon = findViewById(R.id.drawer_profile_icon);
+
+        if (drawerTopSection != null) {
+            drawerTopSection.setOnClickListener(v -> {
+                if (drawerLayout != null && drawerView != null) {
+                    drawerLayout.closeDrawer(drawerView);
+                }
+                pushFragment(new com.ismailmushraf.bujo.fragments.ProfileFragment());
+            });
+        }
 
         // Header view matching screenshot with back arrow
         dbManager = new DatabaseManager(this);
@@ -174,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         refreshDrawer();
+        refreshProfileIcon();
 
         if (savedInstanceState == null) {
             String navigateTo = getIntent().getStringExtra("NAVIGATE_TO");
@@ -203,7 +222,6 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", R.drawable.ic_calendar));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", R.drawable.ic_bb10_timer));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", R.drawable.ic_bb10_logbook));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Profile", R.drawable.ic_today));
         drawerAdapter.notifyDataSetChanged();
     }
 
@@ -231,8 +249,6 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new MigratedItemsFragment();
             } else if ("Focus Timer".equals(item.title)) {
                 fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment();
-            } else if ("Profile".equals(item.title)) {
-                fragment = new com.ismailmushraf.bujo.fragments.ProfileFragment();
             }
         }
 
@@ -281,7 +297,33 @@ public class MainActivity extends AppCompatActivity {
 
     // Profile Menu functionality will be refactored to use the new BB10 layout instead of the Top Menu.
     public void refreshProfileIcon() {
-        // To be updated
+        if (dbManager == null) return;
+        int[] stats = dbManager.getUserStats();
+        int points = stats[0];
+
+        String levelTitle;
+        int iconRes;
+
+        if (points < 500) {
+            levelTitle = getString(R.string.ui_level_1_wanderer_6d5da1);
+            iconRes = R.drawable.ic_bb10_profile_wanderer;
+        } else if (points < 2000) {
+            levelTitle = getString(R.string.ui_level_2_apprentice_ba52e3);
+            iconRes = R.drawable.ic_bb10_profile_book;
+        } else if (points < 5000) {
+            levelTitle = getString(R.string.ui_level_3_scholar_2c2c6c);
+            iconRes = R.drawable.ic_bb10_profile_scholar;
+        } else if (points < 10000) {
+            levelTitle = getString(R.string.ui_level_4_ascendant_6153be);
+            iconRes = R.drawable.ic_bb10_profile_mountain;
+        } else {
+            levelTitle = getString(R.string.ui_level_5_monk_e0c1bb);
+            iconRes = R.drawable.ic_bb10_profile_temple;
+        }
+
+        if (drawerProfileLevel != null) drawerProfileLevel.setText(levelTitle);
+        if (drawerProfilePoints != null) drawerProfilePoints.setText(points + " XP");
+        if (drawerProfileIcon != null) drawerProfileIcon.setImageResource(iconRes);
     }
 
     private void showAuditModal(DatabaseManager.AuditResult result) {

@@ -1,31 +1,36 @@
-# BB10 Redesign for New Habit Modal
+# Modular Primary Navigation Sidebar with Profile Header
 
-This plan details updating the "New Habit" creation modal from a native Android `AlertDialog` to the custom BlackBerry 10 dialog style used by the "Plan Day" modal (`dialog_plan_day.xml`).
+This plan extracts the primary navigation drawer into its own dedicated layout file (`sidebar_primary_nav.xml`) and adds a fixed top header displaying the user's Profile Level, Rank Icon, and Total XP Points.
 
 ## Proposed Changes
 
-### 1. New BB10 Dialog Layout
-#### [NEW] [dialog_add_habit.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_add_habit.xml)
-- Create a dedicated BB10 modal layout file matching the structure of `dialog_plan_day.xml`:
-  - **Outer Container**: Card shape `@drawable/shape_bb10_confirm_card`.
-  - **Header**: Bold title ("New Habit Commitment") on `@color/surface`.
-  - **Divider**: Full-width `1dp` `@color/bujo_divider`.
-  - **Content Body**:
-    - Habit Name `EditText` (`@color/surface`).
-    - Commitment Duration Label & `EditText` (defaults to 30 days).
-    - Optional Target Time Selection Button (`btn_habit_time`).
-  - **Divider**: Full-width `1dp` `@color/bujo_divider`.
-  - **Footer Action Bar**: Horizontal side-by-side action buttons for **Cancel** and **Commit** (`@color/bb10_blue`) separated by a vertical `1dp` divider.
+### 1. Create Primary Navigation Sidebar Layout
+#### [NEW] [sidebar_primary_nav.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/sidebar_primary_nav.xml)
+- Create a dedicated layout file for the primary right sidebar (`300dp` width, `layout_gravity="end"`):
+  - **Top Fixed Section** (`#drawer_top_section`):
+    - **Rank Icon** (`#drawer_profile_icon`, `32dp x 32dp` `AppCompatImageView` tinted `@color/bb10_blue`).
+    - **Text Column**:
+      - **Level Title** (`#drawer_profile_level`, `14sp` bold) e.g., "LEVEL 1: WANDERER".
+      - **Points** (`#drawer_profile_points`, `12sp`) e.g., "350 XP".
+  - **Top Divider** (`#drawer_top_divider`, `1dp` `@color/bb10_sidebar_divider`).
+  - **Centered Navigation List** (`#nav_drawer_list` `ListView` positioned below `#drawer_top_divider`).
 
 ---
 
-### 2. Update Habits Fragment Logic
-#### [HabitsFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/HabitsFragment.java)
-- Refactor `showAddHabitDialog()`:
-  - Inflate `dialog_add_habit.xml` instead of building native `LinearLayout` / `EditText` views in Java.
-  - Wire up the "Set Target Time" button to open the TimePickerDialog and update button text upon selection.
-  - Wire up the "Cancel" and "Commit" button click listeners.
-  - Apply `dialog.setOnShowListener` to set 88% screen width (`metrics.widthPixels * 0.88`) for consistent BB10 card sizing.
+### 2. Include Modular Sidebar in Main Activity
+#### [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml)
+- Replace inline `#nav_drawer_container` definition with a clean `<include layout="@layout/sidebar_primary_nav.xml" />` tag inside `DrawerLayout`.
+
+---
+
+### 3. Wire Up Dynamic Profile Stats & Navigation
+#### [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java)
+- In `onCreate()`: Bind `#drawer_top_section`, `#drawer_profile_level`, `#drawer_profile_points`, and `#drawer_profile_icon`.
+- Implement `refreshProfileIcon()`:
+  - Fetch user stats from `dbManager.getUserStats()`.
+  - Calculate active level title and select appropriate rank icon (`ic_bb10_profile_wanderer`, `ic_bb10_profile_book`, `ic_bb10_profile_scholar`, `ic_bb10_profile_mountain`, `ic_bb10_profile_temple`).
+  - Update level title and points text.
+- Add click listener on `#drawer_top_section`: Tapping the header closes the sidebar and navigates directly to `ProfileFragment`.
 
 ## User Review Required
 

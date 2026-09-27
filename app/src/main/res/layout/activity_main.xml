@@ -299,20 +299,6 @@
     </RelativeLayout>
 
     <!-- Navigation Drawer -->
-    <RelativeLayout
-        android:id="@+id/nav_drawer_container"
-        android:layout_width="300dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:background="@color/bb10_sidebar_dark_bg">
-
-        <ListView
-            android:id="@+id/nav_drawer_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:divider="@color/bb10_sidebar_divider"
-            android:dividerHeight="1dp" />
-    </RelativeLayout>
+    <include layout="@layout/sidebar_primary_nav" />
 
 </androidx.drawerlayout.widget.DrawerLayout>

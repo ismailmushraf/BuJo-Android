@@ -1,3 +1,4 @@
-- [x] Create `dialog_add_habit.xml` layout
-- [x] Refactor `showAddHabitDialog()` in `HabitsFragment.java`
+- [x] Create `sidebar_primary_nav.xml` layout
+- [x] Include `sidebar_primary_nav.xml` in `activity_main.xml`
+- [x] Implement `refreshProfileIcon()` and header click listener in `MainActivity.java`
 - [x] Verify build with Gradle

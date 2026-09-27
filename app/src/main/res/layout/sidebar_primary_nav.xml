@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_drawer_container"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="end"
+    android:background="@color/bb10_sidebar_dark_bg">
+
+    <!-- Top Fixed Section: Profile Level & Points -->
+    <LinearLayout
+        android:id="@+id/drawer_top_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp"
+        android:background="@color/bb10_sidebar_header_bg"
+        android:clickable="true"
+        android:focusable="true">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/drawer_profile_icon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_bb10_profile_wanderer"
+            app:tint="@color/bb10_blue" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/drawer_profile_level"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ui_level_1_wanderer_6d5da1"
+                android:textColor="@color/bb10_sidebar_on_background"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/drawer_profile_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="0 XP"
+                android:textColor="@color/bb10_sidebar_subtext"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/drawer_top_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/drawer_top_section"
+        android:background="@color/bb10_sidebar_divider" />
+
+    <!-- Centered Navigation List -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/drawer_top_divider">
+
+        <ListView
+            android:id="@+id/nav_drawer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:divider="@color/bb10_sidebar_divider"
+            android:dividerHeight="1dp" />
+    </RelativeLayout>
+
+</RelativeLayout>
