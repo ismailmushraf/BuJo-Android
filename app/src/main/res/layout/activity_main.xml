@@ -80,7 +80,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_projects_53e890"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text" />
@@ -111,7 +111,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_habits_45ab39"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text" />
@@ -146,7 +146,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_new_task_cc3dbd"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text" />
@@ -181,7 +181,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_reset_44c57a"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text"
@@ -222,7 +222,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_workouts_ccb58b"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text" />
@@ -253,7 +253,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/ui_settings_c7f73b"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"
                     android:textColor="@color/bujo_text" />

@@ -1,66 +1,28 @@
-# Architectural Cleanup & Optimization Plan
+# Bottom Bar Text Size & Sidebar Width Standardization Plan
 
-This implementation plan addresses the anti-patterns and performance bottlenecks identified in the codebase audit prior to starting the Profile page redesign.
+I have researched your request and identified the cause of both UI issues:
 
-## Overview of Proposed Changes
+1. **Bottom Bar Text Size**: In `activity_main.xml`, the bottom bar labels (`Projects`, `Habits`, `New Task`, `Reset`, `Workouts`, `Settings`) are set to `12sp`. Lowering them back to `10sp` will make them smaller and match BB10 guidelines.
+2. **Sidebar Width Inconsistency**: The right-side dialog sidebars should all share an identical `0.3` (scrim) / `0.7` (container) weight ratio (70% screen width). Standardizing this across all sidebar layouts ensures every sidebar takes the exact same width.
 
-### 1. Gamification Logic Centralization
-#### [NEW] [GamificationManager.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/GamificationManager.java)
-- Create a dedicated manager class to house point values, level rank threshold definitions, and XP award calculations.
-- Centralize points constants:
-  - `POINTS_WORKOUT_SET = 10`
-  - `POINTS_DAILY_COMMITMENT = 5`
-  - `POINTS_TASK_COMPLETION = ...`
-  - `POINTS_HABIT_LOG = ...`
-- Refactor point awards in [DailyLogFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/DailyLogFragment.java), [WorkoutFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/WorkoutFragment.java), [HabitsFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/HabitsFragment.java), [InboxFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/InboxFragment.java), [ProjectDetailFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/ProjectDetailFragment.java), and [EntryUIHelper.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/EntryUIHelper.java) to delegate calculations to `GamificationManager`.
+## Proposed Changes
 
----
+Only the following **4 XML layout files** will be modified. No other code, existing functionality, or UI components will be touched:
 
-### 2. Preference Storage Centralization
-#### [NEW] [AppPreferences.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/AppPreferences.java)
-- Create `AppPreferences.java` to encapsulate `SharedPreferences` operations and key definitions:
-  - `KEY_STARTUP_SCREEN = "startup_screen"`
-  - `KEY_ENABLE_ANIMATIONS = "enable_animations"`
-  - `KEY_ENABLE_SOUNDS = "enable_sounds"`
-  - `KEY_SOUND_EFFECTS = "enable_sound_effects"`
-- Refactor [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java), [SettingsFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/SettingsFragment.java), and [SoundHelper.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/SoundHelper.java) to use `AppPreferences`.
+### [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml)
+- Change `android:textSize` from `12sp` to `10sp` for all 6 bottom action bar text labels.
+
+### [dialog_bb10_project_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_project_sidebar.xml)
+- Set container `layout_weight` to `0.7` (and scrim weight to `0.3`) to match the primary context sidebar width.
+
+### [dialog_bb10_context_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_context_sidebar.xml)
+- Ensure container `layout_weight` is set to `0.7` and scrim weight is `0.3`.
+
+### [dialog_bb10_workout_sidebar.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/dialog_bb10_workout_sidebar.xml)
+- Ensure container `layout_weight` is set to `0.7` and scrim weight is `0.3`.
 
 ---
 
-### 3. ListView Adapter Performance Optimization (Eliminate Scroll Jank)
-#### [MODIFY] [EntryAdapter.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/adapters/EntryAdapter.java)
-- Cache Calendar instances and reusable listener instances instead of instantiating `Calendar.getInstance()`, `Date`, `SpannableString`, `CustomStrikethroughSpan`, and `OnLongClickListener` on every `getView()` pass.
-- Reduce object allocations during list scrolling to prevent GC pauses.
+## User Review Required
 
----
-
-### 4. Fragment Navigation Method Centralization
-#### [MODIFY] [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java)
-- Expose a public `pushFragment(Fragment fragment)` method that encapsulates the custom animation transaction (`R.anim.slide_in_right`, etc.) and automatically calls `updateBottomBarButtons(fragment)`.
-- Refactor fragment replacements in `DailyLogFragment`, `WorkoutFragment`, `ProjectDetailFragment`, and `InboxFragment` to call `((MainActivity) getActivity()).pushFragment(...)`.
-
----
-
-### 5. Background Offloading for Database Operations
-#### [NEW] [AppExecutors.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/AppExecutors.java)
-- Create a lightweight background executor class (`AppExecutors`) containing a single background disk thread executor and a main UI thread handler.
-- Wrap heavy database reads and mutations (such as `evaluateDailyStreak()`, audit evaluations, complex habit log calculations) in `AppExecutors.diskIO().execute(...)` so that database tasks run off the UI main thread and post callbacks safely to the main thread.
-
----
-
-### 6. Robust Exception & Resource Cleanup
-#### [MODIFY] [DatabaseManager.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/db/DatabaseManager.java) & [SoundHelper.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/SoundHelper.java)
-- Ensure all cursor operations in `DatabaseManager` utilize `try-finally` blocks so cursors are guaranteed to close even on unexpected exceptions.
-- Add fallback handling in `SoundHelper` if audio playback initialization fails.
-
-## Verification Plan
-
-### Automated Build Verification
-- Execute `./gradlew assembleDebug` via `gradle_build` to verify zero compile or resource errors across all components.
-
-### Manual Functional Verification
-- Test task/workout/habit points animations to confirm `GamificationManager` correctly awards XP.
-- Verify settings toggle options (sounds, animations, startup screen) persist through `AppPreferences`.
-- Perform smooth scrolling on Daily Log and Inbox lists to verify zero stuttering.
-- Verify background database execution using `AppExecutors` operates smoothly without thread lock or UI freezing.
-- Verify back button and screen transitions function properly with centralized `pushFragment(...)`.
+Please review the list of **4 files to modify** above. Let me know if you approve so I can begin execution!

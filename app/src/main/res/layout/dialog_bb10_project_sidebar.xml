@@ -15,11 +15,11 @@
         android:clickable="true"
         android:focusable="true" />
 
-    <!-- Right 70% BB10 Sidebar Container -->
+    <!-- Right 50% BB10 Sidebar Container -->
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.7"
+        android:layout_weight="0.5"
         android:background="@color/bb10_sidebar_dark_bg">
 
         <!-- 1. TOP FIXED SECTION: Project Name & Created Date & Stats -->

@@ -1,7 +1,5 @@
-- [x] Create `GamificationManager.java` & refactor points award logic
-- [x] Create `AppPreferences.java` & refactor `SharedPreferences` usage
-- [x] Optimize `EntryAdapter.java` `getView()` allocations
-- [x] Centralize fragment navigation with `pushFragment(...)` in `MainActivity.java`
-- [x] Create `AppExecutors.java` & offload heavy DB tasks off main thread
-- [x] Harden `DatabaseManager.java` cursor cleanup & `SoundHelper.java`
+- [x] Update bottom bar text size in `activity_main.xml`
+- [x] Update container weight to 0.7 in `dialog_bb10_project_sidebar.xml`
+- [x] Ensure container weight is 0.7 in `dialog_bb10_context_sidebar.xml`
+- [x] Ensure container weight is 0.7 in `dialog_bb10_workout_sidebar.xml`
 - [x] Verify build with Gradle
