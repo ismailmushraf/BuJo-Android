@@ -40,11 +40,11 @@ public class FocusCheckReceiver extends BroadcastReceiver {
             Toast.makeText(context, "Penalty: -5 points for inactivity.", Toast.LENGTH_LONG).show();
             
             // Notification to inform the user
-            android.support.v4.app.NotificationCompat.Builder builder = new android.support.v4.app.NotificationCompat.Builder(context, "pomodoro_alerts")
+            androidx.core.app.NotificationCompat.Builder builder = new androidx.core.app.NotificationCompat.Builder(context, "pomodoro_alerts")
                     .setSmallIcon(android.R.drawable.ic_dialog_alert)
                     .setContentTitle("Focus Lost")
                     .setContentText("Penalty of -5 points applied for missing focus check.")
-                    .setPriority(android.support.v4.app.NotificationCompat.PRIORITY_HIGH)
+                    .setPriority(androidx.core.app.NotificationCompat.PRIORITY_HIGH)
                     .setDefaults(android.app.Notification.DEFAULT_ALL)
                     .setAutoCancel(true);
 

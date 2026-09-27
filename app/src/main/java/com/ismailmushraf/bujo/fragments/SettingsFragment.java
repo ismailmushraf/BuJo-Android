@@ -7,8 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,7 +54,7 @@ public class SettingsFragment extends Fragment {
         Spinner spinnerTheme = (Spinner) root.findViewById(R.id.spinner_theme);
         final String[] themes = {"Light Theme", "Dark Theme", "Auto"};
         ArrayAdapter<String> themeAdapter = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_spinner, themes);
-        themeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        themeAdapter.setDropDownViewResource(R.layout.item_bb10_spinner_dropdown);
         spinnerTheme.setAdapter(themeAdapter);
 
         int currentTheme = prefs.getInt("theme_mode", AppCompatDelegate.MODE_NIGHT_AUTO);
@@ -97,7 +97,7 @@ public class SettingsFragment extends Fragment {
         Spinner spinnerStartup = (Spinner) root.findViewById(R.id.spinner_startup);
         final String[] screens = {"Inbox", "Today"};
         ArrayAdapter<String> startupAdapter = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_spinner, screens);
-        startupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        startupAdapter.setDropDownViewResource(R.layout.item_bb10_spinner_dropdown);
         spinnerStartup.setAdapter(startupAdapter);
 
         String currentStartup = prefs.getString("startup_screen", "Today");

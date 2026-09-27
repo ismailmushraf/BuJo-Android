@@ -21,4 +21,9 @@
     <color name="bb10_folder_green">#6b8e23</color>
     <color name="bb10_folder_purple">#a6338b</color>
     <color name="bb10_folder_red">#d32f2f</color>
+    <color name="bb10_sidebar_on_background">#FFFFFFFF</color>
+    <color name="bb10_dropdown_background">#222222</color>
+    <color name="bb10_button_background">#333333</color>
+    <color name="bb10_button_pressed">#4A4A4A</color>
+    <color name="bb10_dialog_footer">#1A1A1A</color>
 </resources>

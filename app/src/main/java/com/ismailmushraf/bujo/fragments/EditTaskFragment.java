@@ -6,7 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import com.ismailmushraf.bujo.utils.BB10ToggleSwitch;
 import android.text.Editable;
 import android.text.TextWatcher;

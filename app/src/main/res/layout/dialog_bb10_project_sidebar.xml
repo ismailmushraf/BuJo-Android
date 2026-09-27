@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -18,7 +19,7 @@
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.5"
+        android:layout_weight="0.7"
         android:background="@color/bb10_sidebar_dark_bg">
 
         <!-- 1. TOP FIXED SECTION: Project Name & Created Date & Stats -->
@@ -35,7 +36,7 @@
                 android:id="@+id/sidebar_project_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/white"
+                android:textColor="@color/bb10_sidebar_on_background"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:maxLines="2"
@@ -85,14 +86,14 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@android:drawable/ic_menu_delete"
-                android:tint="@color/white" />
+                app:tint="@color/bb10_sidebar_on_background" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:text="Delete"
-                android:textColor="@color/white"
+                android:textColor="@color/bb10_sidebar_on_background"
                 android:textSize="16sp" />
         </LinearLayout>
 

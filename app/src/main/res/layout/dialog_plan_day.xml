@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Plan Sessions"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -29,7 +29,7 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="@color/bujo_divider" />
 
     <!-- Content Section -->
     <LinearLayout
@@ -52,13 +52,13 @@
                 android:layout_height="wrap_content"
                 android:text="Today"
                 android:checked="true"
-                android:textColor="#222222"
+                android:textColor="@color/bujo_text"
                 android:layout_marginEnd="24dp"/>
             <RadioButton
                 android:id="@+id/rb_tomorrow"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#222222"
+                android:textColor="@color/bujo_text"
                 android:text="Tomorrow"/>
         </RadioGroup>
 
@@ -95,14 +95,14 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#E0E0E0" />
+        android:background="@color/bujo_divider" />
 
     <!-- Bottom Buttons Section (Horizontal Side-by-Side) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"
-        android:background="#F2F2F2">
+        android:background="@color/bb10_dialog_footer">
 
         <TextView
             android:id="@+id/btn_plan_cancel"
@@ -111,7 +111,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Cancel"
-            android:textColor="#222222"
+            android:textColor="@color/bujo_text"
             android:textSize="15sp"
             android:textStyle="bold"
             android:clickable="true"
@@ -121,7 +121,7 @@
         <View
             android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:background="#E0E0E0" />
+            android:background="@color/bujo_divider" />
 
         <TextView
             android:id="@+id/btn_plan_add"

@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Workouts"
-                android:textColor="@color/white"
+                android:textColor="@color/bb10_sidebar_on_background"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 

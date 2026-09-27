@@ -3,7 +3,7 @@ package com.ismailmushraf.bujo;
 import android.app.Application;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.appcompat.app.AppCompatDelegate;
 
 public class BuJoApp extends Application {
     @Override

@@ -1,10 +1,10 @@
 package com.ismailmushraf.bujo;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity {
             btnSettings.setOnClickListener(v -> navigateToFragment(new SettingsFragment()));
         }
 
-        getSupportFragmentManager().addOnBackStackChangedListener(new android.support.v4.app.FragmentManager.OnBackStackChangedListener() {
+        getSupportFragmentManager().addOnBackStackChangedListener(new androidx.fragment.app.FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
                 Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -150,7 +150,11 @@ public class MainActivity extends AppCompatActivity {
         com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
             DatabaseManager.AuditResult audit = dbManager.evaluateDailyStreak();
             if (audit != null && audit.totalPenalty > 0) {
-                com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> showAuditModal(audit));
+                com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
+                    if (!isFinishing() && !isDestroyed()) {
+                        showAuditModal(audit);
+                    }
+                });
             }
         });
 

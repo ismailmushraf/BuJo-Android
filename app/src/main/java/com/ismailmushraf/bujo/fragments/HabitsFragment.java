@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -250,7 +250,7 @@ public class HabitsFragment extends Fragment {
 
     private void openHabitProgressPage(int habitId) {
         HabitProgressFragment fragment = HabitProgressFragment.newInstance(habitId);
-        android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+        androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
         ft.replace(R.id.fragment_container, fragment);
         ft.addToBackStack(null);

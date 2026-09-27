@@ -23,6 +23,8 @@ import java.util.Map;
 
 public class DatabaseManager {
 
+    private static final Object DAILY_AUDIT_LOCK = new Object();
+
     public static final String CAT_TASKS = "tasks";
     public static final String CAT_HABITS = "habits";
     public static final String CAT_WORKOUTS = "workouts";
@@ -689,6 +691,19 @@ public class DatabaseManager {
     }
 
     public AuditResult evaluateDailyStreak() {
+        synchronized (DAILY_AUDIT_LOCK) {
+            database.beginTransaction();
+            try {
+                AuditResult result = evaluateDailyStreakInTransaction();
+                database.setTransactionSuccessful();
+                return result;
+            } finally {
+                database.endTransaction();
+            }
+        }
+    }
+
+    private AuditResult evaluateDailyStreakInTransaction() {
         String todayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(new Date());
         Cursor c = database.query(DatabaseHelper.TABLE_USER_STATS,
                 new String[]{DatabaseHelper.COLUMN_LAST_ACTIVE_DATE, DatabaseHelper.COLUMN_CURRENT_STREAK,
@@ -812,14 +827,19 @@ public class DatabaseManager {
                 new String[]{DatabaseHelper.COLUMN_WEIGHT, DatabaseHelper.COLUMN_REPS},
                 DatabaseHelper.COLUMN_EXERCISE + " = ? COLLATE NOCASE", new String[]{exercise},
                 null, null, null);
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                double w = cursor.getDouble(0);
-                int r = cursor.getInt(1);
-                double score = (w <= 0) ? r : (w * (1.0 + (r / 30.0)));
-                if (score > maxPR) maxPR = score;
-            } while (cursor.moveToNext());
-            cursor.close();
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    do {
+                        double w = cursor.getDouble(0);
+                        int r = cursor.getInt(1);
+                        double score = (w <= 0) ? r : (w * (1.0 + (r / 30.0)));
+                        if (score > maxPR) maxPR = score;
+                    } while (cursor.moveToNext());
+                }
+            } finally {
+                cursor.close();
+            }
         }
         return maxPR;
     }
@@ -1046,7 +1066,7 @@ public class DatabaseManager {
                     setNum = 1;
                     double pr = getPersonalRecord(currentEx);
                     String prText = (pr == Math.floor(pr)) ? String.valueOf((int)pr) : String.format(Locale.US, "%.1f", pr);
-                    list.add(currentEx.toUpperCase() + " (PR: " + prText + ")");
+                    list.add(currentEx.toUpperCase(Locale.getDefault()) + " (PR: " + prText + ")");
                 }
                 ws.setSetNumber(setNum++);
                 list.add(ws);

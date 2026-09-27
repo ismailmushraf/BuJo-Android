@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.SystemClock;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
@@ -167,8 +168,15 @@ public class WorkoutFragment extends Fragment {
                 String ex = autoExercise.getText().toString().trim();
                 if (ex.isEmpty()) return;
 
-                double w = etWeight.getText().toString().isEmpty() ? 0 : Double.parseDouble(etWeight.getText().toString());
-                int r = etReps.getText().toString().isEmpty() ? 0 : Integer.parseInt(etReps.getText().toString());
+                double w;
+                int r;
+                try {
+                    w = etWeight.getText().toString().isEmpty() ? 0 : Double.parseDouble(etWeight.getText().toString());
+                    r = etReps.getText().toString().isEmpty() ? 0 : Integer.parseInt(etReps.getText().toString());
+                } catch (NumberFormatException exception) {
+                    Toast.makeText(getActivity(), "Enter a valid weight and whole-number rep count.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String n = etNote.getText().toString().trim();
 
                 double oldPR = dbManager.getPersonalRecord(ex);
@@ -252,10 +260,7 @@ public class WorkoutFragment extends Fragment {
         suggestionsList.clear();
         suggestionsList.addAll(dbManager.getUniqueExerciseNames());
         
-        if (getActivity() != null) {
-            autoAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line, suggestionsList);
-            autoExercise.setAdapter(autoAdapter);
-        }
+        autoAdapter.notifyDataSetChanged();
 
         todayItems.clear();
         todayItems.addAll(dbManager.getGroupedDailyWorkouts(todayStr));

@@ -3,7 +3,7 @@ package com.ismailmushraf.bujo.fragments;
 import android.app.AlertDialog;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -122,7 +122,7 @@ public class DailyLogFragment extends Fragment {
         lvRecs.addFooterView(footer, null, false);
 
         final List<Entry> currentRecs = new ArrayList<>();
-        final ArrayAdapter<String> adapterRecs = new ArrayAdapter<>(getActivity(), android.R.layout.simple_list_item_multiple_choice, new ArrayList<String>());
+        final ArrayAdapter<String> adapterRecs = new ArrayAdapter<>(getActivity(), R.layout.item_bb10_multiple_choice, new ArrayList<String>());
         lvRecs.setAdapter(adapterRecs);
 
         final Runnable refreshRecs = new Runnable() {
@@ -263,7 +263,7 @@ public class DailyLogFragment extends Fragment {
                 @Override
                 public void onEntryTextClick(Entry entry) {
                     if (getFragmentManager() != null && entry != null) {
-                        android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                        androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
                         ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
                         ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
                         ft.addToBackStack(null);

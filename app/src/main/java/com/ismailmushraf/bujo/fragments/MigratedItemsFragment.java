@@ -1,7 +1,7 @@
 package com.ismailmushraf.bujo.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -65,7 +65,7 @@ public class MigratedItemsFragment extends Fragment {
             @Override
             public void onEntryTextClick(Entry entry) {
                 if (getFragmentManager() != null && entry != null) {
-                    android.support.v4.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
                     ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
                     ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
                     ft.addToBackStack(null);

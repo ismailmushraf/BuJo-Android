@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -97,7 +98,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    android:tint="@color/bujo_text" />
+                    app:tint="@color/bujo_text" />
 
             </LinearLayout>
         </LinearLayout>
@@ -147,7 +148,7 @@
                     android:layout_height="12dp"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_bb10_dropdown_arrow"
-                    android:tint="@color/bujo_text" />
+                    app:tint="@color/bujo_text" />
 
             </LinearLayout>
         </LinearLayout>
