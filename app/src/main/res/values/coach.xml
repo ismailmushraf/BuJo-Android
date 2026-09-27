@@ -1,0 +1,130 @@
+<resources>
+    <string name="coach_title">Coach</string>
+    <string name="coach_notification">Time for a quick check-in. How is your day going?</string>
+    <string name="coach_intro">A small next step for your day. Guidance is optional; your tasks and deadlines stay under your control.</string>
+    <string name="coach_settings">Coach settings</string>
+    <string name="coach_checkin">CHECK IN</string>
+    <string name="coach_kind">Check-in</string>
+    <string name="coach_mood">Mood</string>
+    <string name="coach_energy">Energy</string>
+    <string name="coach_progress">Progress</string>
+    <string name="coach_minutes">Available minutes</string>
+    <string name="coach_get_guidance">Get guidance</string>
+    <string name="coach_local">Save offline check-in</string>
+    <string name="coach_privacy">Online guidance sends this check-in and the task/habit details you enable to Google Gemini. Use Coach settings to choose what to share. No request runs automatically in the background.</string>
+    <string name="coach_result">LATEST GUIDANCE</string>
+    <string name="coach_history">RECENT CHECK-INS</string>
+    <string name="coach_plan">TODAY’S FOCUS PLAN</string>
+    <string name="coach_empty">Your first check-in will appear here.</string>
+    <string name="coach_no_plan">No focus plan accepted today.</string>
+    <string name="coach_apply">Use this focus plan</string>
+    <string name="coach_undo">Undo last focus plan</string>
+    <string name="coach_retry">Retry latest check-in</string>
+    <string name="coach_snooze">Snooze reminders for 1 hour</string>
+    <string name="coach_snoozed">Next reminder postponed within your waking hours.</string>
+    <string name="coach_key">Personal Gemini API key</string>
+    <string name="coach_model">Gemini model ID</string>
+    <string name="coach_enabled">Enable check-in reminders</string>
+    <string name="coach_start">Day starts (hour, 0–23)</string>
+    <string name="coach_end">Evening check-in (hour, 0–23)</string>
+    <string name="coach_consent">Allow sending my check-ins to Google Gemini</string>
+    <string name="coach_share_tasks">Include today’s tasks, project priorities and recent project task history</string>
+    <string name="coach_share_habits">Include up to 20 current habits and today’s completion</string>
+    <string name="coach_storage">Your key and coach history stay in app-private storage and are excluded from Android backups and journal exports. They are not encrypted by this feature. Anyone with access to a compromised device may retrieve them. Reminders run approximately every four hours, from morning to evening.</string>
+    <string name="coach_save">Save</string>
+    <string name="coach_cancel">Cancel</string>
+    <string name="coach_test">Test connection</string>
+    <string name="coach_delete">Delete coach history</string>
+    <string name="coach_delete_confirm">Delete all check-ins, guidance and coach focus plans? Your journal tasks, habits and API key will not change.</string>
+    <string name="coach_forget">Forget API key</string>
+    <string name="coach_key_removed">API key removed. Offline coaching is still available.</string>
+    <string name="coach_invalid_settings">Enter a model ID and a start hour earlier than the evening hour (0–23). Use only letters, numbers, dots, hyphens and underscores in the model ID.</string>
+    <string name="coach_invalid_key">The key contains embedded whitespace or unsupported characters. Copy the key itself, not its label or surrounding text.</string>
+    <string name="coach_key_required">Enter your personal API key first.</string>
+    <string name="coach_more">More options</string>
+    <string name="coach_less">Fewer options</string>
+    <string name="coach_history_show">View recent check-ins</string>
+    <string name="coach_history_hide">Hide recent check-ins</string>
+    <string name="coach_connection_section">CONNECTION</string>
+    <string name="coach_sharing_section">SHARING</string>
+    <string name="coach_reminders_section">Reminders</string>
+    <string name="coach_privacy_section">PRIVACY</string>
+    <string name="coach_prompt">How are you doing?</string>
+    <string name="coach_note_short">Anything on your mind? (optional)</string>
+    <string name="coach_settings_short">Settings</string>
+    <string name="coach_invalid_minutes">Enter available time between 0 and 960 minutes.</string>
+    <string name="coach_working">Working… Your check-in stays saved if the connection fails.</string>
+    <string name="coach_busy">Coach is already working. Please try again in a moment.</string>
+    <string name="coach_saved">Saved.</string>
+    <string name="coach_local_notice">Offline guidance saved. No information was sent to Google.</string>
+    <string name="coach_consent_required">Offline guidance shown because permission to send check-ins to Gemini is off. Enable it in Coach Settings to receive online suggestions.</string>
+    <string name="coach_key_required_online">Offline guidance shown because no Gemini API key is saved. Add one in Coach Settings to receive online suggestions.</string>
+    <string name="coach_local_message">You do not have to solve the whole day at once. A small step or a deliberate rest can be enough for now.</string>
+    <string name="coach_local_step">Choose one manageable action. If you have the energy, give it five minutes; otherwise pause and reassess.</string>
+    <string name="coach_local_rest">You have no time available right now. Leave the task list as it is and check in when you have room to breathe.</string>
+    <string name="coach_local_plan">After that, check your energy before deciding what comes next.</string>
+    <string name="coach_storage_error">Could not save this check-in. Please try again.</string>
+    <string name="coach_network_error">The connection failed or timed out. Your check-in is saved with offline guidance. You can retry.</string>
+    <string name="coach_no_internet">This device is connected to Wi‑Fi, but Android has not confirmed internet access. Reconnect Wi‑Fi or wait for the connection to recover, then retry.</string>
+    <string name="coach_key_error">Gemini rejected the request. Check the saved API key, access and model settings. Your check-in is safe.</string>
+    <string name="coach_model_error">This model is unavailable. Check the model ID in Coach settings.</string>
+    <string name="coach_quota_error">Gemini’s usage limit was reached. Your check-in is saved. Retry later.</string>
+    <string name="coach_tls_error">Secure networking could not start on this device. Offline coaching is available.</string>
+    <string name="coach_response_error">Gemini returned an incomplete or invalid plan. Nothing was applied; offline guidance is available.</string>
+    <string name="coach_connection_ok">Secure connection and structured response verified. No journal data was sent.</string>
+    <string name="coach_plan_saved">Focus plan saved. Journal tasks and deadlines were not changed.</string>
+    <string name="coach_already_applied">This plan has already been used. Submit another check-in for an updated plan.</string>
+    <string name="coach_stale">This suggestion is out of date or its tasks changed. Get fresh guidance before using it.</string>
+    <string name="coach_apply_confirm">Replace today’s displayed coach focus plan with this suggestion? This does not edit tasks, deadlines, habits or points. You can undo this change.</string>
+    <string name="coach_ai_label">Gemini guidance</string>
+    <string name="coach_local_label">Offline guidance</string>
+    <string name="coach_failed_label">Request failed — offline guidance</string>
+    <string name="coach_interrupted">Interrupted request — retry when ready</string>
+    <string name="coach_pending">Guidance is being prepared.</string>
+    <string name="coach_reminders_off">Reminders are off. You can check in whenever you like.</string>
+    <string name="coach_reminders_on">Reminders are on: morning, roughly every four hours, and evening.</string>
+    <string name="coach_notifications_blocked">Notifications are blocked by Android. Enable them in the system app settings to receive reminders.</string>
+    <string name="coach_history_item">%1$s · %2$s\nMood: %3$s · Energy: %4$s\n%5$s</string>
+    <string name="coach_no_key">Save your API key and enable online sharing in Coach settings first. You can still check in offline.</string>
+    <string name="coach_day_prompt">Coach: choose your next small step</string>
+    <string name="coach_plan_with">Plan today with coach</string>
+    <string name="coach_note_limit">Optional note (maximum 1,000 characters)</string>
+    <string-array name="coach_kinds">
+        <item>Morning planning</item>
+        <item>Progress check-in</item>
+        <item>Evening reflection</item>
+    </string-array>
+    <string-array name="coach_moods">
+        <item>Low</item>
+        <item>Uneasy</item>
+        <item>Okay</item>
+        <item>Good</item>
+        <item>Great</item>
+    </string-array>
+    <string-array name="coach_energies">
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+    <string-array name="coach_progresses">
+        <item>Not started</item>
+        <item>Some progress</item>
+        <item>On track</item>
+        <item>Blocked</item>
+        <item>Taking a break</item>
+    </string-array>
+    <style name="CoachText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:padding">8dp</item>
+    </style>
+    <style name="CoachButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+    </style>
+</resources>

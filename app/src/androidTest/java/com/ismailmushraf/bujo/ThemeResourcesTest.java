@@ -34,6 +34,9 @@ public class ThemeResourcesTest {
                 assertEquals(textColor, ((TextView) workout.findViewById(R.id.btn_add_set)).getCurrentTextColor());
                 assertNotEquals(textColor, context.getResources().getColor(R.color.bb10_button_background));
                 inflater.inflate(R.layout.fragment_settings, null);
+                View coach = inflater.inflate(R.layout.dialog_coach_wizard, null);
+                assertEquals(textColor, ((TextView)coach.findViewById(R.id.coach_wizard_message)).getCurrentTextColor());
+                inflater.inflate(R.layout.settings_coach_section, null);
                 inflater.inflate(R.layout.dialog_plan_day, null);
                 View profile = inflater.inflate(R.layout.fragment_profile, null);
                 assertEquals(textColor, ((TextView) profile.findViewById(R.id.tv_rank_title)).getCurrentTextColor());

@@ -29,6 +29,9 @@ android {
 }
 
 dependencies {
+    // Match the networking stack verified in the user's BlackBerry Gemini client.
+    implementation 'com.squareup.okhttp3:okhttp:3.12.13'
+    implementation 'org.conscrypt:conscrypt-android:2.5.2'
 
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

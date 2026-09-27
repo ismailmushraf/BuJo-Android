@@ -104,7 +104,7 @@ public class DailyLogFragment extends Fragment {
 
         View btnPlan = root.findViewById(R.id.btn_plan_tomorrow);
         if (btnPlan != null) {
-            btnPlan.setOnClickListener(v -> showRecommendationDialog());
+            btnPlan.setOnClickListener(v -> CoachWizardDialog.show(getParentFragmentManager()));
         }
 
         return root;
@@ -152,6 +152,10 @@ public class DailyLogFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(), R.style.BujoDialog);
         builder.setView(view);
         final AlertDialog dialog = builder.create();
+        view.findViewById(R.id.btn_plan_coach).setOnClickListener(v -> {
+            dialog.dismiss();
+            if (getActivity() instanceof MainActivity) ((MainActivity)getActivity()).showCoach();
+        });
 
         view.findViewById(R.id.btn_plan_cancel).setOnClickListener(v -> dialog.dismiss());
 
@@ -282,6 +286,14 @@ public class DailyLogFragment extends Fragment {
             adapter.addAll(entries);
             adapter.notifyDataSetChanged();
             listView.setSelectionFromTop(index, top);
+        }
+    }
+
+    /** Refresh immediately after Coach creates selected tasks for today. */
+    public void refreshFromCoach() {
+        if (isAdded() && dbManager != null) {
+            loadEntries();
+            updateCompletionRatio();
         }
     }
 

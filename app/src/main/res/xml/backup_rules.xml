@@ -6,6 +6,11 @@
    See https://developer.android.com/about/versions/12/backup-restore
 -->
 <full-backup-content>
+    <exclude domain="sharedpref" path="coach_private.xml" />
+    <exclude domain="database" path="coach_private.db" />
+    <exclude domain="database" path="coach_private.db-journal" />
+    <exclude domain="database" path="coach_private.db-wal" />
+    <exclude domain="database" path="coach_private.db-shm" />
     <!--
    <include domain="sharedpref" path="."/>
    <exclude domain="sharedpref" path="device.xml"/>

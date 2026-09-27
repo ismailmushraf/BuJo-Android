@@ -39,6 +39,13 @@
             android:layout_height="1dp"
             android:background="@color/bujo_divider" />
 
+        <TextView
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="@string/coach_settings" android:textColor="@color/bb10_section_header_text"
+            android:textSize="11sp" android:textStyle="bold" android:paddingStart="16dp" android:paddingEnd="16dp"
+            android:paddingTop="6dp" android:paddingBottom="6dp" android:background="@color/bb10_section_header_bg" />
+        <include layout="@layout/settings_coach_section" />
+
         <!-- SECTION 1: Preferences -->
         <TextView
             android:layout_width="match_parent"
@@ -70,7 +77,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="32dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
@@ -82,7 +89,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/ui_theme_preference_c61fb7"
                     android:textColor="@color/bujo_text"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <Spinner
@@ -120,7 +127,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
+                android:layout_height="32dp"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
                 android:paddingStart="8dp"
@@ -132,7 +139,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/ui_default_startup_screen_a3a979"
                     android:textColor="@color/bujo_text"
-                    android:textSize="14sp"
+                    android:textSize="12sp"
                     android:textStyle="bold" />
 
                 <Spinner

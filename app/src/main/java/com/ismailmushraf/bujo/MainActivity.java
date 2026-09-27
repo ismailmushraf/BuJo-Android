@@ -42,6 +42,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Only re-anchor alarms on UI launch, not Application startup: a cold-start
+        // alarm receiver must still see the due slot rather than a new future slot.
+        com.ismailmushraf.bujo.coach.CoachScheduler.schedule(this);
 
         setContentView(R.layout.activity_main);
         if (android.os.Build.VERSION.SDK_INT >= 33 &&
@@ -176,6 +179,9 @@ public class MainActivity extends AppCompatActivity {
             String navigateTo = getIntent().getStringExtra("NAVIGATE_TO");
             if ("Pomodoro".equals(navigateTo)) {
                 selectItem(3); 
+            } else if ("Coach".equals(navigateTo)) {
+                selectItem(1);
+                getWindow().getDecorView().post(this::showCoach);
             } else {
                 String startup = com.ismailmushraf.bujo.utils.AppPreferences.getStartupScreen(this);
 
@@ -240,6 +246,16 @@ public class MainActivity extends AppCompatActivity {
 
         drawerAdapter.setSelectedPosition(position);
         drawerLayout.closeDrawer(drawerView);
+    }
+
+    public void showCoach() {
+        com.ismailmushraf.bujo.fragments.CoachWizardDialog.show(getSupportFragmentManager());
+    }
+
+    @Override protected void onNewIntent(android.content.Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        if ("Coach".equals(intent.getStringExtra("NAVIGATE_TO"))) showCoach();
     }
 
     public void showDailyLog() {

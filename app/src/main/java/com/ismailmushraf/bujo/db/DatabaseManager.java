@@ -71,6 +71,15 @@ public class DatabaseManager {
         return id;
     }
 
+    /** Inserts an all-or-nothing group so generated plans cannot be partially applied. */
+    public void insertEntriesAtomically(List<Entry> entries) {
+        database.beginTransaction();
+        try {
+            for (Entry entry : entries) if (insertEntry(entry) == -1) throw new IllegalStateException("Could not save task");
+            database.setTransactionSuccessful();
+        } finally { database.endTransaction(); }
+    }
+
     public int updateEntry(Entry entry) {
         ContentValues values = new ContentValues();
         values.put(DatabaseHelper.COLUMN_TYPE, entry.getSignifier());

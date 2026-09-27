@@ -91,6 +91,11 @@ public class InboxFragment extends Fragment {
             }
         });
 
+        View btnPlan = root.findViewById(R.id.btn_plan_tomorrow);
+        if (btnPlan != null) {
+            btnPlan.setVisibility(View.GONE);
+        }
+
         // Emoji and Event buttons removed from XML
 
         return root;
