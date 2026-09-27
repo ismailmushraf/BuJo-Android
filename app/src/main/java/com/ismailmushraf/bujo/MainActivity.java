@@ -510,7 +510,8 @@ public class MainActivity extends AppCompatActivity {
             fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.HabitProgressFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.ProjectHistoryFragment ||
-            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment) {
+            fragment instanceof com.ismailmushraf.bujo.fragments.MigratedItemsFragment ||
+            fragment instanceof com.ismailmushraf.bujo.fragments.ProfileFragment) {
             if (btnFab != null) btnFab.setVisibility(View.GONE);
             if (btnOverflow != null) btnOverflow.setVisibility(View.INVISIBLE);
             if (tvFabText != null) tvFabText.setVisibility(View.GONE);
