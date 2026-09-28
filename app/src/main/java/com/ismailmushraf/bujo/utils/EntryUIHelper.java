@@ -100,7 +100,7 @@ public class EntryUIHelper {
             optionsList.add(new SidebarOption("Mark as Not Migrated", R.drawable.ic_inbox));
         } else {
             optionsList.add(new SidebarOption("Migrate to Future List", R.drawable.ic_inbox));
-            if ("*".equals(entry.getSignifier())) {
+            if ("*".equals(entry.getSignifier()) && DatabaseManager.isToday(entry.getDeadline())) {
                 optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
             }
         }

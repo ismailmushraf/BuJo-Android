@@ -1,5 +1,2 @@
-- [x] Refactor `Entry.java` `isLocked()` logic
-- [x] Update `EditTaskFragment.java` to reset `createdAt` on task save
-- [x] Update `EntryUIHelper.java` to reset `createdAt` when rescheduling
-- [x] Update `ProjectHistoryFragment.java` to open `EditTaskFragment` on click
+- [x] Restrict "Lock Task" sidebar option to Today's tasks in `EntryUIHelper.java`
 - [x] Verify build with Gradle
