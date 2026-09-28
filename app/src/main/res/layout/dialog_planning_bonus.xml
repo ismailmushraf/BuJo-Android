@@ -45,12 +45,12 @@
         android:layout_marginTop="8dp" />
 
     <Button
+        style="@style/Widget.BuJo.Button.Standard"
         android:id="@+id/btn_bonus_collect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/ui_continue_2e0262"
         android:layout_marginTop="20dp"
-        android:background="@drawable/shape_bujo_box"
         android:textColor="@color/bujo_text"
         android:textAllCaps="true"
         android:textStyle="bold" />

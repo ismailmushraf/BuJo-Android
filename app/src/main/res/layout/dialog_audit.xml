@@ -46,12 +46,12 @@
         android:layout_marginTop="8dp" />
 
     <Button
+        style="@style/Widget.BuJo.Button.Standard"
         android:id="@+id/btn_audit_ok"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/ui_i_will_do_better_8a29d9"
         android:layout_marginTop="20dp"
-        android:background="@drawable/shape_bujo_box"
         android:textColor="@color/bujo_text"
         android:textAllCaps="true"
         android:textStyle="bold"

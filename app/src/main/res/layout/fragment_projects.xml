@@ -13,10 +13,10 @@
         android:gravity="center_vertical"
         android:background="@color/bb10_bottom_bar_bg">
         <EditText
+            style="@style/Widget.BuJo.TextInput"
             android:id="@+id/et_search_project"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/surface"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:hint="@string/ui_search_projects_469d78"

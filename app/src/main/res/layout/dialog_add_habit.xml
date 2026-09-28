@@ -48,22 +48,16 @@
             android:layout_marginBottom="4dp"/>
 
         <LinearLayout
+            style="@style/Widget.BuJo.TextInput.Container"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/bb10_bottom_bar_bg"
-            android:padding="4dp">
+            android:layout_height="48dp">
 
             <EditText
+                style="@style/Widget.BuJo.TextInput"
                 android:id="@+id/et_habit_name"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/surface"
                 android:hint="@string/ui_habit_name_e_g_meditate_976cf7"
-                android:textSize="13sp"
-                android:textColor="@color/bujo_text"
-                android:textColorHint="@color/bujo_text_secondary"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
                 android:inputType="textCapSentences"
                 android:singleLine="true"/>
         </LinearLayout>
@@ -78,23 +72,17 @@
             android:layout_marginBottom="4dp"/>
 
         <LinearLayout
+            style="@style/Widget.BuJo.TextInput.Container"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@color/bb10_bottom_bar_bg"
-            android:padding="4dp">
+            android:layout_height="48dp">
 
             <EditText
+                style="@style/Widget.BuJo.TextInput"
                 android:id="@+id/et_habit_days"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/surface"
                 android:text="30"
                 android:inputType="number"
-                android:textSize="13sp"
-                android:textColor="@color/bujo_text"
-                android:textColorHint="@color/bujo_text_secondary"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
                 android:singleLine="true"/>
         </LinearLayout>
 

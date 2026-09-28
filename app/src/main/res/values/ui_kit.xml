@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Widget.BuJo.TextInput.Container" parent="">
+        <item name="android:background">@color/bb10_bottom_bar_bg</item>
+        <item name="android:padding">4dp</item>
+    </style>
+    <style name="Widget.BuJo.TextInput" parent="">
+        <item name="android:background">@color/surface</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textColorHint">@color/bujo_text_secondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="Widget.BuJo.TextInput.Multiline">
+        <item name="android:background">@color/surface</item>
+        <item name="android:gravity">top</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textColorHint">@color/bujo_text_secondary</item>
+        <item name="android:textSize">13sp</item>
+    </style>
+    <style name="Widget.BuJo.Button" parent="" />
+
+    <style name="Widget.BuJo.Button.Standard" parent="">
+        <item name="android:background">@drawable/shape_bb10_btn_layer</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="Widget.BuJo.Button.Compact">
+        <item name="android:background">@drawable/shape_bb10_compact_button</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+    <style name="Widget.BuJo.DialogAction" parent="">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/bujo_text</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+    <style name="Widget.BuJo.RadioButton" parent="">
+        <item name="android:buttonTint">@color/bb10_blue</item>
+        <item name="android:textColor">@color/bujo_text</item>
+    </style>
+    <style name="Widget.BuJo.CheckBox" parent="">
+        <item name="android:buttonTint">@color/bb10_blue</item>
+        <item name="android:textColor">@color/bujo_text</item>
+    </style>
+</resources>

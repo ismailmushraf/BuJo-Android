@@ -39,10 +39,10 @@
         android:padding="8dp"
         android:background="@color/bb10_bottom_bar_bg">
         <EditText
+            style="@style/Widget.BuJo.TextInput"
             android:id="@+id/et_new_entry"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/surface"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:hint="@string/ui_add_a_task_or_search_71bb11"
