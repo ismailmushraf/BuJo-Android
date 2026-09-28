@@ -30,12 +30,37 @@ public class Entry {
 
     public boolean isLocked() {
         if (isLockedManually) return true;
-        // Lock if it's a task, NOT migrated, and older than 2 hours
+        
         if ("*".equals(signifier) && !isMigrated) {
-            long twoHoursInMillis = 2 * 60 * 60 * 1000L;
-            return (System.currentTimeMillis() - createdAt) > twoHoursInMillis;
+            // Overdue tasks and future tasks are NEVER locked automatically
+            if (isOverdue() || isFuture()) {
+                return false;
+            }
+            // Tasks scheduled for Today lock after 3 hours
+            long threeHoursInMillis = 3 * 60 * 60 * 1000L;
+            return (System.currentTimeMillis() - createdAt) > threeHoursInMillis;
         }
         return false;
+    }
+
+    public boolean isOverdue() {
+        if (deadline <= 0) return false;
+        java.util.Calendar today = java.util.Calendar.getInstance();
+        today.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        today.set(java.util.Calendar.MINUTE, 0);
+        today.set(java.util.Calendar.SECOND, 0);
+        today.set(java.util.Calendar.MILLISECOND, 0);
+        return deadline < today.getTimeInMillis();
+    }
+
+    public boolean isFuture() {
+        if (deadline <= 0) return false;
+        java.util.Calendar today = java.util.Calendar.getInstance();
+        today.set(java.util.Calendar.HOUR_OF_DAY, 23);
+        today.set(java.util.Calendar.MINUTE, 59);
+        today.set(java.util.Calendar.SECOND, 59);
+        today.set(java.util.Calendar.MILLISECOND, 999);
+        return deadline > today.getTimeInMillis();
     }
 
     // Getters and Setters

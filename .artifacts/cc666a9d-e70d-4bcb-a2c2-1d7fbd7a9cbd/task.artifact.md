@@ -1,4 +1,5 @@
-- [x] Create `sidebar_primary_nav.xml` layout
-- [x] Include `sidebar_primary_nav.xml` in `activity_main.xml`
-- [x] Implement `refreshProfileIcon()` and header click listener in `MainActivity.java`
+- [x] Refactor `Entry.java` `isLocked()` logic
+- [x] Update `EditTaskFragment.java` to reset `createdAt` on task save
+- [x] Update `EntryUIHelper.java` to reset `createdAt` when rescheduling
+- [x] Update `ProjectHistoryFragment.java` to open `EditTaskFragment` on click
 - [x] Verify build with Gradle

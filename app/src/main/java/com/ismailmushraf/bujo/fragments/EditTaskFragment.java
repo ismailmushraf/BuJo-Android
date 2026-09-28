@@ -633,6 +633,8 @@ public class EditTaskFragment extends Fragment {
             entry.setCreatedAt(System.currentTimeMillis());
             parentEntryId = dbManager.insertEntry(entry);
         } else {
+            entry.setCreatedAt(System.currentTimeMillis());
+            entry.setLockedManually(false);
             dbManager.updateEntry(entry);
         }
 

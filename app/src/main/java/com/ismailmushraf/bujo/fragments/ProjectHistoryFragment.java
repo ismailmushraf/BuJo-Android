@@ -99,8 +99,8 @@ public class ProjectHistoryFragment extends Fragment {
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                if ("*".equals(entry.getSignifier())) {
-                    uiHelper.showTaskDetailDialog(entry);
+                if (entry != null && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
                 }
             }
 

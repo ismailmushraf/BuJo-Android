@@ -1,37 +1,45 @@
-# Modular Primary Navigation Sidebar with Profile Header
+# BlackBerry 10 Active Frame Widget & Minimization Feature
 
-This plan extracts the primary navigation drawer into its own dedicated layout file (`sidebar_primary_nav.xml`) and adds a fixed top header displaying the user's Profile Level, Rank Icon, and Total XP Points.
+Yes! In BlackBerry 10, when an app is minimized to the multitasking grid, it transforms into an **Active Frame** (a live card displaying key real-time metrics like overdue tasks and daily status).
+
+On Android, we can achieve this exact experience using **two complementary features**:
+
+1. **Android Home Screen App Widget (BB10 Active Frame)**: A dedicated 2x2 or 4x2 home screen widget styled identically to a BlackBerry 10 Active Frame. It updates in real-time with your "X Overdue Tasks" and task titles.
+2. **Multitasking Recents Active Frame Card**: When the app is being minimized (`onPause` / `onUserLeaveHint`), we display a dedicated BB10 Active Frame card layout so that the thumbnail saved in Android's Recent Apps multitasking switcher shows the Active Frame summary.
+
+---
 
 ## Proposed Changes
 
-### 1. Create Primary Navigation Sidebar Layout
-#### [NEW] [sidebar_primary_nav.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/sidebar_primary_nav.xml)
-- Create a dedicated layout file for the primary right sidebar (`300dp` width, `layout_gravity="end"`):
-  - **Top Fixed Section** (`#drawer_top_section`):
-    - **Rank Icon** (`#drawer_profile_icon`, `32dp x 32dp` `AppCompatImageView` tinted `@color/bb10_blue`).
-    - **Text Column**:
-      - **Level Title** (`#drawer_profile_level`, `14sp` bold) e.g., "LEVEL 1: WANDERER".
-      - **Points** (`#drawer_profile_points`, `12sp`) e.g., "350 XP".
-  - **Top Divider** (`#drawer_top_divider`, `1dp` `@color/bb10_sidebar_divider`).
-  - **Centered Navigation List** (`#nav_drawer_list` `ListView` positioned below `#drawer_top_divider`).
+### 1. BB10 Active Frame App Widget Layout
+#### [NEW] [widget_active_frame.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/widget_active_frame.xml)
+- Create a BB10 Active Frame card layout for the Home Screen Widget:
+  - **Header**: Black background with blue accent bar (`@color/bb10_blue`) titled "BULLET JOURNAL".
+  - **Status Section**: Displays "X Overdue Tasks" in bold red (`@color/bb10_folder_red`) or "All Tasks Clear!".
+  - **Task List Area**: Shows up to 3-4 top overdue/today task titles.
+  - **Footer**: Displays completion ratio (e.g. "3/5 Completed") and current streak.
+
+#### [NEW] [active_frame_widget_info.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/xml/active_frame_widget_info.xml)
+- Configure widget provider metadata (min width/height, update interval, initial layout).
 
 ---
 
-### 2. Include Modular Sidebar in Main Activity
-#### [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml)
-- Replace inline `#nav_drawer_container` definition with a clean `<include layout="@layout/sidebar_primary_nav.xml" />` tag inside `DrawerLayout`.
+### 2. Widget Provider Implementation
+#### [NEW] [BujoActiveFrameWidget.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/utils/BujoActiveFrameWidget.java)
+- Create an `AppWidgetProvider` class:
+  - Queries `DatabaseManager` for overdue tasks and daily completion stats.
+  - Updates `RemoteViews` with the overdue count and task list.
+  - Handles tap events (tapping the widget launches `MainActivity` directly into the Today/Overdue view).
+
+#### [MODIFY] [AndroidManifest.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/AndroidManifest.xml)
+- Register `BujoActiveFrameWidget` as a broadcast receiver with `android.appwidget.action.APPWIDGET_UPDATE`.
 
 ---
 
-### 3. Wire Up Dynamic Profile Stats & Navigation
-#### [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java)
-- In `onCreate()`: Bind `#drawer_top_section`, `#drawer_profile_level`, `#drawer_profile_points`, and `#drawer_profile_icon`.
-- Implement `refreshProfileIcon()`:
-  - Fetch user stats from `dbManager.getUserStats()`.
-  - Calculate active level title and select appropriate rank icon (`ic_bb10_profile_wanderer`, `ic_bb10_profile_book`, `ic_bb10_profile_scholar`, `ic_bb10_profile_mountain`, `ic_bb10_profile_temple`).
-  - Update level title and points text.
-- Add click listener on `#drawer_top_section`: Tapping the header closes the sidebar and navigates directly to `ProfileFragment`.
+### 3. App Minimization Recents Card (Active Frame)
+#### [MODIFY] [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java)
+- In `onUserLeaveHint()` / `onPause()`: Trigger a widget broadcast update so the Home Screen widget refreshes instantly whenever the app is minimized.
 
 ## User Review Required
 
-Please review the proposed plan above. Let me know if you approve so I can begin execution!
+Please review the proposed plan above. Let me know if you would like me to proceed with building the **BB10 Active Frame Widget & Minimization trigger**!

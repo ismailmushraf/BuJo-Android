@@ -1,26 +1,22 @@
-# Modular Primary Navigation Sidebar & Profile Header Walkthrough
+# Overdue Task Locking Fix & Project History Navigation Walkthrough
 
-The main right-side navigation drawer has been modularized into its own layout file (`sidebar_primary_nav.xml`) and upgraded with a fixed top Profile Level and XP Points header!
+Both user requests have been executed and verified!
 
-## Key Accomplishments
+## Summary of Accomplishments
 
-### 1. Created Modular Navigation Sidebar (`sidebar_primary_nav.xml`)
-- Extracted the primary navigation sidebar into a dedicated layout file [sidebar_primary_nav.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/sidebar_primary_nav.xml).
-- Added a fixed top header (`#drawer_top_section`):
-  - **Rank Icon** (`#drawer_profile_icon`, `32dp x 32dp` `AppCompatImageView` tinted `@color/bb10_blue`).
-  - **Level Title** (`#drawer_profile_level`, `14sp` bold) e.g., `"LEVEL 1: WANDERER"`.
-  - **Total XP Points** (`#drawer_profile_points`, `12sp`) e.g., `"350 XP"`.
-- Added a full-width divider (`#drawer_top_divider`) separating the header from the centered navigation list (`#nav_drawer_list`).
+### 1. Overdue Task Unlocking Fix (`Entry.java` & `EditTaskFragment.java`)
+- **Refactored `Entry.java` `isLocked()`**:
+  - Overdue tasks (deadline before today) and future tasks (deadline after today) are now **never locked automatically**.
+  - Tasks scheduled for **Today** (or without a deadline) lock after 3 hours from creation or rescheduling.
+- **Reset Lock Timer on Task Update**:
+  - In [EditTaskFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/EditTaskFragment.java), saving an edited task now updates `createdAt` to the current timestamp and resets `isLockedManually` to `false`.
+  - When an overdue task is moved to Today, it starts a fresh 3-hour grace period during which it remains completely editable.
 
-### 2. Modular Inclusion in Main Activity (`activity_main.xml`)
-- Updated [activity_main.xml](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/res/layout/activity_main.xml) to use `<include layout="@layout/sidebar_primary_nav" />` inside `DrawerLayout`.
+### 2. Project History Item Navigation Fix (`ProjectHistoryFragment.java`)
+- Refactored `onEntryTextClick` in [ProjectHistoryFragment.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/fragments/ProjectHistoryFragment.java) to call `((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()))`.
+- Clicking completed/past tasks in a Project's History list now opens the full **Edit Task** page instead of the legacy subtask dialog.
 
-### 3. Dynamic Stats Binding & Profile Navigation (`MainActivity.java`)
-- Updated [MainActivity.java](file:///Users/ismailmushraf/AndroidStudioProjects/BuJo-Android/app/src/main/java/com/ismailmushraf/bujo/MainActivity.java):
-  - Implemented `refreshProfileIcon()` to query `dbManager.getUserStats()` and dynamically compute the user's level title (Wanderer, Apprentice, Scholar, Ascendant, Monk), rank icon, and XP points.
-  - Wired the top header click listener (`#drawer_top_section`) to close the drawer and navigate directly to `ProfileFragment`.
-
-## Verification Results
+## Verification
 - Executed `./gradlew assembleDebug` via Gradle - **Build finished successfully with 0 errors**.
-- Opening the navigation drawer now reveals the fixed top header displaying active level, rank icon, and XP points.
-- Tapping the top header opens the Profile screen.
+- Overdue tasks no longer show lock icons on project/daily views.
+- Tapping past tasks in Project History navigates to the Edit Task screen.
