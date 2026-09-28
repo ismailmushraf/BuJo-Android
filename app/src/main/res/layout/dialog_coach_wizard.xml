@@ -8,6 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/surface"
         android:padding="18dp"
         android:text="PLAN DAY"
         android:textColor="@color/bujo_text"
@@ -19,12 +20,23 @@
         android:layout_height="1dp"
         android:background="@color/bujo_divider" />
 
-    <LinearLayout
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+    <ScrollView
         android:id="@+id/coach_step_mood"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="18dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:orientation="vertical"
+            android:padding="18dp">
 
         <TextView
             style="@style/CoachText"
@@ -55,15 +67,22 @@
                 android:layout_height="wrap_content"
                 android:text="Good" />
         </RadioGroup>
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
-    <LinearLayout
+    <ScrollView
         android:id="@+id/coach_step_energy"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="18dp"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
         android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:orientation="vertical"
+            android:padding="18dp">
 
         <TextView
             style="@style/CoachText"
@@ -94,53 +113,89 @@
                 android:layout_height="wrap_content"
                 android:text="High" />
         </RadioGroup>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/coach_step_time"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="18dp"
-        android:visibility="gone">
-
-        <TextView
-            style="@style/CoachText"
-            android:text="How many minutes can you give this plan?"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/coach_wizard_minutes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Minutes"
-            android:inputType="number"
-            android:text="30" />
-
-        <TextView
-            style="@style/CoachText"
-            android:text="Anything on your mind? (optional)" />
-
-        <EditText
-            android:id="@+id/coach_wizard_note"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top"
-            android:maxLength="1000"
-            android:minLines="2" />
-    </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <ScrollView
-        android:id="@+id/coach_step_results"
+        android:id="@+id/coach_step_time"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:fillViewport="true"
         android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+        <TextView
+            style="@style/CoachText"
+            android:text="How many minutes can you give this plan?"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/coach_wizard_minutes"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/surface"
+                android:hint="Minutes"
+                android:inputType="number"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:singleLine="true"
+                android:text="30"
+                android:textColor="@color/bujo_text"
+                android:textColorHint="@color/bujo_text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <TextView
+            style="@style/CoachText"
+            android:text="Anything on your mind? (optional)" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/bb10_bottom_bar_bg"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/coach_wizard_note"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:background="@color/surface"
+                android:gravity="top"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="1000"
+                android:padding="8dp"
+                android:textColor="@color/bujo_text"
+                android:textColorHint="@color/bujo_text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+    <ScrollView
+        android:id="@+id/coach_step_results"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bb10_bottom_bar_bg"
             android:orientation="vertical"
             android:padding="18dp">
 
@@ -164,7 +219,13 @@
     <TextView
         android:id="@+id/coach_wizard_status"
         style="@style/CoachText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="12dp"
         android:visibility="gone" />
+    </FrameLayout>
 
     <View
         android:layout_width="match_parent"
