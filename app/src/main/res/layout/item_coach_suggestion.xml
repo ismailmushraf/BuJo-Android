@@ -1,15 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/coach_suggestion_row"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:orientation="horizontal" android:gravity="center_vertical"
-    android:paddingTop="10dp" android:paddingBottom="10dp"
-    android:clickable="true" android:focusable="true" android:background="?android:attr/selectableItemBackground">
-    <TextView android:id="@+id/coach_suggestion_tick" android:layout_width="22dp" android:layout_height="22dp"
-        android:layout_marginEnd="12dp" android:background="@drawable/bb10_checkbox_unchecked_bg" />
-    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-        <TextView android:id="@+id/coach_suggestion_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/bujo_text" android:textSize="15sp" />
-        <TextView android:id="@+id/coach_suggestion_project" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/bb10_blue" android:textSize="11sp" android:textStyle="bold" android:paddingTop="3dp" />
-        <TextView android:id="@+id/coach_suggestion_reason" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/bujo_text_secondary" android:textSize="12sp" android:paddingTop="2dp" />
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="6dp"
+    android:paddingEnd="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/coach_suggestion_tick"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginEnd="12dp"
+        android:background="@drawable/bb10_checkbox_unchecked_bg" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/coach_suggestion_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/bujo_text"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="4dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/coach_suggestion_project"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_bb10_compact_button"
+                android:paddingStart="6dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="6dp"
+                android:paddingBottom="2dp"
+                android:textColor="@color/bb10_blue"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/coach_suggestion_effort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/coach_suggestion_reason"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:textColor="@color/bujo_text_secondary"
+            android:textSize="12sp" />
     </LinearLayout>
 </LinearLayout>

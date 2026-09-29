@@ -89,6 +89,31 @@
     <string name="coach_day_prompt">Coach: choose your next small step</string>
     <string name="coach_plan_with">Plan today with coach</string>
     <string name="coach_note_limit">Optional note (maximum 1,000 characters)</string>
+
+    <!-- Conversational Phase 1 additions -->
+    <string name="coach_header_step1">PLAN DAY · STEP 1 OF 3</string>
+    <string name="coach_header_step2">PLAN DAY · STEP 2 OF 3</string>
+    <string name="coach_header_step3">PLAN DAY · STEP 3 OF 3</string>
+    <string name="coach_label_ai">AI COACH</string>
+    <string name="coach_label_mood">YOUR MOOD</string>
+    <string name="coach_label_energy">YOUR ENERGY</string>
+    <string name="coach_label_minutes">AVAILABLE FOCUS MINUTES</string>
+    <string name="coach_label_notes">ANYTHING ON YOUR MIND? (OPTIONAL)</string>
+    <string name="coach_hint_minutes">Minutes (e.g. 30)</string>
+    <string name="coach_mood_low">Low</string>
+    <string name="coach_mood_ok">Okay</string>
+    <string name="coach_mood_good">Good</string>
+    <string name="coach_energy_low">Low</string>
+    <string name="coach_energy_med">Medium</string>
+    <string name="coach_energy_high">High</string>
+    <string name="coach_prompt_mood_energy">Hey there! How are you feeling today?</string>
+    <string name="coach_prompt_time_notes">Great! How much time can we focus today?</string>
+    <string name="coach_refine_title">REFINE PLAN WITH COACH</string>
+    <string name="coach_refine_simpler">Simpler tasks</string>
+    <string name="coach_refine_work">Work only</string>
+    <string name="coach_refine_low_effort">Low effort</string>
+    <string name="coach_refinement_applied">Plan updated with your feedback!</string>
+    <string name="coach_refining">Refining guidance with your feedback…</string>
     <string-array name="coach_kinds">
         <item>Morning planning</item>
         <item>Progress check-in</item>

@@ -6,13 +6,14 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/coach_wizard_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/surface"
         android:padding="18dp"
-        android:text="PLAN DAY"
+        android:text="@string/coach_header_step1"
         android:textColor="@color/bujo_text"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
     <View
@@ -25,6 +26,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
+    <!-- Step 1: Mood & Energy Check-in -->
     <ScrollView
         android:id="@+id/coach_step_mood"
         android:layout_width="match_parent"
@@ -36,92 +38,164 @@
             android:layout_height="wrap_content"
             android:background="@color/bb10_bottom_bar_bg"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="16dp">
 
-        <TextView
-            style="@style/CoachText"
-            android:text="What is your mood?"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/coach_wizard_mood"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/mood_low"
+            <!-- Coach Chat Bubble with BB10 Accent Indicator -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Low" />
+                android:background="@drawable/shape_coach_bubble"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/mood_ok"
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/bb10_blue"
+                    android:layout_marginEnd="10dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/coach_label_ai"
+                        android:textColor="@color/bb10_blue"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/CoachText"
+                        android:paddingTop="4dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:paddingBottom="0dp"
+                        android:text="@string/coach_prompt_mood_energy"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/CoachText"
+                android:text="@string/coach_label_mood"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/coach_wizard_mood"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Okay" />
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="16dp">
 
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/mood_good"
+                <RadioButton
+                    android:id="@+id/mood_low"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_mood_low" />
+
+                <RadioButton
+                    android:id="@+id/mood_ok"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:checked="true"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_mood_ok" />
+
+                <RadioButton
+                    android:id="@+id/mood_good"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_mood_good" />
+            </RadioGroup>
+
+            <TextView
+                style="@style/CoachText"
+                android:text="@string/coach_label_energy"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/coach_wizard_energy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Good" />
-        </RadioGroup>
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <RadioButton
+                    android:id="@+id/energy_low"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_energy_low" />
+
+                <RadioButton
+                    android:id="@+id/energy_medium"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:checked="true"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_energy_med" />
+
+                <RadioButton
+                    android:id="@+id/energy_high"
+                    android:layout_width="0dp"
+                    android:layout_height="36dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:button="@null"
+                    android:gravity="center"
+                    android:background="@drawable/selector_chip_bg"
+                    android:textColor="@color/selector_chip_text"
+                    android:textSize="13sp"
+                    android:text="@string/coach_energy_high" />
+            </RadioGroup>
+
         </LinearLayout>
     </ScrollView>
 
-    <ScrollView
-        android:id="@+id/coach_step_energy"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/bb10_bottom_bar_bg"
-            android:orientation="vertical"
-            android:padding="18dp">
-
-        <TextView
-            style="@style/CoachText"
-            android:text="How is your energy?"
-            android:textStyle="bold" />
-
-        <RadioGroup
-            android:id="@+id/coach_wizard_energy"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/energy_low"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Low" />
-
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/energy_medium"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Medium" />
-
-            <RadioButton
-                style="@style/Widget.BuJo.RadioButton"
-                android:id="@+id/energy_high"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="High" />
-        </RadioGroup>
-        </LinearLayout>
-    </ScrollView>
-
+    <!-- Step 2: Time & Notes -->
     <ScrollView
         android:id="@+id/coach_step_time"
         android:layout_width="match_parent"
@@ -134,53 +208,99 @@
             android:layout_height="wrap_content"
             android:background="@color/bb10_bottom_bar_bg"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="16dp">
 
-        <TextView
-            style="@style/CoachText"
-            android:text="How many minutes can you give this plan?"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            style="@style/Widget.BuJo.TextInput.Container"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp">
-
-            <EditText
-                style="@style/Widget.BuJo.TextInput"
-                android:id="@+id/coach_wizard_minutes"
+            <!-- Coach Chat Bubble with BB10 Accent Indicator -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="Minutes"
-                android:inputType="number"
-                android:singleLine="true"
-                android:text="30" />
-        </LinearLayout>
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_coach_bubble"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
 
-        <TextView
-            style="@style/CoachText"
-            android:text="Anything on your mind? (optional)" />
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/bb10_blue"
+                    android:layout_marginEnd="10dp" />
 
-        <LinearLayout
-            style="@style/Widget.BuJo.TextInput.Container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp">
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
 
-            <EditText
-                style="@style/Widget.BuJo.TextInput.Multiline"
-                android:id="@+id/coach_wizard_note"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/coach_label_ai"
+                        android:textColor="@color/bb10_blue"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        style="@style/CoachText"
+                        android:paddingTop="4dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:paddingBottom="0dp"
+                        android:text="@string/coach_prompt_time_notes"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/CoachText"
+                android:text="@string/coach_label_minutes"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                style="@style/Widget.BuJo.TextInput.Container"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:gravity="top"
-                android:inputType="textCapSentences|textMultiLine"
-                android:maxLength="1000"
-                />
-        </LinearLayout>
+                android:layout_height="48dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="16dp">
+
+                <EditText
+                    style="@style/Widget.BuJo.TextInput"
+                    android:id="@+id/coach_wizard_minutes"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="@string/coach_hint_minutes"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:text="30" />
+            </LinearLayout>
+
+            <TextView
+                style="@style/CoachText"
+                android:text="@string/coach_label_notes"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                style="@style/Widget.BuJo.TextInput.Container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp">
+
+                <EditText
+                    style="@style/Widget.BuJo.TextInput.Multiline"
+                    android:id="@+id/coach_wizard_note"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:gravity="top"
+                    android:inputType="textCapSentences|textMultiLine"
+                    android:maxLength="1000" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
+    <!-- Step 3: Results & Refine -->
     <ScrollView
         android:id="@+id/coach_step_results"
         android:layout_width="match_parent"
@@ -193,22 +313,107 @@
             android:layout_height="wrap_content"
             android:background="@color/bb10_bottom_bar_bg"
             android:orientation="vertical"
-            android:padding="18dp">
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/coach_wizard_message"
-                style="@style/CoachText" />
+            <!-- Coach Response Speech Bubble with BB10 Accent Indicator -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/shape_coach_bubble"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <View
+                    android:layout_width="3dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/bb10_blue"
+                    android:layout_marginEnd="10dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/coach_label_ai"
+                        android:textColor="@color/bb10_blue"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/coach_wizard_message"
+                        style="@style/CoachText"
+                        android:paddingTop="4dp"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="0dp"
+                        android:paddingBottom="0dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
 
             <TextView
                 style="@style/CoachText"
                 android:text="SELECT TASKS TO ADD TO TODAY"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
             <LinearLayout
                 android:id="@+id/coach_wizard_suggestions"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:orientation="vertical"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Refine Plan Panel -->
+            <TextView
+                style="@style/CoachText"
+                android:text="@string/coach_refine_title"
+                android:textColor="@color/bujo_text_secondary"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <Button
+                    style="@style/Widget.BuJo.Button.Compact"
+                    android:id="@+id/coach_refine_simpler"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="4dp"
+                    android:text="@string/coach_refine_simpler"
+                    android:textSize="11sp" />
+
+                <Button
+                    style="@style/Widget.BuJo.Button.Compact"
+                    android:id="@+id/coach_refine_work"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:text="@string/coach_refine_work"
+                    android:textSize="11sp" />
+
+                <Button
+                    style="@style/Widget.BuJo.Button.Compact"
+                    android:id="@+id/coach_refine_low_effort"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/coach_refine_low_effort"
+                    android:textSize="11sp" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 
@@ -221,6 +426,8 @@
         android:layout_height="wrap_content"
         android:background="@color/bb10_bottom_bar_bg"
         android:padding="12dp"
+        android:textColor="@color/bb10_blue"
+        android:textStyle="bold"
         android:visibility="gone" />
 
     <View
