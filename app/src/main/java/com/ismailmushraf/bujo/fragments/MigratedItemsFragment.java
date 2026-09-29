@@ -14,6 +14,7 @@ import com.ismailmushraf.bujo.adapters.EntryAdapter;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,7 @@ public class MigratedItemsFragment extends Fragment {
     private EntryAdapter adapter;
     private List<Object> entries;
     private EntryUIHelper uiHelper;
+    private int loadGeneration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -58,19 +60,30 @@ public class MigratedItemsFragment extends Fragment {
     }
 
     private void loadEntries() {
-        entries = new ArrayList<>(dbManager.getMigratedEntries());
+        final int request = ++loadGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<Entry> loaded;
+            try { worker.open(); loaded = worker.getMigratedEntries(); }
+            finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                applyEntries(loaded);
+            });
+        });
+    }
+
+    private void applyEntries(List<Entry> loaded) {
+        entries = new ArrayList<Object>(loaded);
         adapter = new EntryAdapter(getActivity(), entries);
+        adapter.setCompletionTogglesEnabled(false);
         adapter.setUIHelper(uiHelper);
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                if (getFragmentManager() != null && entry != null) {
-                    androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
+                if (getActivity() instanceof MainActivity && entry != null)
+                    ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
             }
 
             @Override
@@ -79,6 +92,7 @@ public class MigratedItemsFragment extends Fragment {
             }
         });
         listView.setAdapter(adapter);
+        updateCompletionRatio();
     }
 
     private void updateCompletionRatio() {
@@ -103,6 +117,13 @@ public class MigratedItemsFragment extends Fragment {
         }
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setToolbarSubtitle(completion);
+        }
+    }
+
+    /** Reloads items when this cached root screen becomes visible. */
+    public void refreshAfterNavigation() {
+        if (isAdded() && dbManager != null) {
+            loadEntries();
         }
     }
 

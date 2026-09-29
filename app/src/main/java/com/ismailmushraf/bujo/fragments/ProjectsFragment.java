@@ -17,6 +17,7 @@ import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Project;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class ProjectsFragment extends Fragment {
     private GridView gridView;
     private DatabaseManager dbManager;
     private List<Project> projectList;
+    private int loadGeneration;
     private List<Project> allProjectsList = new java.util.ArrayList<>();
     private ProjectFolderAdapter adapter;
 
@@ -77,11 +79,7 @@ public class ProjectsFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Project selectedProject = projectList.get(position);
                 ProjectDetailFragment fragment = ProjectDetailFragment.newInstance(selectedProject.getId(), selectedProject.getName());
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                ft.replace(R.id.fragment_container, fragment);
-                ft.addToBackStack(null);
-                ft.commit();
+                if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).pushFragment(fragment);
             }
         });
 
@@ -129,11 +127,7 @@ public class ProjectsFragment extends Fragment {
             lvOptions.setOnItemClickListener((parentAdapter, view1, pos, optionId) -> {
                 dialog.dismiss();
                 EditProjectFragment editFragment = EditProjectFragment.newInstance(selectedProject.getId(), selectedProject.getName());
-                FragmentTransaction ft = getFragmentManager().beginTransaction();
-                ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                ft.replace(R.id.fragment_container, editFragment);
-                ft.addToBackStack(null);
-                ft.commit();
+                if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).pushFragment(editFragment);
             });
 
             sidebarView.findViewById(R.id.sidebar_bottom_delete).setOnClickListener(deleteView -> {
@@ -200,10 +194,28 @@ public class ProjectsFragment extends Fragment {
     }
 
     private void loadProjects() {
-        allProjectsList = dbManager.getAllProjects();
-        projectList = new java.util.ArrayList<>(allProjectsList);
-        adapter = new ProjectFolderAdapter(getActivity(), projectList, dbManager);
-        gridView.setAdapter(adapter);
+        final int request = ++loadGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<Project> loaded;
+            try { worker.open(); loaded = worker.getAllProjects(); }
+            finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                allProjectsList = loaded;
+                projectList = new java.util.ArrayList<>(loaded);
+                adapter = new ProjectFolderAdapter(getActivity(), projectList, dbManager);
+                gridView.setAdapter(adapter);
+            });
+        });
+    }
+
+    /** Refreshes card names and task counts after tasks change elsewhere. */
+    public void refreshProjectCards() {
+        if (isAdded() && dbManager != null) {
+            loadProjects();
+        }
     }
 
     @Override

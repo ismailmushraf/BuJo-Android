@@ -21,6 +21,7 @@ import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Habit;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,6 +36,16 @@ public class HabitsFragment extends Fragment {
     private ListView listView;
     private HabitAdapter adapter;
     private TextView tvEmpty;
+    private int loadGeneration;
+
+    private static final class HabitLoadData {
+        final List<Habit> habits;
+        final Map<Integer, Integer> counts;
+        final Map<Integer, Map<String, Boolean>> logs;
+        HabitLoadData(List<Habit> habits, Map<Integer, Integer> counts, Map<Integer, Map<String, Boolean>> logs) {
+            this.habits = habits; this.counts = counts; this.logs = logs;
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -127,27 +138,43 @@ public class HabitsFragment extends Fragment {
     }
 
     private void loadHabits() {
-        List<Habit> habits = dbManager.getAllHabits();
-        if (habits.isEmpty()) {
+        final int request = ++loadGeneration;
+        final String[] range = habitHistoryRange();
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            HabitLoadData loaded;
+            try {
+                worker.open();
+                List<Habit> habits = worker.getAllHabits();
+                Map<Integer, Integer> counts = worker.getAllHabitCompletionCounts();
+                Map<Integer, Map<String, Boolean>> logs = new java.util.HashMap<>();
+                for (Habit h : habits) logs.put(h.getId(), worker.getHabitCompletionMap(h.getId(), range[0], range[1]));
+                loaded = new HabitLoadData(habits, counts, logs);
+            } finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                applyHabits(loaded);
+            });
+        });
+    }
+
+    private String[] habitHistoryRange() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        Calendar cal = Calendar.getInstance();
+        String endDate = sdf.format(cal.getTime());
+        cal.add(Calendar.DAY_OF_YEAR, -9);
+        return new String[]{sdf.format(cal.getTime()), endDate};
+    }
+
+    private void applyHabits(HabitLoadData loaded) {
+        if (loaded.habits.isEmpty()) {
             tvEmpty.setVisibility(View.VISIBLE);
             listView.setVisibility(View.GONE);
         } else {
             tvEmpty.setVisibility(View.GONE);
             listView.setVisibility(View.VISIBLE);
-            
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-            Calendar cal = Calendar.getInstance();
-            String endDate = sdf.format(cal.getTime());
-            cal.add(Calendar.DAY_OF_YEAR, -9);
-            String startDate = sdf.format(cal.getTime());
-
-            Map<Integer, Integer> counts = dbManager.getAllHabitCompletionCounts();
-            Map<Integer, Map<String, Boolean>> logs = new java.util.HashMap<>();
-            for (Habit h : habits) {
-                logs.put(h.getId(), dbManager.getHabitCompletionMap(h.getId(), startDate, endDate));
-            }
-
-            adapter = new HabitAdapter(getActivity(), habits, counts, logs);
+            adapter = new HabitAdapter(getActivity(), loaded.habits, loaded.counts, loaded.logs);
             listView.setAdapter(adapter);
         }
     }
@@ -239,11 +266,7 @@ public class HabitsFragment extends Fragment {
 
     private void openHabitProgressPage(int habitId) {
         HabitProgressFragment fragment = HabitProgressFragment.newInstance(habitId);
-        androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-        ft.replace(R.id.fragment_container, fragment);
-        ft.addToBackStack(null);
-        ft.commit();
+        if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).pushFragment(fragment);
     }
 
     private class HabitAdapter extends ArrayAdapter<Habit> {

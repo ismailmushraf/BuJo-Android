@@ -144,12 +144,19 @@ public class EntryUIHelper {
                         entry.setCreatedAt(System.currentTimeMillis());
                         entry.setLockedManually(false);
                         entry.setCompleted(false);
+                        // Restoring a migrated item creates a new commitment for Today.
+                        // It must be eligible for a future daily audit if left unfinished.
+                        entry.setAudited(false);
                         Calendar today = Calendar.getInstance();
                         today.set(Calendar.HOUR_OF_DAY, 12);
                         today.set(Calendar.MINUTE, 0);
                         entry.setDeadline(today.getTimeInMillis());
                     }
                     dbManager.updateEntry(entry);
+
+                    if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                        ((com.ismailmushraf.bujo.MainActivity) context).refreshTodayEntries();
+                    }
 
                     boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
                     if (context instanceof com.ismailmushraf.bujo.MainActivity) {
@@ -175,6 +182,9 @@ public class EntryUIHelper {
                 if (pointsDeducted > 0 && context instanceof com.ismailmushraf.bujo.MainActivity) {
                     ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
                 }
+                if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                    ((com.ismailmushraf.bujo.MainActivity) context).refreshProjectCounts();
+                }
                 if (listener != null) listener.onEntryUpdated();
             });
         });
@@ -183,7 +193,7 @@ public class EntryUIHelper {
     }
 
     private void showLockConfirmation(final Entry entry) {
-        BB10DialogHelper.showConfirmDialog(context, "Confirm Lock", "Locking this task will make it unchangeable and non-deletable for the rest of the day. Are you sure?", "Lock Forever", () -> {
+        BB10DialogHelper.showConfirmDialog(context, "Confirm Lock", "Locking this task will make it unchangeable and non-deletable for the rest of the day. Are you sure?", "Lock for Today", () -> {
             entry.setLockedManually(true);
             dbManager.updateEntry(entry);
             listener.onEntryUpdated();
@@ -268,6 +278,7 @@ public class EntryUIHelper {
 
         if (context instanceof com.ismailmushraf.bujo.MainActivity) {
             ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(appliedPoints, sourceView);
+            ((com.ismailmushraf.bujo.MainActivity) context).refreshProjectCounts();
         }
 
         if (listener != null) {

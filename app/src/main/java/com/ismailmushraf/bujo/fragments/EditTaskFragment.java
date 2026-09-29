@@ -46,6 +46,7 @@ public class EditTaskFragment extends Fragment {
     private boolean hasReminder = false;
     private int selectedProjectId = 0;
     private String selectedProjectTag = "";
+    private boolean taskLocked;
 
     // Initial state tracking for unsaved changes comparison
     private String initialContent = "";
@@ -55,6 +56,7 @@ public class EditTaskFragment extends Fragment {
     private long initialReminder = 0;
     private boolean initialHasReminder = false;
     private int initialProjectId = 0;
+    private String initialSubtasksState = "";
 
     public static class SubtaskItem {
         public int id;
@@ -153,6 +155,7 @@ public class EditTaskFragment extends Fragment {
             if (entry != null) {
                 currentContent = entry.getContent() != null ? entry.getContent() : "";
                 isCompleted = entry.isCompleted();
+                taskLocked = entry.isLocked();
                 selectedProjectId = entry.getProjectId();
                 selectedProjectTag = entry.getProjectTag() != null ? entry.getProjectTag() : "";
 
@@ -194,6 +197,7 @@ public class EditTaskFragment extends Fragment {
         if (subtasksList.isEmpty() || !subtasksList.get(subtasksList.size() - 1).content.trim().isEmpty()) {
             subtasksList.add(new SubtaskItem(0, "", false));
         }
+        initialSubtasksState = subtaskState();
         renderSubtasks(false);
 
         etTitle.addTextChangedListener(new TextWatcher() {
@@ -213,6 +217,7 @@ public class EditTaskFragment extends Fragment {
 
         // 2. Due Date Toggle & Picker
         cbDueDateToggle.setOnCheckedChangeListener((toggle, isChecked) -> {
+            if (taskLocked) return;
             hasDueDate = isChecked;
             if (isChecked && dueDate <= 0) {
                 Calendar c = Calendar.getInstance();
@@ -224,10 +229,13 @@ public class EditTaskFragment extends Fragment {
             checkSaveButtonState();
         });
 
-        layoutDueDatePicker.setOnClickListener(v -> showDatePickerForDueDate());
+        layoutDueDatePicker.setOnClickListener(v -> {
+            if (!taskLocked) showDatePickerForDueDate();
+        });
 
         // 3. Reminder Toggle & Picker
         cbReminderToggle.setOnCheckedChangeListener((toggle, isChecked) -> {
+            if (taskLocked) return;
             hasReminder = isChecked;
             if (isChecked && reminderTime <= 0) {
                 Calendar c = Calendar.getInstance();
@@ -239,10 +247,14 @@ public class EditTaskFragment extends Fragment {
             checkSaveButtonState();
         });
 
-        layoutReminderPicker.setOnClickListener(v -> showDateTimePickerForReminder());
+        layoutReminderPicker.setOnClickListener(v -> {
+            if (!taskLocked) showDateTimePickerForReminder();
+        });
 
         // 4. Project Selector Click
-        btnSelectProject.setOnClickListener(v -> showProjectPickerDialog());
+        btnSelectProject.setOnClickListener(v -> {
+            if (!taskLocked) showProjectPickerDialog();
+        });
 
         // Cancel Button Action
         root.findViewById(R.id.btn_cancel_task).setOnClickListener(v -> handleCancelAction());
@@ -250,8 +262,20 @@ public class EditTaskFragment extends Fragment {
         // Save Button Action
         root.findViewById(R.id.btn_save_task).setOnClickListener(v -> handleSaveAction(isCreateMode));
 
+        applyLockedTaskState();
         checkSaveButtonState();
         return root;
+    }
+
+    private void applyLockedTaskState() {
+        if (!taskLocked) return;
+        etTitle.setEnabled(false);
+        etTitle.setFocusable(false);
+        cbDueDateToggle.setEnabled(false);
+        layoutDueDatePicker.setEnabled(false);
+        cbReminderToggle.setEnabled(false);
+        layoutReminderPicker.setEnabled(false);
+        btnSelectProject.setEnabled(false);
     }
 
     private Entry loadEntryById(int id) {
@@ -472,6 +496,7 @@ public class EditTaskFragment extends Fragment {
     }
 
     private void showDatePickerForDueDate() {
+        if (taskLocked) return;
         final Calendar c = Calendar.getInstance();
         if (dueDate > 0) c.setTimeInMillis(dueDate);
 
@@ -487,6 +512,7 @@ public class EditTaskFragment extends Fragment {
     }
 
     private void showDateTimePickerForReminder() {
+        if (taskLocked) return;
         final Calendar c = Calendar.getInstance();
         if (reminderTime > 0) c.setTimeInMillis(reminderTime);
 
@@ -511,6 +537,7 @@ public class EditTaskFragment extends Fragment {
     }
 
     private void showProjectPickerDialog() {
+        if (taskLocked) return;
         List<Project> projects = dbManager.getAllProjects();
         List<Project> pickerList = new java.util.ArrayList<>();
 
@@ -586,7 +613,18 @@ public class EditTaskFragment extends Fragment {
                 || (hasDueDate && dueDate != initialDueDate)
                 || hasReminder != initialHasReminder
                 || (hasReminder && reminderTime != initialReminder)
-                || selectedProjectId != initialProjectId;
+                || selectedProjectId != initialProjectId
+                || !subtaskState().equals(initialSubtasksState);
+    }
+
+    private String subtaskState() {
+        StringBuilder state = new StringBuilder();
+        for (SubtaskItem item : subtasksList) {
+            state.append(item.id).append('\u0001')
+                    .append(item.isCompleted).append('\u0001')
+                    .append(item.content == null ? "" : item.content).append('\u0002');
+        }
+        return state.toString();
     }
 
     private void handleCancelAction() {
@@ -607,25 +645,28 @@ public class EditTaskFragment extends Fragment {
         String title = etTitle.getText().toString().trim();
         if (title.isEmpty()) return;
 
-        Entry entry = new Entry();
-        if (!isCreateMode && entryId > 0) {
-            entry.setId(entryId);
-        }
-        entry.setSignifier("*");
-        entry.setContent(title);
-        entry.setCompleted(isCompleted);
-        entry.setProjectId(selectedProjectId);
-        entry.setProjectTag(selectedProjectTag);
+        Entry entry = taskLocked && !isCreateMode ? loadEntryById(entryId) : new Entry();
+        if (entry == null) return;
+        if (!taskLocked || isCreateMode) {
+            if (!isCreateMode && entryId > 0) {
+                entry.setId(entryId);
+            }
+            entry.setSignifier("*");
+            entry.setContent(title);
+            entry.setCompleted(isCompleted);
+            entry.setProjectId(selectedProjectId);
+            entry.setProjectTag(selectedProjectTag);
 
-        if (hasReminder && reminderTime > 0) {
-            entry.setDeadline(reminderTime);
-            entry.setHasTime(true);
-        } else if (hasDueDate && dueDate > 0) {
-            entry.setDeadline(dueDate);
-            entry.setHasTime(false);
-        } else {
-            entry.setDeadline(0);
-            entry.setHasTime(false);
+            if (hasReminder && reminderTime > 0) {
+                entry.setDeadline(reminderTime);
+                entry.setHasTime(true);
+            } else if (hasDueDate && dueDate > 0) {
+                entry.setDeadline(dueDate);
+                entry.setHasTime(false);
+            } else {
+                entry.setDeadline(0);
+                entry.setHasTime(false);
+            }
         }
 
         long parentEntryId = entryId;
@@ -633,8 +674,11 @@ public class EditTaskFragment extends Fragment {
             entry.setCreatedAt(System.currentTimeMillis());
             parentEntryId = dbManager.insertEntry(entry);
         } else {
-            entry.setCreatedAt(System.currentTimeMillis());
-            entry.setLockedManually(false);
+            if (!taskLocked) {
+                entry.setCreatedAt(System.currentTimeMillis());
+                entry.setLockedManually(false);
+            }
+            entry.setCompleted(isCompleted);
             dbManager.updateEntry(entry);
         }
 
@@ -682,6 +726,23 @@ public class EditTaskFragment extends Fragment {
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).refreshDrawer();
+            ((MainActivity) getActivity()).refreshProjectCounts();
+        }
+
+        Fragment today = getParentFragmentManager().findFragmentByTag("root_today");
+        if (today instanceof DailyLogFragment) {
+            ((DailyLogFragment) today).refreshFromTaskEditor();
+        }
+        for (Fragment fragment : getParentFragmentManager().getFragments()) {
+            if (fragment instanceof ProjectDetailFragment) {
+                ((ProjectDetailFragment) fragment).refreshFromTaskEditor();
+            } else if (fragment instanceof ProjectHistoryFragment) {
+                ((ProjectHistoryFragment) fragment).refreshFromTaskEditor();
+            }
+        }
+        Fragment calendar = getParentFragmentManager().findFragmentByTag("root_calendar");
+        if (calendar instanceof FutureLogFragment) {
+            ((FutureLogFragment) calendar).refreshFromTaskEditor();
         }
 
         if (getFragmentManager() != null) {

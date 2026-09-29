@@ -18,6 +18,7 @@ import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class InboxFragment extends Fragment {
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
+    private int loadGeneration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -114,6 +116,7 @@ public class InboxFragment extends Fragment {
                 // Refresh main activity drawer to show new project instantly
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).refreshDrawer();
+                    ((MainActivity) getActivity()).refreshProjectCounts();
                 }
             }
 
@@ -126,6 +129,7 @@ public class InboxFragment extends Fragment {
                 long insertedId = dbManager.insertEntry(newEntry);
                 
                 if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).refreshProjectCounts();
                     int commitment = dbManager.calculateCommitmentReward(newEntry);
                     if (commitment > 0) {
                         ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
@@ -156,20 +160,30 @@ public class InboxFragment extends Fragment {
     }
 
     private void loadEntries() {
-        allEntriesList = new ArrayList<>(dbManager.getInboxEntries());
+        final int request = ++loadGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<Entry> loaded;
+            try { worker.open(); loaded = worker.getInboxEntries(); }
+            finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                applyEntries(loaded);
+            });
+        });
+    }
+
+    private void applyEntries(List<Entry> loaded) {
+        allEntriesList = new ArrayList<Object>(loaded);
         entries = new ArrayList<>(allEntriesList);
         adapter = new EntryAdapter(getActivity(), entries, true);
         adapter.setUIHelper(uiHelper);
         adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                if (getFragmentManager() != null && entry != null) {
-                    androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
+                if (getActivity() instanceof MainActivity && entry != null)
+                    ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
             }
 
             @Override
@@ -178,6 +192,7 @@ public class InboxFragment extends Fragment {
             }
         });
         listView.setAdapter(adapter);
+        updateCompletionRatio();
     }
 
     private void updateCompletionRatio() {

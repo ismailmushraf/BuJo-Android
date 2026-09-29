@@ -28,6 +28,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
     private boolean showTags = true;
     private boolean isDailyLog = false;
+    private boolean completionTogglesEnabled = true;
     private OnEntryInteractionListener listener;
     private EntryUIHelper uiHelper;
 
@@ -76,6 +77,11 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
     public void setUIHelper(EntryUIHelper helper) {
         this.uiHelper = helper;
+    }
+
+    /** Disables the checkbox action for read-only task contexts such as Logbook. */
+    public void setCompletionTogglesEnabled(boolean enabled) {
+        completionTogglesEnabled = enabled;
     }
 
     @Override
@@ -145,7 +151,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
         // 1. Bullet/Checkbox Area -> Completion Toggle
         holder.tvSignifier.setOnClickListener(v -> {
-            if (uiHelper != null) {
+            if (completionTogglesEnabled && uiHelper != null) {
                 uiHelper.toggleEntryCompletion(entry, v);
             }
         });

@@ -42,6 +42,23 @@ public class MainActivity extends AppCompatActivity {
     private TextView drawerProfileLevel;
     private TextView drawerProfilePoints;
     private ImageView drawerProfileIcon;
+    private int lastAuditDayToken = Integer.MIN_VALUE;
+    private final android.os.Handler dailyAuditHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private boolean dateChangeReceiverRegistered;
+    private final android.content.BroadcastReceiver dateChangeReceiver = new android.content.BroadcastReceiver() {
+        @Override
+        public void onReceive(android.content.Context context, android.content.Intent intent) {
+            runDailyAuditIfNeeded();
+            scheduleNextDailyAuditCheck();
+        }
+    };
+    private final Runnable dailyAuditRunnable = new Runnable() {
+        @Override
+        public void run() {
+            runDailyAuditIfNeeded();
+            scheduleNextDailyAuditCheck();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
         btnOverflow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                Fragment current = getVisibleFragment();
                 if (current instanceof ProjectDetailFragment) {
                     ((ProjectDetailFragment) current).openRightSidebar();
                 } else if (current instanceof com.ismailmushraf.bujo.fragments.WorkoutFragment) {
@@ -134,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         View.OnClickListener resetClickListener = v -> {
-            Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            Fragment current = getVisibleFragment();
             if (current instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
                 ((com.ismailmushraf.bujo.fragments.PomodoroFragment) current).handleResetClick();
             }
@@ -147,49 +164,34 @@ public class MainActivity extends AppCompatActivity {
 
         View btnProjects = findViewById(R.id.btn_bb10_projects);
         if (btnProjects != null) {
-            btnProjects.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.ProjectsFragment()));
+            btnProjects.setOnClickListener(v -> showRootFragment(new com.ismailmushraf.bujo.fragments.ProjectsFragment(), "root_projects"));
         }
 
         View btnHabits = findViewById(R.id.btn_bb10_habits);
         if (btnHabits != null) {
-            btnHabits.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.HabitsFragment()));
+            btnHabits.setOnClickListener(v -> showRootFragment(new com.ismailmushraf.bujo.fragments.HabitsFragment(), "root_habits"));
         }
 
         View btnWorkouts = findViewById(R.id.btn_bb10_workouts);
         if (btnWorkouts != null) {
-            btnWorkouts.setOnClickListener(v -> navigateToFragment(new com.ismailmushraf.bujo.fragments.WorkoutFragment()));
+            btnWorkouts.setOnClickListener(v -> showRootFragment(new com.ismailmushraf.bujo.fragments.WorkoutFragment(), "root_workouts"));
         }
 
         View btnSettings = findViewById(R.id.btn_bb10_settings);
         if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> navigateToFragment(new SettingsFragment()));
+            btnSettings.setOnClickListener(v -> showRootFragment(new SettingsFragment(), "root_settings"));
         }
 
         getSupportFragmentManager().addOnBackStackChangedListener(new androidx.fragment.app.FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                Fragment current = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+                Fragment current = getVisibleFragment();
                 updateBottomBarButtons(current);
             }
         });
 
-        com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
-            DatabaseManager workerDatabase = new DatabaseManager(getApplicationContext());
-            DatabaseManager.AuditResult audit;
-            try {
-                workerDatabase.open();
-                audit = workerDatabase.evaluateDailyStreak();
-            } finally {
-                workerDatabase.close();
-            }
-            if (audit != null && audit.totalPenalty > 0) {
-                com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
-                    if (!isFinishing() && !isDestroyed()) {
-                        showAuditModal(audit);
-                    }
-                });
-            }
-        });
+        runDailyAuditIfNeeded();
+        scheduleNextDailyAuditCheck();
 
         refreshDrawer();
         refreshProfileIcon();
@@ -215,6 +217,92 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerDateChangeReceiver();
+        runDailyAuditIfNeeded();
+        scheduleNextDailyAuditCheck();
+    }
+
+    @Override
+    protected void onPause() {
+        dailyAuditHandler.removeCallbacks(dailyAuditRunnable);
+        unregisterDateChangeReceiver();
+        super.onPause();
+    }
+
+    private void registerDateChangeReceiver() {
+        if (dateChangeReceiverRegistered) return;
+        android.content.IntentFilter filter = new android.content.IntentFilter();
+        filter.addAction(android.content.Intent.ACTION_DATE_CHANGED);
+        filter.addAction(android.content.Intent.ACTION_TIME_CHANGED);
+        filter.addAction(android.content.Intent.ACTION_TIMEZONE_CHANGED);
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(dateChangeReceiver, filter, android.content.Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(dateChangeReceiver, filter);
+        }
+        dateChangeReceiverRegistered = true;
+    }
+
+    private void unregisterDateChangeReceiver() {
+        if (!dateChangeReceiverRegistered) return;
+        unregisterReceiver(dateChangeReceiver);
+        dateChangeReceiverRegistered = false;
+    }
+
+    private void scheduleNextDailyAuditCheck() {
+        dailyAuditHandler.removeCallbacks(dailyAuditRunnable);
+        java.util.Calendar nextMidnight = java.util.Calendar.getInstance();
+        nextMidnight.add(java.util.Calendar.DAY_OF_YEAR, 1);
+        nextMidnight.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        nextMidnight.set(java.util.Calendar.MINUTE, 0);
+        nextMidnight.set(java.util.Calendar.SECOND, 1);
+        nextMidnight.set(java.util.Calendar.MILLISECOND, 0);
+        long delay = Math.max(1000L, nextMidnight.getTimeInMillis() - System.currentTimeMillis());
+        dailyAuditHandler.postDelayed(dailyAuditRunnable, delay);
+    }
+
+    private void runDailyAuditIfNeeded() {
+        runDailyAudit(false);
+    }
+
+    /** Runs the audit from the confirmed Today-screen date rollover. */
+    public void runDailyAuditAfterDayChange() {
+        runDailyAudit(true);
+    }
+
+    private void runDailyAudit(boolean force) {
+        java.util.Calendar calendar = java.util.Calendar.getInstance();
+        int todayToken = calendar.get(java.util.Calendar.YEAR) * 1000
+                + calendar.get(java.util.Calendar.DAY_OF_YEAR);
+        if (!force && todayToken == lastAuditDayToken) return;
+        lastAuditDayToken = todayToken;
+
+        com.ismailmushraf.bujo.utils.AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager workerDatabase = new DatabaseManager(getApplicationContext());
+            DatabaseManager.AuditResult audit;
+            try {
+                workerDatabase.open();
+                audit = workerDatabase.evaluateDailyStreak();
+            } finally {
+                workerDatabase.close();
+            }
+            com.ismailmushraf.bujo.utils.AppExecutors.getInstance().mainThread().execute(() -> {
+                if (isFinishing() || isDestroyed()) return;
+                refreshTodayEntries();
+                refreshProjectCounts();
+                // Show the audit whenever missed tasks were processed. The task-points
+                // balance may already be zero, in which case the applied deduction is
+                // zero but the user should still see that the missed tasks were audited.
+                if (audit != null && audit.missedTasks > 0) {
+                    showAuditModal(audit);
+                }
+            });
+        });
+    }
+
     public void refreshDrawer() {
         drawerItemsList.clear();
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", R.drawable.ic_inbox));
@@ -236,29 +324,24 @@ public class MainActivity extends AppCompatActivity {
     private void selectItemWithCustomAnim(int position, int enterAnim, int exitAnim) {
         if (position < 0 || position >= drawerItemsList.size()) return;
         Fragment fragment = null;
+        String rootTag = null;
         DrawerItem item = drawerItemsList.get(position);
 
         if (item.getType() == DrawerItem.TYPE_ITEM) {
             if ("Inbox".equals(item.title)) {
-                fragment = new InboxFragment();
+                fragment = new InboxFragment(); rootTag = "root_inbox";
             } else if ("Today".equals(item.title)) {
-                fragment = new DailyLogFragment();
+                fragment = new DailyLogFragment(); rootTag = "root_today";
             } else if ("Calendar".equals(item.title)) {
-                fragment = new FutureLogFragment();
+                fragment = new FutureLogFragment(); rootTag = "root_calendar";
             } else if ("Logbook".equals(item.title)) {
-                fragment = new MigratedItemsFragment();
+                fragment = new MigratedItemsFragment(); rootTag = "root_logbook";
             } else if ("Focus Timer".equals(item.title)) {
-                fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment();
+                fragment = new com.ismailmushraf.bujo.fragments.PomodoroFragment(); rootTag = "root_pomodoro";
             }
         }
 
-        if (fragment != null) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.setCustomAnimations(enterAnim, exitAnim);
-            ft.replace(R.id.fragment_container, fragment);
-            ft.commit();
-            updateBottomBarButtons(fragment);
-        }
+        if (fragment != null) showRootFragment(fragment, rootTag, enterAnim, exitAnim);
 
         drawerAdapter.setSelectedPosition(position);
         drawerLayout.closeDrawer(drawerView);
@@ -470,7 +553,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 3. Determine which fragment is currently visible
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        Fragment currentFragment = getVisibleFragment();
 
         // Fetch the user's preferred startup screen from Settings
         String startup = com.ismailmushraf.bujo.utils.AppPreferences.getStartupScreen(this);
@@ -502,9 +585,12 @@ public class MainActivity extends AppCompatActivity {
 
     public void pushFragment(Fragment fragment) {
         if (fragment == null) return;
+        Fragment current = getVisibleFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ft.setReorderingAllowed(true);
         ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-        ft.replace(R.id.fragment_container, fragment);
+        if (current != null) ft.hide(current);
+        ft.add(R.id.fragment_container, fragment);
         ft.addToBackStack(null);
         ft.commit();
         updateBottomBarButtons(fragment);
@@ -514,9 +600,70 @@ public class MainActivity extends AppCompatActivity {
         pushFragment(fragment);
     }
 
+    private void showRootFragment(Fragment requested, String tag) {
+        showRootFragment(requested, tag, R.anim.slide_in_right, R.anim.slide_out_left);
+    }
+
+    private void showRootFragment(Fragment requested, String tag, int enterAnim, int exitAnim) {
+        if (requested == null || tag == null) return;
+        androidx.fragment.app.FragmentManager manager = getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        manager.popBackStackImmediate(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        Fragment current = getVisibleFragment();
+        Fragment target = manager.findFragmentByTag(tag);
+        if (target == null) target = requested;
+        if (current == target) {
+            updateBottomBarButtons(target);
+            refreshDynamicRootIfShown(target);
+            return;
+        }
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.setReorderingAllowed(true);
+        transaction.setCustomAnimations(enterAnim, exitAnim);
+        if (current != null) transaction.hide(current);
+        if (target.isAdded()) transaction.show(target);
+        else transaction.add(R.id.fragment_container, target, tag);
+        transaction.commitNow();
+        updateBottomBarButtons(target);
+        refreshDynamicRootIfShown(target);
+    }
+
+    private void refreshDynamicRootIfShown(Fragment fragment) {
+        if (fragment instanceof FutureLogFragment) {
+            ((FutureLogFragment) fragment).refreshAfterNavigation();
+        } else if (fragment instanceof MigratedItemsFragment) {
+            ((MigratedItemsFragment) fragment).refreshAfterNavigation();
+        } else if (fragment instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
+            ((com.ismailmushraf.bujo.fragments.PomodoroFragment) fragment).refreshTasksAfterNavigation();
+        }
+    }
+
+    /** Updates cached project cards after a task or project changes. */
+    public void refreshProjectCounts() {
+        Fragment projects = getSupportFragmentManager().findFragmentByTag("root_projects");
+        if (projects instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {
+            ((com.ismailmushraf.bujo.fragments.ProjectsFragment) projects).refreshProjectCards();
+        }
+    }
+
+    /** Updates the cached Today list after a task moves into or out of Today. */
+    public void refreshTodayEntries() {
+        Fragment today = getSupportFragmentManager().findFragmentByTag("root_today");
+        if (today instanceof DailyLogFragment) {
+            ((DailyLogFragment) today).refreshFromTaskEditor();
+        }
+    }
+
+    private Fragment getVisibleFragment() {
+        for (Fragment fragment : getSupportFragmentManager().getFragments()) {
+            if (fragment.getId() == R.id.fragment_container && fragment.isVisible()) return fragment;
+        }
+        return getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    }
+
     public void updateBottomBarButtons(Fragment fragment) {
         if (fragment == null) {
-            fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            fragment = getVisibleFragment();
         }
 
         View bottomBar = findViewById(R.id.bb10_bottom_bar);
@@ -660,7 +807,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void handleFabClick() {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        Fragment currentFragment = getVisibleFragment();
         if (currentFragment instanceof com.ismailmushraf.bujo.fragments.HabitsFragment) {
             ((com.ismailmushraf.bujo.fragments.HabitsFragment) currentFragment).showAddHabitDialog();
         } else if (currentFragment instanceof com.ismailmushraf.bujo.fragments.ProjectsFragment) {

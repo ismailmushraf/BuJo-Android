@@ -26,6 +26,7 @@ import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class ProjectDetailFragment extends Fragment {
     private ListView lvUncompleted;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
+    private int loadGeneration;
 
     public static ProjectDetailFragment newInstance(int projectId, String projectName) {
         ProjectDetailFragment fragment = new ProjectDetailFragment();
@@ -136,26 +138,53 @@ public class ProjectDetailFragment extends Fragment {
     }
 
     private void loadEntries() {
-        List<Entry> allEntries = dbManager.getEntriesForProject(projectId);
-        List<Object> uncompleted = new ArrayList<>();
+        final int request = ++loadGeneration;
+        final int requestedProjectId = projectId;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<Object> uncompleted = new ArrayList<>();
+            try {
+                worker.open();
+                for (Entry e : worker.getEntriesForProject(requestedProjectId)) if (!e.isCompleted()) uncompleted.add(e);
+            } finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                applyEntries(uncompleted);
+            });
+        });
+    }
 
-        for (Entry e : allEntries) {
-            if (!e.isCompleted()) uncompleted.add(e);
+    /** Refreshes project tasks after the shared task editor saves a task. */
+    public void refreshFromTaskEditor() {
+        if (isAdded() && dbManager != null) {
+            loadEntries();
         }
+    }
 
+    /** Updates the heading after this project is renamed in the project editor. */
+    public void refreshFromProjectEditor() {
+        if (!isAdded() || dbManager == null) return;
+        for (Project project : dbManager.getAllProjects()) {
+            if (project.getId() == projectId) {
+                projectName = project.getName();
+                View root = getView();
+                TextView title = root != null ? root.findViewById(R.id.tv_project_detail_title) : null;
+                if (title != null) title.setText(projectName);
+                return;
+            }
+        }
+    }
+
+    private void applyEntries(List<Object> uncompleted) {
         // Uncompleted List Setup
         EntryAdapter uncompletedAdapter = new EntryAdapter(getActivity(), uncompleted, false);
         uncompletedAdapter.setUIHelper(uiHelper);
         uncompletedAdapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
             @Override
             public void onEntryTextClick(Entry entry) {
-                if (getFragmentManager() != null && entry != null) {
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
+                if (getActivity() instanceof MainActivity && entry != null)
+                    ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
             }
 
             @Override
@@ -200,6 +229,7 @@ public class ProjectDetailFragment extends Fragment {
                 long insertedId = dbManager.insertEntry(newEntry);
 
                 if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).refreshProjectCounts();
                     int commitment = dbManager.calculateCommitmentReward(newEntry);
                     if (commitment > 0) {
                         ((MainActivity) getActivity()).animatePointsChange(commitment, sourceView);
@@ -298,6 +328,7 @@ public class ProjectDetailFragment extends Fragment {
                         dbManager.deleteProjectAndAllEntries(projectId);
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).refreshDrawer();
+                            ((MainActivity) getActivity()).refreshProjectCounts();
                         }
                         if (getFragmentManager() != null) {
                             getFragmentManager().popBackStack();

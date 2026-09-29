@@ -22,6 +22,7 @@ import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,16 +41,15 @@ public class DailyLogFragment extends Fragment {
     private ListView listView;
     private DatabaseManager dbManager;
     private EntryUIHelper uiHelper;
+    private int loadGeneration;
+    private int displayedDayToken;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_daily_log, container, false);
 
-        if (getActivity() instanceof MainActivity) {
-            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
-            ((MainActivity) getActivity()).setToolbarTitle(sdf.format(new Date()).toUpperCase(Locale.getDefault()));
-            ((MainActivity) getActivity()).setToolbarSubtitle("");
-        }
+        displayedDayToken = currentDayToken();
+        updateDateTitle();
 
         listView = (ListView) root.findViewById(R.id.lv_daily_bullets);
         final EditText etNewEntry = (EditText) root.findViewById(R.id.et_new_entry);
@@ -108,6 +108,35 @@ public class DailyLogFragment extends Fragment {
         }
 
         return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        int todayToken = currentDayToken();
+        if (todayToken != displayedDayToken) {
+            displayedDayToken = todayToken;
+            updateDateTitle();
+            if (dbManager != null) {
+                loadEntries();
+            }
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).runDailyAuditAfterDayChange();
+            }
+        }
+    }
+
+    private int currentDayToken() {
+        Calendar calendar = Calendar.getInstance();
+        return calendar.get(Calendar.YEAR) * 1000 + calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private void updateDateTitle() {
+        if (getActivity() instanceof MainActivity) {
+            SimpleDateFormat sdf = new SimpleDateFormat("EEEE, MMMM d", Locale.US);
+            ((MainActivity) getActivity()).setToolbarTitle(sdf.format(new Date()).toUpperCase(Locale.getDefault()));
+            ((MainActivity) getActivity()).setToolbarSubtitle("");
+        }
     }
 
     public void showRecommendationDialog() {
@@ -180,6 +209,9 @@ public class DailyLogFragment extends Fragment {
                 }
             }
             loadEntries();
+            if (getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).refreshProjectCounts();
+            }
 
             if (totalCommitment > 0 && getActivity() instanceof MainActivity) {
                 MainActivity main = (MainActivity) getActivity();
@@ -217,13 +249,17 @@ public class DailyLogFragment extends Fragment {
             if (newEntry.getProjectTag() != null) {
                 Project p = dbManager.getOrCreateProject(newEntry.getProjectTag());
                 projectId = p.getId();
-                if (getActivity() instanceof MainActivity) ((MainActivity) getActivity()).refreshDrawer();
+                if (getActivity() instanceof MainActivity) {
+                    ((MainActivity) getActivity()).refreshDrawer();
+                    ((MainActivity) getActivity()).refreshProjectCounts();
+                }
             }
             newEntry.setDeadline(Calendar.getInstance().getTimeInMillis());
             newEntry.setProjectId(projectId);
             long insertedId = dbManager.insertEntry(newEntry);
             
             if (insertedId != -1 && getActivity() instanceof MainActivity) {
+                ((MainActivity) getActivity()).refreshProjectCounts();
                 int commitment = dbManager.calculateCommitmentReward(newEntry);
                 if (commitment > 0) {
                     ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);
@@ -256,8 +292,22 @@ public class DailyLogFragment extends Fragment {
         int index = listView.getFirstVisiblePosition();
         View v = listView.getChildAt(0);
         int top = (v == null) ? 0 : (v.getTop() - listView.getPaddingTop());
+        final int request = ++loadGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<Entry> loaded;
+            try { worker.open(); loaded = worker.getTodayEntries(); }
+            finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != loadGeneration) return;
+                applyEntries(loaded, index, top);
+            });
+        });
+    }
 
-        allEntriesList = new ArrayList<>(dbManager.getTodayEntries());
+    private void applyEntries(List<Entry> loaded, int index, int top) {
+        allEntriesList = new ArrayList<Object>(loaded);
         entries = new ArrayList<>(allEntriesList);
 
         if (adapter == null || listView.getAdapter() == null) {
@@ -266,13 +316,8 @@ public class DailyLogFragment extends Fragment {
             adapter.setOnEntryInteractionListener(new EntryAdapter.OnEntryInteractionListener() {
                 @Override
                 public void onEntryTextClick(Entry entry) {
-                    if (getFragmentManager() != null && entry != null) {
-                        androidx.fragment.app.FragmentTransaction ft = getFragmentManager().beginTransaction();
-                        ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                        ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
-                        ft.addToBackStack(null);
-                        ft.commit();
-                    }
+                    if (getActivity() instanceof MainActivity && entry != null)
+                        ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
                 }
 
                 @Override
@@ -287,6 +332,7 @@ public class DailyLogFragment extends Fragment {
             adapter.notifyDataSetChanged();
             listView.setSelectionFromTop(index, top);
         }
+        updateCompletionRatio();
     }
 
     /** Refresh immediately after Coach creates selected tasks for today. */
@@ -294,6 +340,13 @@ public class DailyLogFragment extends Fragment {
         if (isAdded() && dbManager != null) {
             loadEntries();
             updateCompletionRatio();
+        }
+    }
+
+    /** Refreshes the list after the shared task editor saves a task. */
+    public void refreshFromTaskEditor() {
+        if (isAdded() && dbManager != null) {
+            loadEntries();
         }
     }
 

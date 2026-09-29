@@ -1,17 +1,13 @@
 package com.ismailmushraf.bujo.fragments;
 
-import android.animation.LayoutTransition;
 import android.content.Context;
-import android.graphics.Color;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -26,6 +22,7 @@ import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
 import com.ismailmushraf.bujo.utils.EntryUIHelper;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,6 +57,18 @@ public class FutureLogFragment extends Fragment {
     private CalendarTaskAdapter calendarTaskAdapter;
     private MonthAdapter monthAdapter;
     private WeekAdapter weekAdapter;
+    private int deadlineLoadGeneration;
+    private Map<Long, List<Integer>> indicatorColorsByDay = Collections.emptyMap();
+    private int selectedDayColor;
+    private int selectedDayTextColor;
+    private int calendarBackgroundColor;
+    private int calendarTextColor;
+    private int calendarMutedTextColor;
+    private int defaultIndicatorColor;
+    private int indicatorSizePx;
+    private int indicatorMarginPx;
+    private float transitionDistancePx;
+    private int monthTransitionGeneration;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,17 +84,24 @@ public class FutureLogFragment extends Fragment {
         weekNumberTitle = (TextView) root.findViewById(R.id.tv_week_number);
         agendaList = (ListView) root.findViewById(R.id.list_agenda);
 
+        selectedDayColor = getResources().getColor(R.color.literal_769a30);
+        selectedDayTextColor = getResources().getColor(R.color.on_accent);
+        calendarBackgroundColor = getResources().getColor(R.color.bujo_background);
+        calendarTextColor = getResources().getColor(R.color.bujo_text);
+        calendarMutedTextColor = getResources().getColor(R.color.bujo_text_secondary);
+        defaultIndicatorColor = getResources().getColor(R.color.bb10_blue);
+        float density = getResources().getDisplayMetrics().density;
+        indicatorSizePx = (int) (5 * density);
+        indicatorMarginPx = (int) (1.5f * density);
+        transitionDistancePx = 18 * density;
+
         dbManager = new DatabaseManager(getActivity());
         dbManager.open();
 
         uiHelper = new EntryUIHelper(getActivity(), dbManager, new EntryUIHelper.OnEntryUpdatedListener() {
             @Override
             public void onEntryUpdated() {
-                if (agendaContainer.getVisibility() == View.VISIBLE) {
-                    reloadVisibleEntries();
-                } else {
-                    showMonth();
-                }
+                refreshCalendarData();
             }
         });
 
@@ -94,12 +110,6 @@ public class FutureLogFragment extends Fragment {
 
         calendarTaskAdapter = new CalendarTaskAdapter(getActivity(), displayedEntries);
         agendaList.setAdapter(calendarTaskAdapter);
-
-        LinearLayout rootLayout = (LinearLayout) root;
-        LayoutTransition transition = rootLayout.getLayoutTransition();
-        if (transition != null) {
-            transition.setDuration(150);
-        }
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).setToolbarTitle("CALENDAR");
@@ -167,21 +177,52 @@ public class FutureLogFragment extends Fragment {
     }
 
     private void showMonthWithAnimation(boolean slideUp) {
-        showMonth();
-        if (monthGrid != null) {
-            float startTranslation = slideUp ? monthGrid.getHeight() : -monthGrid.getHeight();
-            if (startTranslation == 0) startTranslation = slideUp ? 300f : -300f;
-            monthGrid.setTranslationY(startTranslation);
-            monthGrid.animate()
-                    .translationY(0f)
-                    .setDuration(220)
-                    .setInterpolator(new DecelerateInterpolator())
-                    .start();
+        if (deadlineEntries == null) {
+            loadDeadlineEntries(() -> animateMonthChange(slideUp));
+        } else {
+            animateMonthChange(slideUp);
         }
     }
 
+    private void animateMonthChange(boolean movingForward) {
+        if (monthGrid == null || monthGrid.getVisibility() != View.VISIBLE) {
+            renderMonth();
+            return;
+        }
+
+        final int transition = ++monthTransitionGeneration;
+        final float outgoingOffset = movingForward ? -transitionDistancePx : transitionDistancePx;
+        monthGrid.animate().cancel();
+        monthGrid.setAlpha(1f);
+        monthGrid.setTranslationY(0f);
+        monthGrid.animate()
+                .alpha(0f)
+                .translationY(outgoingOffset)
+                .setDuration(70)
+                .withEndAction(() -> {
+                    if (!isAdded() || transition != monthTransitionGeneration) return;
+                    renderMonth();
+                    monthGrid.setTranslationY(-outgoingOffset);
+                    monthGrid.setAlpha(0f);
+                    monthGrid.animate()
+                            .alpha(1f)
+                            .translationY(0f)
+                            .setDuration(130)
+                            .start();
+                })
+                .start();
+    }
+
     private void showMonth() {
-        deadlineEntries = dbManager.getEntriesWithDeadlines();
+        if (deadlineEntries == null) {
+            loadDeadlineEntries(this::renderMonth);
+        } else {
+            renderMonth();
+        }
+    }
+
+    private void renderMonth() {
+        boolean returningFromAgenda = agendaContainer.getVisibility() == View.VISIBLE;
         monthControls.setVisibility(View.VISIBLE);
         monthSelectedBar.setVisibility(View.VISIBLE);
         monthGrid.setVisibility(View.VISIBLE);
@@ -191,24 +232,41 @@ public class FutureLogFragment extends Fragment {
         monthSelectedDateTitle.setText(new SimpleDateFormat("EEEE, MMMM d, yyyy", Locale.US).format(selectedDate.getTime()));
         weekNumberTitle.setText(getString(com.ismailmushraf.bujo.R.string.format_futurelogfragment_30, String.valueOf(selectedDate.get(Calendar.WEEK_OF_YEAR))));
 
-        monthAdapter = new MonthAdapter(getActivity(), currentMonth);
-        monthGrid.setAdapter(monthAdapter);
+        if (monthAdapter == null) {
+            monthAdapter = new MonthAdapter(getActivity(), currentMonth);
+            monthGrid.setAdapter(monthAdapter);
+        } else {
+            monthAdapter.setMonth(currentMonth);
+            monthAdapter.notifyDataSetChanged();
+        }
 
+        final MonthAdapter adapter = monthAdapter;
         monthGrid.post(() -> {
-            if (monthGrid == null) return;
+            if (monthGrid == null || adapter != monthAdapter) return;
             int totalHeight = monthGrid.getHeight();
             if (totalHeight > 0) {
                 int cellHeight = totalHeight / 6;
-                if (cellHeight > 0 && monthAdapter != null) {
-                    monthAdapter.setCellHeight(cellHeight);
-                    monthAdapter.notifyDataSetChanged();
+                if (cellHeight > 0 && adapter.setCellHeight(cellHeight)) {
+                    adapter.notifyDataSetChanged();
                 }
             }
         });
+
+        if (returningFromAgenda) {
+            reveal(monthGrid, -transitionDistancePx);
+        }
     }
 
     private void showAgendaForSelectedDate() {
-        deadlineEntries = dbManager.getEntriesWithDeadlines();
+        if (deadlineEntries == null) {
+            loadDeadlineEntries(this::renderAgendaForSelectedDate);
+        } else {
+            renderAgendaForSelectedDate();
+        }
+    }
+
+    private void renderAgendaForSelectedDate() {
+        boolean expandingFromMonth = monthGrid.getVisibility() == View.VISIBLE;
         monthControls.setVisibility(View.GONE);
         monthSelectedBar.setVisibility(View.GONE);
         monthGrid.setVisibility(View.GONE);
@@ -224,6 +282,81 @@ public class FutureLogFragment extends Fragment {
         }
 
         loadEntriesForSelectedDate();
+
+        if (expandingFromMonth) {
+            reveal(agendaContainer, transitionDistancePx);
+        }
+    }
+
+    private void reveal(View view, float startOffset) {
+        view.animate().cancel();
+        view.setAlpha(0f);
+        view.setTranslationY(startOffset);
+        view.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(140)
+                .start();
+    }
+
+    private void loadDeadlineEntries(Runnable onLoaded) {
+        final int request = ++deadlineLoadGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            CalendarLoadData loaded;
+            try {
+                worker.open();
+                List<Entry> entries = worker.getEntriesWithDeadlines();
+                Map<Integer, Integer> projectColors = new HashMap<>();
+                for (Project project : worker.getAllProjects()) {
+                    projectColors.put(project.getId(), project.getColor() != 0
+                            ? project.getColor() : defaultIndicatorColor);
+                }
+
+                Map<Long, List<Integer>> indicators = new HashMap<>();
+                for (Entry entry : entries) {
+                    long day = dayKey(entry.getDeadline());
+                    List<Integer> colors = indicators.get(day);
+                    if (colors == null) {
+                        colors = new ArrayList<>(3);
+                        indicators.put(day, colors);
+                    }
+                    if (colors.size() < 3) {
+                        Integer projectColor = projectColors.get(entry.getProjectId());
+                        colors.add(projectColor != null ? projectColor : defaultIndicatorColor);
+                    }
+                }
+                loaded = new CalendarLoadData(entries, indicators);
+            }
+            finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != deadlineLoadGeneration) return;
+                deadlineEntries = loaded.entries;
+                indicatorColorsByDay = loaded.indicatorColors;
+                onLoaded.run();
+            });
+        });
+    }
+
+    private static long dayKey(long timeInMillis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMillis);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+
+    private static final class CalendarLoadData {
+        final List<Entry> entries;
+        final Map<Long, List<Integer>> indicatorColors;
+
+        CalendarLoadData(List<Entry> entries, Map<Long, List<Integer>> indicatorColors) {
+            this.entries = entries;
+            this.indicatorColors = indicatorColors;
+        }
     }
 
     private void loadEntriesForSelectedDate() {
@@ -252,7 +385,31 @@ public class FutureLogFragment extends Fragment {
     }
 
     private void reloadVisibleEntries() {
-        showAgendaForSelectedDate();
+        refreshCalendarData();
+    }
+
+    private void refreshCalendarData() {
+        loadDeadlineEntries(() -> {
+            if (agendaContainer != null && agendaContainer.getVisibility() == View.VISIBLE) {
+                renderAgendaForSelectedDate();
+            } else {
+                renderMonth();
+            }
+        });
+    }
+
+    /** Refreshes cached indicators after Calendar becomes visible again. */
+    public void refreshAfterNavigation() {
+        if (deadlineEntries != null) {
+            refreshCalendarData();
+        }
+    }
+
+    /** Refreshes the visible agenda or month after saving through the task editor. */
+    public void refreshFromTaskEditor() {
+        if (isAdded() && deadlineEntries != null) {
+            refreshCalendarData();
+        }
     }
 
     private long startOfDay(Calendar calendar) {
@@ -336,13 +493,8 @@ public class FutureLogFragment extends Fragment {
             }
 
             convertView.setOnClickListener(v -> {
-                if (getFragmentManager() != null && entry != null) {
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                    ft.replace(R.id.fragment_container, EditTaskFragment.newInstance(entry.getId()));
-                    ft.addToBackStack(null);
-                    ft.commit();
-                }
+                if (getActivity() instanceof MainActivity && entry != null)
+                    ((MainActivity) getActivity()).pushFragment(EditTaskFragment.newInstance(entry.getId()));
             });
 
             return convertView;
@@ -356,6 +508,11 @@ public class FutureLogFragment extends Fragment {
 
         MonthAdapter(Context context, Calendar source) {
             this.context = context;
+            setMonth(source);
+        }
+
+        void setMonth(Calendar source) {
+            days.clear();
             Calendar month = (Calendar) source.clone();
             month.set(Calendar.DAY_OF_MONTH, 1);
             month.set(Calendar.HOUR_OF_DAY, 12);
@@ -371,8 +528,10 @@ public class FutureLogFragment extends Fragment {
             }
         }
 
-        public void setCellHeight(int cellHeight) {
+        public boolean setCellHeight(int cellHeight) {
+            if (this.cellHeight == cellHeight) return false;
             this.cellHeight = cellHeight;
+            return true;
         }
 
         @Override public int getCount() { return days.size(); }
@@ -420,60 +579,55 @@ public class FutureLogFragment extends Fragment {
     private View bindDayView(Context context, Calendar date, View convertView, boolean muted) {
         if (convertView == null) {
             convertView = LayoutInflater.from(context).inflate(R.layout.item_calendar_day, null, false);
+            DayViewHolder holder = new DayViewHolder();
+            holder.number = (TextView) convertView.findViewById(R.id.tv_day_number);
+            LinearLayout dots = (LinearLayout) convertView.findViewById(R.id.layout_dots);
+            for (int i = 0; i < 3; i++) {
+                View indicator = new View(context);
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(indicatorSizePx, indicatorSizePx);
+                params.setMargins(0, indicatorMarginPx, 0, indicatorMarginPx);
+                indicator.setLayoutParams(params);
+                indicator.setVisibility(View.GONE);
+                dots.addView(indicator);
+                holder.indicators[i] = indicator;
+            }
+            convertView.setTag(holder);
         }
-        TextView number = (TextView) convertView.findViewById(R.id.tv_day_number);
-        ViewGroup dots = (ViewGroup) convertView.findViewById(R.id.layout_dots);
-        dots.removeAllViews();
+        DayViewHolder holder = (DayViewHolder) convertView.getTag();
+        TextView number = holder.number;
 
         boolean selected = isSameDay(date, selectedDate);
         number.setText(String.valueOf(date.get(Calendar.DAY_OF_MONTH)));
 
         if (selected) {
-            convertView.setBackgroundColor(getResources().getColor(R.color.literal_769a30));
-            number.setTextColor(getResources().getColor(R.color.on_accent));
+            convertView.setBackgroundColor(selectedDayColor);
+            number.setTextColor(selectedDayTextColor);
         } else if (muted) {
-            convertView.setBackgroundColor(getResources().getColor(R.color.bujo_background));
-            number.setTextColor(getResources().getColor(R.color.bujo_text_secondary));
+            convertView.setBackgroundColor(calendarBackgroundColor);
+            number.setTextColor(calendarMutedTextColor);
         } else {
-            convertView.setBackgroundColor(getResources().getColor(R.color.on_accent));
-            number.setTextColor(getResources().getColor(R.color.bujo_text));
+            convertView.setBackgroundColor(selectedDayTextColor);
+            number.setTextColor(calendarTextColor);
         }
 
-        long start = startOfDay(date);
-        long end = endOfDay(date);
-        List<Entry> dayEntries = new ArrayList<>();
-        if (deadlineEntries != null) {
-            for (Entry entry : deadlineEntries) {
-                if (entry.getDeadline() >= start && entry.getDeadline() <= end) {
-                    dayEntries.add(entry);
-                }
+        List<Integer> colors = indicatorColorsByDay.get(startOfDay(date));
+        int indicatorCount = colors == null ? 0 : colors.size();
+        for (int i = 0; i < holder.indicators.length; i++) {
+            View indicator = holder.indicators[i];
+            if (i < indicatorCount) {
+                indicator.setVisibility(View.VISIBLE);
+                indicator.setBackgroundColor(selected ? selectedDayTextColor : colors.get(i));
+            } else {
+                indicator.setVisibility(View.GONE);
             }
         }
 
-        List<Project> allProjects = dbManager != null ? dbManager.getAllProjects() : new ArrayList<>();
-        Map<Integer, Integer> projectColorMap = new HashMap<>();
-        for (Project p : allProjects) {
-            projectColorMap.put(p.getId(), p.getColor() != 0 ? p.getColor() : getResources().getColor(R.color.bb10_blue));
-        }
-
-        int maxIndicators = Math.min(dayEntries.size(), 3);
-        int squarePx = (int) (5 * getResources().getDisplayMetrics().density);
-        int marginPx = (int) (1.5f * getResources().getDisplayMetrics().density);
-
-        for (int i = 0; i < maxIndicators; i++) {
-            Entry e = dayEntries.get(i);
-            View square = new View(context);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(squarePx, squarePx);
-            lp.setMargins(0, marginPx, 0, marginPx);
-            square.setLayoutParams(lp);
-
-            Integer mappedColor = projectColorMap.get(e.getProjectId());
-            int color = (mappedColor != null) ? mappedColor : getResources().getColor(R.color.bb10_blue);
-            square.setBackgroundColor(selected ? getResources().getColor(R.color.on_accent) : color);
-            dots.addView(square);
-        }
-
         return convertView;
+    }
+
+    private static final class DayViewHolder {
+        TextView number;
+        final View[] indicators = new View[3];
     }
 
     @Override

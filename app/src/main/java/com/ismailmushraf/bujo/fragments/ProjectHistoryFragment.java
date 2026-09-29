@@ -112,6 +112,13 @@ public class ProjectHistoryFragment extends Fragment {
         listView.setAdapter(adapter);
     }
 
+    /** Refreshes completed tasks after returning from the task editor. */
+    public void refreshFromTaskEditor() {
+        if (isAdded() && dbManager != null) {
+            loadEntries();
+        }
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();

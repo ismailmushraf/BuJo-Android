@@ -34,6 +34,7 @@ import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.WorkoutSet;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +62,18 @@ public class WorkoutFragment extends Fragment {
     // Reusable adapter to prevent GC pressure
     private ArrayAdapter<String> autoAdapter;
     private List<String> suggestionsList = new ArrayList<>();
+    private int refreshGeneration;
+
+    private static final class WorkoutLoadData {
+        final long sessionDuration;
+        final List<String> exercises;
+        final List<Object> workouts;
+        WorkoutLoadData(long sessionDuration, List<String> exercises, List<Object> workouts) {
+            this.sessionDuration = sessionDuration;
+            this.exercises = exercises;
+            this.workouts = workouts;
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,8 +108,7 @@ public class WorkoutFragment extends Fragment {
         etReps = headerView.findViewById(R.id.et_reps);
         etNote = headerView.findViewById(R.id.et_note);
 
-        accumulatedTime = dbManager.getSessionDuration(todayStr);
-        chronometer.setBase(SystemClock.elapsedRealtime() - accumulatedTime);
+        chronometer.setBase(SystemClock.elapsedRealtime());
 
         // The header's focus anchor prevents the keyboard opening automatically;
         // leave the input focusable for keyboard and accessibility navigation.
@@ -256,14 +268,30 @@ public class WorkoutFragment extends Fragment {
     }
 
     private void refreshUI() {
-        suggestionsList.clear();
-        suggestionsList.addAll(dbManager.getUniqueExerciseNames());
-        
-        autoAdapter.notifyDataSetChanged();
-
-        todayItems.clear();
-        todayItems.addAll(dbManager.getGroupedDailyWorkouts(todayStr));
-        listAdapter.notifyDataSetChanged();
+        final int request = ++refreshGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            WorkoutLoadData loaded;
+            try {
+                worker.open();
+                loaded = new WorkoutLoadData(worker.getSessionDuration(todayStr),
+                        worker.getUniqueExerciseNames(), worker.getGroupedDailyWorkouts(todayStr));
+            } finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != refreshGeneration) return;
+                if (!isTracking) {
+                    accumulatedTime = loaded.sessionDuration;
+                    chronometer.setBase(SystemClock.elapsedRealtime() - accumulatedTime);
+                }
+                suggestionsList.clear();
+                suggestionsList.addAll(loaded.exercises);
+                autoAdapter.notifyDataSetChanged();
+                todayItems.clear();
+                todayItems.addAll(loaded.workouts);
+                listAdapter.notifyDataSetChanged();
+            });
+        });
     }
 
     private void triggerPRAnimation() {

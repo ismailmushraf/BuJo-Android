@@ -142,6 +142,12 @@ public class EditProjectFragment extends Fragment {
 
                 if (getActivity() instanceof MainActivity) {
                     ((MainActivity) getActivity()).refreshDrawer();
+                    ((MainActivity) getActivity()).refreshProjectCounts();
+                }
+                for (Fragment fragment : getParentFragmentManager().getFragments()) {
+                    if (fragment instanceof ProjectDetailFragment) {
+                        ((ProjectDetailFragment) fragment).refreshFromProjectEditor();
+                    }
                 }
 
                 if (getFragmentManager() != null) {

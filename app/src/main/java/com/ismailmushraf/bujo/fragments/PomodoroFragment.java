@@ -22,6 +22,7 @@ import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.services.PomodoroService;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -94,18 +95,29 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
     }
 
     private void setupTaskSpinner() {
-        List<Entry> tasks = dbManager.getTodayEntries();
-        List<String> taskNames = new ArrayList<>();
-        taskNames.add("General Focus Session");
-        for (Entry e : tasks) {
-            if (!e.isCompleted() && "*".equals(e.getSignifier())) {
-                taskNames.add(e.getContent());
-            }
-        }
-        if (getActivity() != null) {
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, taskNames);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerTasks.setAdapter(adapter);
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            DatabaseManager worker = new DatabaseManager(context);
+            List<String> taskNames = new ArrayList<>();
+            taskNames.add("General Focus Session");
+            try {
+                worker.open();
+                for (Entry e : worker.getTodayEntries())
+                    if (!e.isCompleted() && "*".equals(e.getSignifier())) taskNames.add(e.getContent());
+            } finally { worker.close(); }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || getActivity() == null) return;
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, taskNames);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerTasks.setAdapter(adapter);
+            });
+        });
+    }
+
+    /** Reloads today's tasks when this cached root screen becomes visible. */
+    public void refreshTasksAfterNavigation() {
+        if (isAdded() && spinnerTasks != null) {
+            setupTaskSpinner();
         }
     }
 

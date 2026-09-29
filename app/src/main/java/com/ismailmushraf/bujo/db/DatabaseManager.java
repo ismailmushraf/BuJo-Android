@@ -1005,7 +1005,7 @@ public class DatabaseManager {
 
     public int calculatePenalty(Entry entry) {
         if (entry.getParentId() != 0 || !"*".equals(entry.getSignifier())) return 0;
-        // Total audit penalty is 10 (Commitment 5 + Extra 5)
+        // A missed top-level task costs five task points.
         return 5;
     }
 
@@ -1038,9 +1038,8 @@ public class DatabaseManager {
                             Entry e = new Entry();
                             e.setSignifier("*");
                             e.setProjectId(c.getInt(projIdx));
-                            int commitment = calculateCommitmentReward(e);
                             int penalty = calculatePenalty(e);
-                            result.totalPenalty += (commitment + penalty);
+                            result.totalPenalty += penalty;
                             result.missedTasks++;
                         } while (c.moveToNext());
 
