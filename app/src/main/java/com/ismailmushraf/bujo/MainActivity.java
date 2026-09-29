@@ -654,6 +654,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Refreshes every cached screen whose content is derived from tasks. */
+    public void refreshTaskSurfaces() {
+        refreshTodayEntries();
+        refreshProjectCounts();
+
+        Fragment calendar = getSupportFragmentManager().findFragmentByTag("root_calendar");
+        if (calendar instanceof FutureLogFragment) {
+            ((FutureLogFragment) calendar).refreshFromTaskEditor();
+        }
+        Fragment logbook = getSupportFragmentManager().findFragmentByTag("root_logbook");
+        if (logbook instanceof MigratedItemsFragment) {
+            ((MigratedItemsFragment) logbook).refreshAfterNavigation();
+        }
+        Fragment pomodoro = getSupportFragmentManager().findFragmentByTag("root_pomodoro");
+        if (pomodoro instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment) {
+            ((com.ismailmushraf.bujo.fragments.PomodoroFragment) pomodoro).refreshTasksAfterNavigation();
+        }
+    }
+
     private Fragment getVisibleFragment() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {
             if (fragment.getId() == R.id.fragment_container && fragment.isVisible()) return fragment;

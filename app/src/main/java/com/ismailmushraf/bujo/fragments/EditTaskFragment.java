@@ -726,7 +726,7 @@ public class EditTaskFragment extends Fragment {
 
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).refreshDrawer();
-            ((MainActivity) getActivity()).refreshProjectCounts();
+            ((MainActivity) getActivity()).refreshTaskSurfaces();
         }
 
         Fragment today = getParentFragmentManager().findFragmentByTag("root_today");

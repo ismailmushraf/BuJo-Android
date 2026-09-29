@@ -155,7 +155,7 @@ public class EntryUIHelper {
                     dbManager.updateEntry(entry);
 
                     if (context instanceof com.ismailmushraf.bujo.MainActivity) {
-                        ((com.ismailmushraf.bujo.MainActivity) context).refreshTodayEntries();
+                        ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
                     }
 
                     boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
@@ -183,7 +183,7 @@ public class EntryUIHelper {
                     ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-pointsDeducted, sourceView);
                 }
                 if (context instanceof com.ismailmushraf.bujo.MainActivity) {
-                    ((com.ismailmushraf.bujo.MainActivity) context).refreshProjectCounts();
+                    ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
                 }
                 if (listener != null) listener.onEntryUpdated();
             });
@@ -278,7 +278,7 @@ public class EntryUIHelper {
 
         if (context instanceof com.ismailmushraf.bujo.MainActivity) {
             ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(appliedPoints, sourceView);
-            ((com.ismailmushraf.bujo.MainActivity) context).refreshProjectCounts();
+            ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
         }
 
         if (listener != null) {
@@ -351,6 +351,9 @@ public class EntryUIHelper {
                             event.setProjectTag(projectTag);
                             event.setCreatedAt(System.currentTimeMillis());
                             dbManager.insertEntry(event);
+                            if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                                ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
+                            }
                             if (listener != null) listener.onEntryUpdated();
                         }
                     }

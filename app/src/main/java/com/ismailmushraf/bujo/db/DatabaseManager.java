@@ -93,6 +93,9 @@ public class DatabaseManager {
         values.put(DatabaseHelper.COLUMN_PARENT_ID, entry.getParentId());
         values.put(DatabaseHelper.COLUMN_IS_AUDITED, entry.isAudited() ? 1 : 0);
         values.put(DatabaseHelper.COLUMN_IS_LOCKED, entry.isLockedManually() ? 1 : 0);
+        if (entry.getCreatedAt() > 0) {
+            values.put(DatabaseHelper.COLUMN_CREATED_AT, entry.getCreatedAt());
+        }
 
         int pointsDelta = 0;
         Cursor c = database.query(DatabaseHelper.TABLE_ENTRIES,

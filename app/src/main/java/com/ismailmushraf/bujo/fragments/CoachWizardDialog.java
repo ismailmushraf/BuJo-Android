@@ -34,13 +34,16 @@ public final class CoachWizardDialog extends DialogFragment {
         root = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_coach_wizard, null);
         Dialog d = new android.app.AlertDialog.Builder(requireContext(), R.style.BujoDialog).setView(root).create();
 
-        root.findViewById(R.id.coach_wizard_cancel).setOnClickListener(v -> dismiss());
-        root.findViewById(R.id.coach_wizard_next).setOnClickListener(v -> next());
-        root.findViewById(R.id.coach_wizard_back).setOnClickListener(v -> {
+        root.findViewById(R.id.coach_wizard_cancel_step1).setOnClickListener(v -> dismiss());
+        root.findViewById(R.id.coach_wizard_cancel_step2).setOnClickListener(v -> dismiss());
+        root.findViewById(R.id.coach_wizard_cancel_step3).setOnClickListener(v -> dismiss());
+        root.findViewById(R.id.coach_wizard_next_step1).setOnClickListener(v -> next());
+        root.findViewById(R.id.coach_wizard_next_step2).setOnClickListener(v -> next());
+        root.findViewById(R.id.coach_wizard_back_step2).setOnClickListener(v -> {
             step--;
             render();
         });
-        root.findViewById(R.id.coach_wizard_add).setOnClickListener(v -> addSelected());
+        root.findViewById(R.id.coach_wizard_add_step3).setOnClickListener(v -> addSelected());
 
         root.findViewById(R.id.coach_refine_simpler).setOnClickListener(v -> refine("Focus on simpler, shorter tasks under 10 minutes."));
         root.findViewById(R.id.coach_refine_work).setOnClickListener(v -> refine("Prioritize work project tasks."));
@@ -138,7 +141,7 @@ public final class CoachWizardDialog extends DialogFragment {
             TextView status = root.findViewById(R.id.coach_wizard_status);
             status.setText(refinementNote != null ? R.string.coach_refining : R.string.coach_working);
             status.setVisibility(View.VISIBLE);
-            root.findViewById(R.id.coach_wizard_next).setEnabled(false);
+            root.findViewById(R.id.coach_wizard_next_step2).setEnabled(false);
             setRefineButtonsEnabled(false);
         } catch (Exception e) {
             error();
@@ -170,7 +173,7 @@ public final class CoachWizardDialog extends DialogFragment {
         TextView status = root.findViewById(R.id.coach_wizard_status);
         status.setText(CoachEngine.get(requireContext()).notice());
         status.setVisibility(View.VISIBLE);
-        root.findViewById(R.id.coach_wizard_next).setEnabled(true);
+        root.findViewById(R.id.coach_wizard_next_step2).setEnabled(true);
         setRefineButtonsEnabled(true);
     }
 
@@ -286,9 +289,9 @@ public final class CoachWizardDialog extends DialogFragment {
         } finally {
             db.close();
         }
-        androidx.fragment.app.Fragment active = getParentFragmentManager().findFragmentById(R.id.fragment_container);
-        if (active instanceof DailyLogFragment)
-            ((DailyLogFragment) active).refreshFromCoach();
+        if (getActivity() instanceof com.ismailmushraf.bujo.MainActivity) {
+            ((com.ismailmushraf.bujo.MainActivity) getActivity()).refreshTaskSurfaces();
+        }
         Toast.makeText(requireContext(), getString(R.string.coach_toast_added, count), Toast.LENGTH_SHORT).show();
         dismiss();
     }
@@ -308,16 +311,9 @@ public final class CoachWizardDialog extends DialogFragment {
             root.findViewById(ids[i]).setVisibility(i == step ? View.VISIBLE : View.GONE);
         }
 
-        boolean showBack = step == 1;
-        boolean showNext = step < 2;
-        boolean showAdd = step == 2;
-
-        root.findViewById(R.id.coach_wizard_back).setVisibility(showBack ? View.VISIBLE : View.GONE);
-        root.findViewById(R.id.coach_wizard_next).setVisibility(showNext ? View.VISIBLE : View.GONE);
-        root.findViewById(R.id.coach_wizard_add).setVisibility(showAdd ? View.VISIBLE : View.GONE);
-        root.findViewById(R.id.coach_wizard_divider_after_cancel).setVisibility((showBack || showNext || showAdd) ? View.VISIBLE : View.GONE);
-        root.findViewById(R.id.coach_wizard_divider_after_back).setVisibility(showBack && showNext ? View.VISIBLE : View.GONE);
-        root.findViewById(R.id.coach_wizard_divider_after_next).setVisibility(View.GONE);
+        root.findViewById(R.id.coach_footer_step1).setVisibility(step == 0 ? View.VISIBLE : View.GONE);
+        root.findViewById(R.id.coach_footer_step2).setVisibility(step == 1 ? View.VISIBLE : View.GONE);
+        root.findViewById(R.id.coach_footer_step3).setVisibility(step == 2 ? View.VISIBLE : View.GONE);
     }
 
     @Override

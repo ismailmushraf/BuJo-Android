@@ -229,7 +229,7 @@ public class ProjectDetailFragment extends Fragment {
                 long insertedId = dbManager.insertEntry(newEntry);
 
                 if (insertedId != -1 && getActivity() instanceof MainActivity) {
-                    ((MainActivity) getActivity()).refreshProjectCounts();
+                    ((MainActivity) getActivity()).refreshTaskSurfaces();
                     int commitment = dbManager.calculateCommitmentReward(newEntry);
                     if (commitment > 0) {
                         ((MainActivity) getActivity()).animatePointsChange(commitment, sourceView);
@@ -328,7 +328,7 @@ public class ProjectDetailFragment extends Fragment {
                         dbManager.deleteProjectAndAllEntries(projectId);
                         if (getActivity() instanceof MainActivity) {
                             ((MainActivity) getActivity()).refreshDrawer();
-                            ((MainActivity) getActivity()).refreshProjectCounts();
+                            ((MainActivity) getActivity()).refreshTaskSurfaces();
                         }
                         if (getFragmentManager() != null) {
                             getFragmentManager().popBackStack();

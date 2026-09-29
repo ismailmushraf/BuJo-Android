@@ -210,7 +210,7 @@ public class DailyLogFragment extends Fragment {
             }
             loadEntries();
             if (getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).refreshProjectCounts();
+                ((MainActivity) getActivity()).refreshTaskSurfaces();
             }
 
             if (totalCommitment > 0 && getActivity() instanceof MainActivity) {
@@ -259,7 +259,7 @@ public class DailyLogFragment extends Fragment {
             long insertedId = dbManager.insertEntry(newEntry);
             
             if (insertedId != -1 && getActivity() instanceof MainActivity) {
-                ((MainActivity) getActivity()).refreshProjectCounts();
+                ((MainActivity) getActivity()).refreshTaskSurfaces();
                 int commitment = dbManager.calculateCommitmentReward(newEntry);
                 if (commitment > 0) {
                     ((MainActivity) getActivity()).animatePointsChange(commitment, etNewEntry);

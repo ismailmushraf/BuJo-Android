@@ -32,8 +32,9 @@ public class Entry {
         if (isLockedManually) return true;
         
         if ("*".equals(signifier) && !isMigrated) {
-            // Overdue tasks and future tasks are NEVER locked automatically
-            if (isOverdue() || isFuture()) {
+            // Only a task explicitly scheduled for Today can lock automatically.
+            // Inbox/no-date tasks, overdue tasks, and future tasks remain editable.
+            if (deadline <= 0 || isOverdue() || isFuture()) {
                 return false;
             }
             // Tasks scheduled for Today lock after 3 hours
