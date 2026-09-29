@@ -103,7 +103,7 @@
                     android:button="@null"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_low" />
 
@@ -118,7 +118,7 @@
                     android:gravity="center"
                     android:checked="true"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_ok" />
 
@@ -131,7 +131,7 @@
                     android:button="@null"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_good" />
             </RadioGroup>
@@ -159,7 +159,7 @@
                     android:button="@null"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_low" />
 
@@ -174,7 +174,7 @@
                     android:gravity="center"
                     android:checked="true"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_med" />
 
@@ -187,7 +187,7 @@
                     android:button="@null"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
-                    android:textColor="@color/selector_chip_text"
+                    android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_high" />
             </RadioGroup>

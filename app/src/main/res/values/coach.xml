@@ -114,6 +114,21 @@
     <string name="coach_refine_low_effort">Low effort</string>
     <string name="coach_refinement_applied">Plan updated with your feedback!</string>
     <string name="coach_refining">Refining guidance with your feedback…</string>
+
+    <!-- Phase 2 additions -->
+    <string name="coach_vibe_section">COACH VIBE</string>
+    <string name="coach_vibe_label">Coach personality vibe</string>
+    <string name="coach_toast_added">%1$d focus task(s) added to Today! You\'ve got this! High five!</string>
+    <string-array name="coach_vibe_labels">
+        <item>Cheerful Cheerleader</item>
+        <item>Direct &amp; Laser-Focused</item>
+        <item>Mindful &amp; Gentle</item>
+    </string-array>
+    <string-array name="coach_vibe_keys">
+        <item>cheerful</item>
+        <item>direct</item>
+        <item>mindful</item>
+    </string-array>
     <string-array name="coach_kinds">
         <item>Morning planning</item>
         <item>Progress check-in</item>

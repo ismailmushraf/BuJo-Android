@@ -199,6 +199,21 @@ public class SettingsFragment extends Fragment {
         final SharedPreferences coachPrefs=CoachPreferences.get(requireContext());
         EditText key=root.findViewById(R.id.coach_api_key), model=root.findViewById(R.id.coach_model);
         EditText start=root.findViewById(R.id.coach_start), end=root.findViewById(R.id.coach_end);
+        Spinner vibeSpinner = root.findViewById(R.id.coach_vibe);
+        if (vibeSpinner != null) {
+            ArrayAdapter<CharSequence> vibeAdapter = ArrayAdapter.createFromResource(requireContext(),
+                    R.array.coach_vibe_labels, android.R.layout.simple_spinner_item);
+            vibeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            vibeSpinner.setAdapter(vibeAdapter);
+            String currentVibe = CoachPreferences.vibe(requireContext());
+            String[] vibeKeys = getResources().getStringArray(R.array.coach_vibe_keys);
+            for (int i = 0; i < vibeKeys.length; i++) {
+                if (vibeKeys[i].equals(currentVibe)) {
+                    vibeSpinner.setSelection(i);
+                    break;
+                }
+            }
+        }
         key.setText(coachPrefs.getString("key", ""));
         key.setTransformationMethod(android.text.method.PasswordTransformationMethod.getInstance());
         model.setText(CoachPreferences.model(requireContext())); start.setText(String.valueOf(coachPrefs.getInt("start",8))); end.setText(String.valueOf(coachPrefs.getInt("end",20)));
@@ -209,7 +224,23 @@ public class SettingsFragment extends Fragment {
             if(!CoachApiKey.valid(clean)){ key.setError(getString(R.string.coach_invalid_key)); return; }
             String selectedModel=model.getText().toString().trim();
             if(!CoachPreferences.validModel(selectedModel)){ model.setError("Enter a valid Gemini model ID."); return; }
-            try { int from=Integer.parseInt(start.getText().toString()), to=Integer.parseInt(end.getText().toString()); if(from<0||to>23||from>=to) throw new IllegalArgumentException(); SharedPreferences.Editor edit=coachPrefs.edit().putString("key",clean).putString("model",selectedModel).putInt("start",from).putInt("end",to).remove("snooze"); for(int i=0;i<ids.length;i++) edit.putBoolean(names[i],((CheckBox)root.findViewById(ids[i])).isChecked()); edit.apply(); key.setText(clean); CoachScheduler.schedule(requireContext()); setCoachStatus(root,getString(R.string.coach_saved)); } catch(Exception error) { end.setError(getString(R.string.coach_invalid_settings)); }
+            try {
+                int from=Integer.parseInt(start.getText().toString()), to=Integer.parseInt(end.getText().toString());
+                if(from<0||to>23||from>=to) throw new IllegalArgumentException();
+                SharedPreferences.Editor edit=coachPrefs.edit().putString("key",clean).putString("model",selectedModel).putInt("start",from).putInt("end",to).remove("snooze");
+                if (vibeSpinner != null) {
+                    String[] vibeKeys = getResources().getStringArray(R.array.coach_vibe_keys);
+                    int pos = vibeSpinner.getSelectedItemPosition();
+                    if (pos >= 0 && pos < vibeKeys.length) {
+                        edit.putString("vibe", vibeKeys[pos]);
+                    }
+                }
+                for(int i=0;i<ids.length;i++) edit.putBoolean(names[i],((CheckBox)root.findViewById(ids[i])).isChecked());
+                edit.apply();
+                key.setText(clean);
+                CoachScheduler.schedule(requireContext());
+                setCoachStatus(root,getString(R.string.coach_saved));
+            } catch(Exception error) { end.setError(getString(R.string.coach_invalid_settings)); }
         };
         root.findViewById(R.id.coach_save_settings).setOnClickListener(save);
         root.findViewById(R.id.coach_test).setOnClickListener(v -> {

@@ -163,29 +163,67 @@ public final class CoachEngine {
                 }
             }
             if(prefs.getBoolean("share_habits",false)) {
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.DATE, -7);
+                String sevenDaysAgo = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(c.getTime());
                 for(Habit habit:db.getAllHabits()) {
                     if(habits.length()>=20 || habit.getStartDate().compareTo(today())>0) continue;
+                    Map<String, Boolean> compMap = db.getHabitCompletionMap(habit.getId(), sevenDaysAgo, today());
+                    int recent7Completed = 0;
+                    for (Boolean b : compMap.values()) {
+                        if (Boolean.TRUE.equals(b)) recent7Completed++;
+                    }
                     habits.put(new JSONObject().put("name",clip(habit.getName(),200))
-                            .put("completed",Boolean.TRUE.equals(db.getHabitCompletionMap(habit.getId(),today(),today()).get(today()))));
+                            .put("completed_today", Boolean.TRUE.equals(compMap.get(today())))
+                            .put("recent_7_days_completed", recent7Completed)
+                            .put("total_completions", db.getHabitTotalCompletions(habit.getId())));
                 }
             }
         } finally { db.close(); }
+        Calendar yCal = Calendar.getInstance();
+        yCal.add(Calendar.DATE, -1);
+        String yesterdayStr = new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(yCal.getTime());
+        snapshot.put("yesterday", yesterdayStr);
+        snapshot.put("coach_vibe", CoachPreferences.vibe(context));
         return snapshot.put("tasks",tasks).put("habits",habits).put("projects",projects);
     }
     private JSONObject localAnswer(JSONObject snapshot) throws JSONException {
         boolean rest=snapshot.optInt("available_minutes",0)==0;
+        int mins=snapshot.optInt("available_minutes",30);
         JSONArray suggestions=new JSONArray();
         if(!rest) {
             JSONArray projects=snapshot.optJSONArray("projects");
-            if(projects!=null) for(int i=0;i<projects.length() && suggestions.length()<3;i++) {
-                JSONObject project=projects.getJSONObject(i);
-                suggestions.put(new JSONObject().put("title","Take one small next step for "+project.getString("name"))
-                        .put("project_id",project.getInt("id"))
-                        .put("reason","Offline suggestion based on this project’s priority."));
+            if(projects!=null && projects.length()>0) {
+                List<JSONObject> selected=new ArrayList<>();
+                Set<Integer> representedWeights=new HashSet<>();
+                // Cover each priority level first, then fill any remaining slots by priority.
+                for(int i=0;i<projects.length() && selected.size()<5;i++) {
+                    JSONObject project=projects.getJSONObject(i);
+                    if(representedWeights.add(project.optInt("priority_weight",1))) selected.add(project);
+                }
+                for(int i=0;i<projects.length() && selected.size()<5;i++) {
+                    JSONObject project=projects.getJSONObject(i);
+                    if(!selected.contains(project)) selected.add(project);
+                }
+                int count=Math.min(selected.size(), Math.max(1, mins));
+                int totalWeight=0;
+                for(int i=0;i<count;i++) totalWeight+=Math.max(1,selected.get(i).optInt("priority_weight",1));
+                int remaining=mins;
+                for(int i=0;i<count;i++) {
+                    JSONObject project=selected.get(i);
+                    int slotsLeft=count-i-1;
+                    int allocation=i==count-1 ? remaining : Math.max(1,
+                            Math.min(remaining-slotsLeft, Math.round((float)mins*Math.max(1,project.optInt("priority_weight",1))/totalWeight)));
+                    remaining-=allocation;
+                    suggestions.put(new JSONObject().put("title","Take one meaningful next step for "+project.getString("name"))
+                            .put("project_id",project.getInt("id")).put("estimated_minutes",allocation)
+                            .put("reason","Offline suggestion balanced by this project’s priority."));
+                }
             }
             if(suggestions.length()==0) suggestions.put(new JSONObject()
                     .put("title","Write down the smallest next action for today")
-                    .put("project_id",0).put("reason","A short offline starting point while guidance is unavailable."));
+                    .put("project_id",0).put("estimated_minutes", Math.max(1, mins))
+                    .put("reason","A short offline starting point while guidance is unavailable."));
         }
         return new JSONObject().put("message",context.getString(R.string.coach_local_message))
                 .put("suggestions",suggestions);

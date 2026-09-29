@@ -46,8 +46,33 @@ public final class CoachWizardDialog extends DialogFragment {
         root.findViewById(R.id.coach_refine_work).setOnClickListener(v -> refine("Prioritize work project tasks."));
         root.findViewById(R.id.coach_refine_low_effort).setOnClickListener(v -> refine("Focus on low effort, low energy tasks."));
 
+        bindChipGroupTextColors(root.findViewById(R.id.coach_wizard_mood));
+        bindChipGroupTextColors(root.findViewById(R.id.coach_wizard_energy));
+
         render();
         return d;
+    }
+
+    private void bindChipGroupTextColors(RadioGroup group) {
+        if (group == null) return;
+        int textColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text);
+        group.setOnCheckedChangeListener((g, checkedId) -> {
+            for (int i = 0; i < g.getChildCount(); i++) {
+                View child = g.getChildAt(i);
+                if (child instanceof RadioButton) {
+                    RadioButton rb = (RadioButton) child;
+                    rb.setTextColor(rb.getId() == checkedId ? android.graphics.Color.WHITE : textColor);
+                }
+            }
+        });
+        int initialChecked = group.getCheckedRadioButtonId();
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child instanceof RadioButton) {
+                RadioButton rb = (RadioButton) child;
+                rb.setTextColor(rb.getId() == initialChecked ? android.graphics.Color.WHITE : textColor);
+            }
+        }
     }
 
     private void next() {
@@ -155,12 +180,15 @@ public final class CoachWizardDialog extends DialogFragment {
         LinearLayout list = root.findViewById(R.id.coach_wizard_suggestions);
         list.removeAllViews();
         Map<Integer, String> names = projects();
-        int estMinutes = (!suggestions.isEmpty() && minutes > 0) ? Math.max(5, minutes / suggestions.size()) : 15;
-        String effortLabel = "⏱️ ~" + estMinutes + "m";
 
         for (JSONObject item : suggestions) {
             View row = LayoutInflater.from(requireContext()).inflate(R.layout.item_coach_suggestion, list, false);
             int id = item.optInt("project_id");
+            int taskEst = item.optInt("estimated_minutes", 0);
+            if (taskEst <= 0) {
+                taskEst = (!suggestions.isEmpty() && minutes > 0) ? Math.max(5, minutes / suggestions.size()) : 15;
+            }
+            String effortLabel = "⏱️ ~" + taskEst + "m";
             ((TextView) row.findViewById(R.id.coach_suggestion_title)).setText(item.optString("title"));
             ((TextView) row.findViewById(R.id.coach_suggestion_project)).setText(id == 0 ? "GENERAL" : "PROJECT · " + names.get(id));
             ((TextView) row.findViewById(R.id.coach_suggestion_effort)).setText(effortLabel);
@@ -259,7 +287,7 @@ public final class CoachWizardDialog extends DialogFragment {
         androidx.fragment.app.Fragment active = getParentFragmentManager().findFragmentById(R.id.fragment_container);
         if (active instanceof DailyLogFragment)
             ((DailyLogFragment) active).refreshFromCoach();
-        Toast.makeText(requireContext(), count + " task" + (count == 1 ? "" : "s") + " added to Today", Toast.LENGTH_SHORT).show();
+        Toast.makeText(requireContext(), getString(R.string.coach_toast_added, count), Toast.LENGTH_SHORT).show();
         dismiss();
     }
 

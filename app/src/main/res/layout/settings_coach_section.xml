@@ -47,6 +47,33 @@
             android:textSize="12sp" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bb10_section_header_bg"
+        android:padding="6dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/coach_vibe_section"
+        android:textColor="@color/bb10_section_header_text"
+        android:textSize="11sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/bb10_bottom_bar_bg"
+        android:padding="8dp">
+
+        <Spinner
+            android:id="@+id/coach_vibe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
+    </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="46dp"
@@ -254,8 +281,8 @@
             style="@style/Widget.BuJo.Button.Compact"
             android:id="@+id/coach_forget"
             android:layout_width="0dp"
-            android:layout_marginStart="4dp"
             android:layout_height="24dp"
+            android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:background="@drawable/shape_bb10_compact_button"
             android:clickable="true"
