@@ -86,7 +86,7 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <RadioGroup
+            <LinearLayout
                 android:id="@+id/coach_wizard_mood"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -94,47 +94,49 @@
                 android:layout_marginTop="6dp"
                 android:layout_marginBottom="16dp">
 
-                <RadioButton
+                <TextView
                     android:id="@+id/mood_low"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_low" />
 
-                <RadioButton
+                <TextView
                     android:id="@+id/mood_ok"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginStart="2dp"
                     android:layout_marginEnd="2dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
-                    android:checked="true"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_ok" />
 
-                <RadioButton
+                <TextView
                     android:id="@+id/mood_good"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_mood_good" />
-            </RadioGroup>
+            </LinearLayout>
 
             <TextView
                 style="@style/CoachText"
@@ -143,54 +145,56 @@
                 android:textSize="11sp"
                 android:textStyle="bold" />
 
-            <RadioGroup
+            <LinearLayout
                 android:id="@+id/coach_wizard_energy"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginTop="6dp">
 
-                <RadioButton
+                <TextView
                     android:id="@+id/energy_low"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginEnd="4dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_low" />
 
-                <RadioButton
+                <TextView
                     android:id="@+id/energy_medium"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginStart="2dp"
                     android:layout_marginEnd="2dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
-                    android:checked="true"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_med" />
 
-                <RadioButton
+                <TextView
                     android:id="@+id/energy_high"
                     android:layout_width="0dp"
                     android:layout_height="36dp"
                     android:layout_weight="1"
                     android:layout_marginStart="4dp"
-                    android:button="@null"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:gravity="center"
                     android:background="@drawable/selector_chip_bg"
                     android:textColor="@color/bujo_text"
                     android:textSize="13sp"
                     android:text="@string/coach_energy_high" />
-            </RadioGroup>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

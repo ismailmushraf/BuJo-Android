@@ -46,32 +46,31 @@ public final class CoachWizardDialog extends DialogFragment {
         root.findViewById(R.id.coach_refine_work).setOnClickListener(v -> refine("Prioritize work project tasks."));
         root.findViewById(R.id.coach_refine_low_effort).setOnClickListener(v -> refine("Focus on low effort, low energy tasks."));
 
-        bindChipGroupTextColors(root.findViewById(R.id.coach_wizard_mood));
-        bindChipGroupTextColors(root.findViewById(R.id.coach_wizard_energy));
+        bindChipGroup(root.findViewById(R.id.coach_wizard_mood), R.id.mood_ok);
+        bindChipGroup(root.findViewById(R.id.coach_wizard_energy), R.id.energy_medium);
 
         render();
         return d;
     }
 
-    private void bindChipGroupTextColors(RadioGroup group) {
+    private void bindChipGroup(LinearLayout group, int defaultSelectedId) {
         if (group == null) return;
-        int textColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text);
-        group.setOnCheckedChangeListener((g, checkedId) -> {
-            for (int i = 0; i < g.getChildCount(); i++) {
-                View child = g.getChildAt(i);
-                if (child instanceof RadioButton) {
-                    RadioButton rb = (RadioButton) child;
-                    rb.setTextColor(rb.getId() == checkedId ? android.graphics.Color.WHITE : textColor);
-                }
-            }
-        });
-        int initialChecked = group.getCheckedRadioButtonId();
+        View initialSelected = group.findViewById(defaultSelectedId);
         for (int i = 0; i < group.getChildCount(); i++) {
             View child = group.getChildAt(i);
-            if (child instanceof RadioButton) {
-                RadioButton rb = (RadioButton) child;
-                rb.setTextColor(rb.getId() == initialChecked ? android.graphics.Color.WHITE : textColor);
-            }
+            child.setOnClickListener(v -> selectChip(group, v));
+        }
+        selectChip(group, initialSelected != null ? initialSelected : group.getChildAt(0));
+    }
+
+    private void selectChip(LinearLayout group, View selected) {
+        int textColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text);
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            boolean isSelected = child == selected;
+            child.setSelected(isSelected);
+            if (child instanceof TextView)
+                ((TextView) child).setTextColor(isSelected ? android.graphics.Color.WHITE : textColor);
         }
     }
 
@@ -157,10 +156,13 @@ public final class CoachWizardDialog extends DialogFragment {
     }
 
     private String choice(int id) {
-        RadioGroup group = root.findViewById(id);
-        int checkedId = group.getCheckedRadioButtonId();
-        RadioButton b = root.findViewById(checkedId);
-        return b != null ? b.getText().toString() : "";
+        LinearLayout group = root.findViewById(id);
+        for (int i = 0; i < group.getChildCount(); i++) {
+            View child = group.getChildAt(i);
+            if (child.isSelected() && child instanceof TextView)
+                return ((TextView) child).getText().toString();
+        }
+        return "";
     }
 
     private void error() {
