@@ -143,7 +143,7 @@ public final class CoachEngine {
         try {
             if(prefs.getBoolean("share_tasks",false)) {
                 for(Entry entry:db.getTodayEntries()) {
-                    if(!"*".equals(entry.getSignifier()) || tasks.length()>=30) continue;
+                    if(tasks.length()>=30) continue;
                     tasks.put(new JSONObject().put("id",entry.getId()).put("text",clip(entry.getContent(),300))
                             .put("completed",entry.isCompleted()).put("locked",entry.isLocked())
                             .put("deadline",entry.getDeadline()));

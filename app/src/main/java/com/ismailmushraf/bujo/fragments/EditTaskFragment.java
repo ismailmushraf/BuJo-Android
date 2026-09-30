@@ -651,7 +651,6 @@ public class EditTaskFragment extends Fragment {
             if (!isCreateMode && entryId > 0) {
                 entry.setId(entryId);
             }
-            entry.setSignifier("*");
             entry.setContent(title);
             entry.setCompleted(isCompleted);
             entry.setProjectId(selectedProjectId);
@@ -695,7 +694,6 @@ public class EditTaskFragment extends Fragment {
                     Entry child = new Entry();
                     child.setId(subItem.id);
                     child.setParentId((int) parentEntryId);
-                    child.setSignifier("*");
                     child.setContent(subContent);
                     child.setCompleted(subItem.isCompleted);
                     child.setProjectId(selectedProjectId);
@@ -704,7 +702,6 @@ public class EditTaskFragment extends Fragment {
                 } else {
                     Entry child = new Entry();
                     child.setParentId((int) parentEntryId);
-                    child.setSignifier("*");
                     child.setContent(subContent);
                     child.setCompleted(subItem.isCompleted);
                     child.setProjectId(selectedProjectId);

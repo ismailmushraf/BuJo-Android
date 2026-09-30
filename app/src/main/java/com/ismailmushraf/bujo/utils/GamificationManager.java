@@ -10,7 +10,7 @@ public class GamificationManager {
 
     public static int calculateCommitmentReward(Entry entry) {
         if (entry == null) return 0;
-        if ("*".equals(entry.getSignifier()) && entry.getDeadline() > 0) {
+        if (entry.getDeadline() > 0) {
             return POINTS_DATE_COMMITMENT;
         }
         return 0;
@@ -18,9 +18,6 @@ public class GamificationManager {
 
     public static int calculateCompletionReward(Entry entry) {
         if (entry == null) return 0;
-        if ("*".equals(entry.getSignifier())) {
-            return POINTS_DATE_COMMITMENT;
-        }
-        return 0;
+        return POINTS_DATE_COMMITMENT;
     }
 }

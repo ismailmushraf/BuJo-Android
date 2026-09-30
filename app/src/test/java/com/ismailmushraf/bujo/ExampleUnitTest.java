@@ -27,6 +27,5 @@ public class ExampleUnitTest {
 
         assertEquals("Project-One", entry.getProjectTag());
         assertEquals("Plan release", entry.getContent());
-        assertEquals("*", entry.getSignifier());
     }
 }

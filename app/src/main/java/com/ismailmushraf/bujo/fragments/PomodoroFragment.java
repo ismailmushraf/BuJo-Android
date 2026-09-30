@@ -103,7 +103,7 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
             try {
                 worker.open();
                 for (Entry e : worker.getTodayEntries())
-                    if (!e.isCompleted() && "*".equals(e.getSignifier())) taskNames.add(e.getContent());
+                    if (!e.isCompleted()) taskNames.add(e.getContent());
             } finally { worker.close(); }
             AppExecutors.getInstance().mainThread().execute(() -> {
                 if (!isAdded() || getActivity() == null) return;

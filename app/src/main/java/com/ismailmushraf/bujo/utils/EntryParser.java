@@ -6,7 +6,6 @@ public class EntryParser {
 
     public static Entry parse(String input) {
         Entry entry = new Entry();
-        String signifier = "*"; // Default to Task
         String content = input.trim();
         String projectTag = null;
 
@@ -20,13 +19,11 @@ public class EntryParser {
             }
         }
 
-        // 2. Identify signifier only for tasks if explicitly typed, but default is now task.
-        // We remove support for '-' and 'o' parsing here as they are no longer handled via the text box.
+        // An optional leading asterisk remains harmless for existing input habits.
         if (content.startsWith("*")) {
             content = content.substring(1).trim();
         }
 
-        entry.setSignifier(signifier);
         entry.setContent(content);
         entry.setProjectTag(projectTag);
         

@@ -2,7 +2,6 @@ package com.ismailmushraf.bujo.models;
 
 public class Entry {
     private int id;
-    private String signifier;    // "*", "-", "o"
     private String content;       // The actual logged text
     private String projectTag;    // Optional project tag (e.g., "ProjectPhoenix")
     private boolean isCompleted;
@@ -16,9 +15,8 @@ public class Entry {
     private boolean isAudited;
     private boolean isLockedManually;
 
-    public Entry(int id, String signifier, String content, String projectTag, boolean isCompleted) {
+    public Entry(int id, String content, String projectTag, boolean isCompleted) {
         this.id = id;
-        this.signifier = signifier;
         this.content = content;
         this.projectTag = projectTag;
         this.isCompleted = isCompleted;
@@ -31,7 +29,7 @@ public class Entry {
     public boolean isLocked() {
         if (isLockedManually) return true;
         
-        if ("*".equals(signifier) && !isMigrated) {
+        if (!isMigrated) {
             // Only a task explicitly scheduled for Today can lock automatically.
             // Inbox/no-date tasks, overdue tasks, and future tasks remain editable.
             if (deadline <= 0 || isOverdue() || isFuture()) {
@@ -67,9 +65,6 @@ public class Entry {
     // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    
-    public String getSignifier() { return signifier; }
-    public void setSignifier(String signifier) { this.signifier = signifier; }
     
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }

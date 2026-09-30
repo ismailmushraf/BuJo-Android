@@ -179,7 +179,7 @@ public class EntryAdapter extends ArrayAdapter<Object> {
             holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
             holder.tvSignifier.setText(">");
             holder.tvSignifier.setTextColor(colorText);
-        } else if ("*".equals(entry.getSignifier())) {
+        } else {
             // BB10 style checkmark
             if (entry.isCompleted()) {
                 holder.tvSignifier.setBackgroundResource(R.drawable.bb10_checkbox_checked_bg);
@@ -190,13 +190,6 @@ public class EntryAdapter extends ArrayAdapter<Object> {
                 holder.tvSignifier.setText("");
                 holder.tvSignifier.setTextColor(colorText);
             }
-        } else if ("o".equals(entry.getSignifier())) {
-            holder.tvSignifier.setBackgroundResource(entry.isCompleted() ? R.drawable.ic_event_completed : R.drawable.ic_calendar);
-            holder.tvSignifier.setText("");
-        } else {
-            holder.tvSignifier.setBackgroundResource(android.R.color.transparent);
-            holder.tvSignifier.setText(entry.getSignifier());
-            holder.tvSignifier.setTextColor(colorText);
         }
 
         String content = entry.getContent() != null ? entry.getContent() : "";

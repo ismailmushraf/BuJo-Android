@@ -100,14 +100,14 @@ public class EntryUIHelper {
 
         final String breakdownOptionTitle = context.getString(R.string.coach_break_down_ai);
         final List<SidebarOption> optionsList = new ArrayList<>();
-        if ("*".equals(entry.getSignifier()) && !entry.isCompleted()) {
+        if (!entry.isCompleted()) {
             optionsList.add(new SidebarOption(breakdownOptionTitle, R.drawable.ic_bb10_breakdown));
         }
         if (entry.isMigrated()) {
             optionsList.add(new SidebarOption("Mark as Not Migrated", R.drawable.ic_inbox));
         } else {
             optionsList.add(new SidebarOption("Migrate to Future List", R.drawable.ic_inbox));
-            if ("*".equals(entry.getSignifier()) && DatabaseManager.isToday(entry.getDeadline())) {
+            if (DatabaseManager.isToday(entry.getDeadline())) {
                 optionsList.add(new SidebarOption("Lock Task", android.R.drawable.ic_lock_lock));
             }
         }
@@ -155,7 +155,7 @@ public class EntryUIHelper {
                 if (selected.equals("Mark as Not Migrated") || selected.equals("Migrate to Future List")) {
                     boolean migrating = !entry.isMigrated();
                     long prevDeadline = entry.getDeadline();
-                    boolean wasToday = DatabaseManager.isToday(prevDeadline) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+                    boolean wasToday = DatabaseManager.isToday(prevDeadline) && entry.getParentId() == 0;
 
                     entry.setMigrated(migrating);
                     if (migrating) {
@@ -180,7 +180,7 @@ public class EntryUIHelper {
                         ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
                     }
 
-                    boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && "*".equals(entry.getSignifier()) && entry.getParentId() == 0;
+                    boolean isToday = DatabaseManager.isToday(entry.getDeadline()) && entry.getParentId() == 0;
                     if (context instanceof com.ismailmushraf.bujo.MainActivity) {
                         if (wasToday && !isToday) {
                             ((com.ismailmushraf.bujo.MainActivity) context).animatePointsChange(-5, sourceView);
@@ -289,8 +289,6 @@ public class EntryUIHelper {
     }
 
     public void toggleEntryCompletion(Entry entry, View sourceView) {
-        if ("-".equals(entry.getSignifier())) return;
-
         int pointsBefore = dbManager.getUserStats()[0];
         entry.setCompleted(!entry.isCompleted());
         dbManager.updateEntry(entry);
@@ -306,99 +304,6 @@ public class EntryUIHelper {
         if (listener != null) {
             listener.onEntryUpdated();
         }
-    }
-
-    public void showAddEventDialog(final int projectId, final String projectTag) {
-        final View view = LayoutInflater.from(context).inflate(R.layout.dialog_add_event, null);
-        final EditText etName = view.findViewById(R.id.et_event_name);
-        final EditText etDesc = view.findViewById(R.id.et_event_desc);
-        final Button btnDate = view.findViewById(R.id.btn_event_date);
-        final Button btnTime = view.findViewById(R.id.btn_event_time);
-
-        final Calendar selected = Calendar.getInstance();
-        final boolean[] hasTime = {false};
-
-        final SimpleDateFormat df = new SimpleDateFormat("MMM d, yyyy", Locale.US);
-        final SimpleDateFormat tf = new SimpleDateFormat("h:mm a", Locale.US);
-
-        btnDate.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_7, String.valueOf(df.format(selected.getTime()))));
-
-        btnDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new DatePickerDialog(context, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(android.widget.DatePicker view, int year, int month, int dayOfMonth) {
-                        selected.set(Calendar.YEAR, year);
-                        selected.set(Calendar.MONTH, month);
-                        selected.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-                        btnDate.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_6, String.valueOf(df.format(selected.getTime()))));
-                    }
-                }, selected.get(Calendar.YEAR), selected.get(Calendar.MONTH), selected.get(Calendar.DAY_OF_MONTH)).show();
-            }
-        });
-
-        btnTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new TimePickerDialog(context, new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        selected.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                        selected.set(Calendar.MINUTE, minute);
-                        selected.set(Calendar.SECOND, 0);
-                        hasTime[0] = true;
-                        btnTime.setText(context.getString(com.ismailmushraf.bujo.R.string.format_entryuihelper_5, String.valueOf(tf.format(selected.getTime()))));
-                    }
-                }, selected.get(Calendar.HOUR_OF_DAY), selected.get(Calendar.MINUTE), false).show();
-            }
-        });
-
-        final AlertDialog dialog = new AlertDialog.Builder(context, R.style.BujoDialog)
-                .setView(view)
-                .setPositiveButton("Schedule", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface d, int which) {
-                        String name = etName.getText().toString().trim();
-                        String desc = etDesc.getText().toString().trim();
-                        if (!name.isEmpty()) {
-                            Entry event = new Entry();
-                            event.setSignifier("o");
-                            String content = name;
-                            if (!desc.isEmpty()) content += "\n" + desc;
-                            event.setContent(content);
-                            event.setDeadline(selected.getTimeInMillis());
-                            event.setHasTime(hasTime[0]);
-                            event.setProjectId(projectId);
-                            event.setProjectTag(projectTag);
-                            event.setCreatedAt(System.currentTimeMillis());
-                            dbManager.insertEntry(event);
-                            if (context instanceof com.ismailmushraf.bujo.MainActivity) {
-                                ((com.ismailmushraf.bujo.MainActivity) context).refreshTaskSurfaces();
-                            }
-                            if (listener != null) listener.onEntryUpdated();
-                        }
-                    }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .create();
-
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
-            @Override
-            public void onShow(DialogInterface d) {
-                if (dialog.getWindow() != null) {
-                    DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-                    int width = (int) (metrics.widthPixels * 0.94);
-                    dialog.getWindow().setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
-                }
-
-                int color = context.getResources().getColor(R.color.bujo_text);
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(color);
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(color);
-            }
-        });
-
-        dialog.show();
     }
 
     public void showTaskDetailDialog(final Entry parent) {
@@ -521,7 +426,6 @@ public class EntryUIHelper {
                     }
 
                     Entry newSub = new Entry();
-                    newSub.setSignifier("*");
                     newSub.setContent("");
                     newSub.setParentId(parent.getId());
                     newSub.setProjectId(parent.getProjectId());

@@ -35,7 +35,7 @@ public class JournalBackupTest {
         DatabaseHelper helper = new DatabaseHelper(isolated);
         try {
             SQLiteDatabase live = helper.getWritableDatabase();
-            live.execSQL("INSERT INTO entries(type, content) VALUES ('*', 'Original task')");
+            live.execSQL("INSERT INTO entries(content) VALUES ('Original task')");
             JournalBackup.transfer(isolated, snapshot, false);
             live.execSQL("UPDATE entries SET content='Changed task'");
             JournalBackup.transfer(isolated, snapshot, true);

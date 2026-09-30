@@ -105,12 +105,8 @@ public class MigratedItemsFragment extends Fragment {
             for (Object item : entries) {
                 if (item instanceof Entry) {
                     Entry entry = (Entry) item;
-                    if ("*".equals(entry.getSignifier())) {
-                        totalTasks++;
-                        if (entry.isCompleted()) {
-                            completedCount++;
-                        }
-                    }
+                    totalTasks++;
+                    if (entry.isCompleted()) completedCount++;
                 }
             }
             completion = totalTasks == 0 ? entries.size() + " items" : completedCount + "/" + totalTasks;

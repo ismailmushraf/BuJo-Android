@@ -343,8 +343,7 @@ public final class CoachWizardDialog extends DialogFragment {
                         continue;
                     }
                     Entry e = new Entry();
-                    e.setSignifier("*");
-                    e.setContent(title);
+                                e.setContent(title);
                     if (breakdownParentId > 0) {
                         e.setParentId(breakdownParentId);
                         e.setProjectId(breakdownProjectId);

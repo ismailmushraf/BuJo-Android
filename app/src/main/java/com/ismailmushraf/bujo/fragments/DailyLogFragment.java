@@ -386,7 +386,7 @@ public class DailyLogFragment extends Fragment {
             for (Object item : entries) {
                 if (!(item instanceof Entry)) continue;
                 Entry entry = (Entry) item;
-                if (entry.getParentId() == 0 && "*".equals(entry.getSignifier()) && entry.isCompleted()
+                if (entry.getParentId() == 0 && entry.isCompleted()
                         && entry.getContent() != null) {
                     completedTitles.add(entry.getContent().trim().toLowerCase(Locale.getDefault()));
                 }
@@ -425,7 +425,7 @@ public class DailyLogFragment extends Fragment {
             for (Object item : entries) {
                 if (item instanceof Entry) {
                     Entry entry = (Entry) item;
-                    if (entry.getParentId() == 0 && "*".equals(entry.getSignifier())) {
+                    if (entry.getParentId() == 0) {
                         totalTasks++;
                         if (entry.isCompleted()) completedCount++;
                     }

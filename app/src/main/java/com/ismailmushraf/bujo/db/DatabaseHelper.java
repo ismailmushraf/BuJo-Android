@@ -7,12 +7,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "bujo.db";
-    private static final int DATABASE_VERSION = 13; // Added project color
+    private static final int DATABASE_VERSION = 14; // Removed legacy entry type
 
     // --- ENTRIES TABLE ---
     public static final String TABLE_ENTRIES = "entries";
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_TYPE = "type"; // "*", "-", "o"
     public static final String COLUMN_CONTENT = "content";
     public static final String COLUMN_CONTEXT = "context";
     public static final String COLUMN_COMPLETED = "completed";
@@ -77,7 +76,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String TABLE_CREATE_ENTRIES =
             "CREATE TABLE " + TABLE_ENTRIES + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                    COLUMN_TYPE + " TEXT, " +
                     COLUMN_CONTENT + " TEXT, " +
                     COLUMN_CONTEXT + " TEXT, " +
                     COLUMN_COMPLETED + " INTEGER DEFAULT 0, " +
@@ -215,6 +213,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
         if (oldVersion < 13) {
             db.execSQL("ALTER TABLE " + TABLE_PROJECTS + " ADD COLUMN " + COLUMN_PROJECT_COLOR + " INTEGER DEFAULT 0;");
+        }
+        if (oldVersion < 14) {
+            // SQLite table reconstruction is required to remove a column on all supported devices.
+            db.execSQL(TABLE_CREATE_ENTRIES.replace(TABLE_ENTRIES, "entries_without_type"));
+            db.execSQL("INSERT INTO entries_without_type (_id, content, context, completed, migrated, deadline, project_id, has_time, completed_at, created_at, parent_id, is_audited, is_locked) "
+                    + "SELECT _id, content, context, completed, migrated, deadline, project_id, has_time, completed_at, created_at, parent_id, is_audited, is_locked FROM entries");
+            db.execSQL("DROP TABLE entries");
+            db.execSQL("ALTER TABLE entries_without_type RENAME TO entries");
         }
     }
 }
