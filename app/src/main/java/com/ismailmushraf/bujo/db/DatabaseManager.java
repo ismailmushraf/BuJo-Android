@@ -180,6 +180,31 @@ public class DatabaseManager {
         return getEntries(DatabaseHelper.COLUMN_PROJECT_ID + " = " + projectId + " AND " + DatabaseHelper.COLUMN_PARENT_ID + " = 0", null);
     }
 
+    /** Returns whether the same unfinished top-level task already exists in this project. */
+    public boolean hasUnfinishedTopLevelTask(String content, int projectId) {
+        if (content == null || content.trim().isEmpty()) return false;
+        String selection = DatabaseHelper.COLUMN_PROJECT_ID + " = ? AND "
+                + DatabaseHelper.COLUMN_PARENT_ID + " = 0 AND "
+                + DatabaseHelper.COLUMN_COMPLETED + " = 0 AND LOWER("
+                + DatabaseHelper.COLUMN_CONTENT + ") = LOWER(?)";
+        try (Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, new String[]{DatabaseHelper.COLUMN_ID},
+                selection, new String[]{String.valueOf(projectId), content.trim()}, null, null, null, "1")) {
+            return cursor.moveToFirst();
+        }
+    }
+
+    /** Returns whether this parent task already has the same unfinished subtask. */
+    public boolean hasUnfinishedSubtask(int parentId, String content) {
+        if (parentId <= 0 || content == null || content.trim().isEmpty()) return false;
+        String selection = DatabaseHelper.COLUMN_PARENT_ID + " = ? AND "
+                + DatabaseHelper.COLUMN_COMPLETED + " = 0 AND LOWER("
+                + DatabaseHelper.COLUMN_CONTENT + ") = LOWER(?)";
+        try (Cursor cursor = database.query(DatabaseHelper.TABLE_ENTRIES, new String[]{DatabaseHelper.COLUMN_ID},
+                selection, new String[]{String.valueOf(parentId), content.trim()}, null, null, null, "1")) {
+            return cursor.moveToFirst();
+        }
+    }
+
     public Entry getEntryById(int id) {
         List<Entry> entries = getEntries(DatabaseHelper.COLUMN_ID + " = " + id, null);
         if (entries != null && !entries.isEmpty()) {

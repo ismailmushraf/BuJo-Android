@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
@@ -31,6 +33,7 @@ import android.widget.Toast;
 
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.db.DatabaseManager;
+import com.ismailmushraf.bujo.fragments.CoachWizardDialog;
 import com.ismailmushraf.bujo.models.Entry;
 
 import java.text.SimpleDateFormat;
@@ -95,7 +98,11 @@ public class EntryUIHelper {
         TextView tvTitle = (TextView) view.findViewById(R.id.sidebar_task_title);
         tvTitle.setText(entry.getContent());
 
+        final String breakdownOptionTitle = context.getString(R.string.coach_break_down_ai);
         final List<SidebarOption> optionsList = new ArrayList<>();
+        if ("*".equals(entry.getSignifier()) && !entry.isCompleted()) {
+            optionsList.add(new SidebarOption(breakdownOptionTitle, R.drawable.ic_bb10_breakdown));
+        }
         if (entry.isMigrated()) {
             optionsList.add(new SidebarOption("Mark as Not Migrated", R.drawable.ic_inbox));
         } else {
@@ -127,9 +134,24 @@ public class EntryUIHelper {
         lvOptions.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-                dialog.dismiss();
                 SidebarOption option = optionsList.get(position);
                 String selected = option.title;
+                if (selected.equals(breakdownOptionTitle)) {
+                    // Let the full-screen sidebar finish closing before adding a fragment dialog.
+                    // Older Android window managers can otherwise drop the second dialog silently.
+                    dialog.dismiss();
+                    if (context instanceof com.ismailmushraf.bujo.MainActivity) {
+                        com.ismailmushraf.bujo.MainActivity activity =
+                                (com.ismailmushraf.bujo.MainActivity) context;
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            if (!activity.isFinishing() && !activity.isDestroyed()) {
+                                CoachWizardDialog.showBreakdown(activity.getSupportFragmentManager(), entry);
+                            }
+                        }, 160);
+                    }
+                    return;
+                }
+                dialog.dismiss();
                 if (selected.equals("Mark as Not Migrated") || selected.equals("Migrate to Future List")) {
                     boolean migrating = !entry.isMigrated();
                     long prevDeadline = entry.getDeadline();

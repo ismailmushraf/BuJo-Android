@@ -359,6 +359,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/coach_results_selection_label"
                 style="@style/CoachText"
                 android:text="SELECT TASKS TO ADD TO TODAY"
                 android:textColor="@color/bujo_text_secondary"

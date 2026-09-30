@@ -12,25 +12,63 @@ import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.coach.*;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.*;
+import com.ismailmushraf.bujo.utils.AppExecutors;
 import org.json.*;
 import java.util.*;
 
 /** The coach is a conversational Plan Day flow. */
 public final class CoachWizardDialog extends DialogFragment {
+    private static final String TAG = "coach_wizard";
+    private static final String BREAKDOWN_TAG = "coach_task_breakdown";
+    private static final String ARG_BREAKDOWN_TASK = "breakdown_task";
+    private static final String ARG_BREAKDOWN_PARENT_ID = "breakdown_parent_id";
+    private static final String ARG_BREAKDOWN_PROJECT_ID = "breakdown_project_id";
+    private static final String ARG_BREAKDOWN_PROJECT_TAG = "breakdown_project_tag";
+    private static final String ARG_BREAKDOWN_DEADLINE = "breakdown_deadline";
     private View root;
     private int step = 0;
     private final ArrayList<JSONObject> suggestions = new ArrayList<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable typewriterRunnable;
+    private String breakdownTask = "";
+    private int breakdownParentId;
+    private int breakdownProjectId;
+    private String breakdownProjectTag;
+    private long breakdownDeadline;
+    private CoachStore.Record latestRecord;
+    private String latestPlan = "";
 
     public static void show(androidx.fragment.app.FragmentManager manager) {
-        if (manager.findFragmentByTag("coach_wizard") == null)
-            new CoachWizardDialog().show(manager, "coach_wizard");
+        if (manager.findFragmentByTag(TAG) == null)
+            new CoachWizardDialog().show(manager, TAG);
+    }
+
+    /** Opens Coach directly in a focused flow for splitting one task into small actions. */
+    public static void showBreakdown(androidx.fragment.app.FragmentManager manager, Entry task) {
+        if (manager.isStateSaved()) return;
+        if (task == null || task.getId() <= 0) return;
+        CoachWizardDialog dialog = new CoachWizardDialog();
+        Bundle args = new Bundle();
+        args.putString(ARG_BREAKDOWN_TASK, task.getContent() == null ? "" : task.getContent().trim());
+        args.putInt(ARG_BREAKDOWN_PARENT_ID, task.getId());
+        args.putInt(ARG_BREAKDOWN_PROJECT_ID, task.getProjectId());
+        args.putString(ARG_BREAKDOWN_PROJECT_TAG, task.getProjectTag());
+        args.putLong(ARG_BREAKDOWN_DEADLINE, task.getDeadline());
+        dialog.setArguments(args);
+        // This is called from a sidebar click. Attach it immediately rather than queueing it
+        // behind any fragment transaction that may still be removing a previous Coach dialog.
+        dialog.showNow(manager, BREAKDOWN_TAG + "_" + android.os.SystemClock.elapsedRealtime());
     }
 
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle state) {
+        Bundle args = getArguments();
+        breakdownTask = args == null ? "" : args.getString(ARG_BREAKDOWN_TASK, "").trim();
+        breakdownParentId = args == null ? 0 : args.getInt(ARG_BREAKDOWN_PARENT_ID);
+        breakdownProjectId = args == null ? 0 : args.getInt(ARG_BREAKDOWN_PROJECT_ID);
+        breakdownProjectTag = args == null ? null : args.getString(ARG_BREAKDOWN_PROJECT_TAG);
+        breakdownDeadline = args == null ? 0 : args.getLong(ARG_BREAKDOWN_DEADLINE);
         root = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_coach_wizard, null);
         Dialog d = new android.app.AlertDialog.Builder(requireContext(), R.style.BujoDialog).setView(root).create();
 
@@ -52,7 +90,18 @@ public final class CoachWizardDialog extends DialogFragment {
         bindChipGroup(root.findViewById(R.id.coach_wizard_mood), R.id.mood_ok);
         bindChipGroup(root.findViewById(R.id.coach_wizard_energy), R.id.energy_medium);
 
+        if (!breakdownTask.isEmpty()) {
+            step = 2;
+            ((TextView) root.findViewById(R.id.coach_wizard_message)).setText("Breaking this task into small, actionable steps…");
+            ((TextView) root.findViewById(R.id.coach_results_selection_label)).setText("SELECT SUBTASKS TO ADD");
+            ((TextView) root.findViewById(R.id.coach_wizard_add_step3)).setText("Add selected subtasks");
+            root.findViewById(R.id.coach_wizard_add_step3).setEnabled(false);
+            root.findViewById(R.id.coach_refine_simpler).setVisibility(View.GONE);
+            root.findViewById(R.id.coach_refine_work).setVisibility(View.GONE);
+            root.findViewById(R.id.coach_refine_low_effort).setVisibility(View.GONE);
+        }
         render();
+        if (!breakdownTask.isEmpty()) root.post(this::submitBreakdown);
         return d;
     }
 
@@ -97,19 +146,38 @@ public final class CoachWizardDialog extends DialogFragment {
             ((EditText) root.findViewById(R.id.coach_wizard_minutes)).setError(getString(R.string.coach_invalid_minutes));
             return;
         }
-        final int targetMinutes = minutes;
         try {
             JSONObject input = new JSONObject()
                     .put("kind", "day planning")
                     .put("mood", choice(R.id.coach_wizard_mood))
                     .put("energy", choice(R.id.coach_wizard_energy))
-                    .put("available_minutes", targetMinutes)
+                    .put("available_minutes", minutes)
                     .put("note", ((EditText) root.findViewById(R.id.coach_wizard_note)).getText().toString());
-
             if (refinementNote != null && !refinementNote.trim().isEmpty()) {
                 input.put("refinement_note", refinementNote);
             }
+            submit(input, minutes, refinementNote);
+        } catch (Exception e) {
+            error();
+        }
+    }
 
+    /** Sends only the selected task and fixed micro-action constraints; no check-in is required. */
+    private void submitBreakdown() {
+        try {
+            JSONObject input = new JSONObject()
+                    .put("kind", "task breakdown")
+                    .put("available_minutes", 45)
+                    .put("note", "Break down: " + breakdownTask)
+                    .put("breakdown_task", breakdownTask);
+            submit(input, 45, null);
+        } catch (JSONException error) {
+            error();
+        }
+    }
+
+    private void submit(JSONObject input, int targetMinutes, String refinementNote) {
+        try {
             CoachEngine engine = CoachEngine.get(requireContext());
             if (!engine.submit(input, true, record -> {
                 if (!isAdded()) return;
@@ -120,17 +188,16 @@ public final class CoachWizardDialog extends DialogFragment {
                 }
                 try {
                     JSONObject answer = new JSONObject(record.response);
+                    latestRecord = record;
+                    latestPlan = CoachProtocol.display(answer);
                     JSONArray list = answer.getJSONArray("suggestions");
                     suggestions.clear();
-                    for (int i = 0; i < list.length(); i++)
-                        suggestions.add(list.getJSONObject(i));
+                    for (int i = 0; i < list.length(); i++) suggestions.add(list.getJSONObject(i));
                     String message = answer.getString("message");
-                    if (!"ai".equals(record.status))
-                        message += "\n\nOffline fallback: " + engine.notice();
+                    if (!"ai".equals(record.status)) message += "\n\nOffline fallback: " + engine.notice();
                     showResults(message, targetMinutes);
-                } catch (Exception e) {
-                    error();
-                }
+                    if (!breakdownTask.isEmpty()) root.findViewById(R.id.coach_wizard_add_step3).setEnabled(true);
+                } catch (Exception e) { error(); }
             })) {
                 TextView status = root.findViewById(R.id.coach_wizard_status);
                 status.setText(R.string.coach_busy);
@@ -143,9 +210,7 @@ public final class CoachWizardDialog extends DialogFragment {
             status.setVisibility(View.VISIBLE);
             root.findViewById(R.id.coach_wizard_next_step2).setEnabled(false);
             setRefineButtonsEnabled(false);
-        } catch (Exception e) {
-            error();
-        }
+        } catch (Exception e) { error(); }
     }
 
     private void refine(String note) {
@@ -195,7 +260,9 @@ public final class CoachWizardDialog extends DialogFragment {
             }
             String effortLabel = "⏱️ ~" + taskEst + "m";
             ((TextView) row.findViewById(R.id.coach_suggestion_title)).setText(item.optString("title"));
-            ((TextView) row.findViewById(R.id.coach_suggestion_project)).setText(id == 0 ? "GENERAL" : "PROJECT · " + names.get(id));
+            ((TextView) row.findViewById(R.id.coach_suggestion_project)).setText(!breakdownTask.isEmpty()
+                    ? "SUBTASK"
+                    : (id == 0 ? "GENERAL" : "PROJECT · " + names.get(id)));
             ((TextView) row.findViewById(R.id.coach_suggestion_effort)).setText(effortLabel);
             ((TextView) row.findViewById(R.id.coach_suggestion_reason)).setText(item.optString("reason"));
             row.setTag(item);
@@ -256,7 +323,9 @@ public final class CoachWizardDialog extends DialogFragment {
     private void addSelected() {
         DatabaseManager db = new DatabaseManager(requireContext());
         int count = 0;
+        int duplicatesSkipped = 0;
         try {
+            db.open();
             Map<Integer, String> names = projects();
             ArrayList<Entry> selected = new ArrayList<>();
             LinearLayout list = root.findViewById(R.id.coach_wizard_suggestions);
@@ -264,12 +333,27 @@ public final class CoachWizardDialog extends DialogFragment {
                 View child = list.getChildAt(i);
                 if (Boolean.TRUE.equals(child.getTag(R.id.coach_suggestion_tick))) {
                     JSONObject item = (JSONObject) child.getTag();
+                    int project = breakdownParentId > 0 ? breakdownProjectId : item.optInt("project_id");
+                    String title = item.getString("title").trim();
+                    boolean alreadyExists = breakdownParentId > 0
+                            ? db.hasUnfinishedSubtask(breakdownParentId, title)
+                            : db.hasUnfinishedTopLevelTask(title, project);
+                    if (alreadyExists) {
+                        duplicatesSkipped++;
+                        continue;
+                    }
                     Entry e = new Entry();
                     e.setSignifier("*");
-                    e.setContent(item.getString("title"));
-                    e.setDeadline(System.currentTimeMillis());
-                    int project = item.optInt("project_id");
-                    if (project != 0) {
+                    e.setContent(title);
+                    if (breakdownParentId > 0) {
+                        e.setParentId(breakdownParentId);
+                        e.setProjectId(breakdownProjectId);
+                        e.setProjectTag(breakdownProjectTag);
+                        e.setDeadline(breakdownDeadline);
+                    } else {
+                        e.setDeadline(System.currentTimeMillis());
+                    }
+                    if (breakdownParentId == 0 && project != 0) {
                         e.setProjectId(project);
                         e.setProjectTag(names.get(project));
                     }
@@ -277,10 +361,11 @@ public final class CoachWizardDialog extends DialogFragment {
                 }
             }
             if (selected.isEmpty()) {
-                Toast.makeText(requireContext(), "Select at least one task.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), duplicatesSkipped > 0
+                        ? (breakdownParentId > 0 ? "Those subtasks already exist." : "Those suggested tasks are already in your task list.")
+                        : "Select at least one task.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            db.open();
             db.insertEntriesAtomically(selected);
             count = selected.size();
         } catch (Exception error) {
@@ -289,16 +374,34 @@ public final class CoachWizardDialog extends DialogFragment {
         } finally {
             db.close();
         }
-        if (getActivity() instanceof com.ismailmushraf.bujo.MainActivity) {
-            ((com.ismailmushraf.bujo.MainActivity) getActivity()).refreshTaskSurfaces();
-        }
-        Toast.makeText(requireContext(), getString(R.string.coach_toast_added, count), Toast.LENGTH_SHORT).show();
-        dismiss();
+        final int addedCount = count;
+        final android.content.Context appContext = requireContext().getApplicationContext();
+        final CoachStore.Record record = latestRecord;
+        final String plan = latestPlan;
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            if (breakdownParentId == 0 && record != null && !plan.isEmpty()) {
+                try (CoachStore store = new CoachStore(appContext)) {
+                    store.accept(record.id, CoachEngine.today(), plan);
+                } catch (RuntimeException ignored) { }
+            }
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded()) return;
+                if (getActivity() instanceof com.ismailmushraf.bujo.MainActivity) {
+                    ((com.ismailmushraf.bujo.MainActivity) getActivity()).refreshTaskSurfaces();
+                }
+                Toast.makeText(requireContext(), breakdownParentId > 0
+                        ? addedCount + " subtask(s) added."
+                        : getString(R.string.coach_toast_added, addedCount), Toast.LENGTH_SHORT).show();
+                dismiss();
+            });
+        });
     }
 
     private void render() {
         TextView titleView = root.findViewById(R.id.coach_wizard_title);
-        if (step == 0) {
+        if (!breakdownTask.isEmpty()) {
+            titleView.setText("BREAK DOWN TASK");
+        } else if (step == 0) {
             titleView.setText(R.string.coach_header_step1);
         } else if (step == 1) {
             titleView.setText(R.string.coach_header_step2);

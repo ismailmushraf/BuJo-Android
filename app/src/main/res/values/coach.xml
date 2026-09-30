@@ -119,6 +119,12 @@
     <string name="coach_vibe_section">COACH VIBE</string>
     <string name="coach_vibe_label">Coach personality vibe</string>
     <string name="coach_toast_added">%1$d focus task(s) added to Today! You\'ve got this! High five!</string>
+
+    <!-- Phase 3 additions -->
+    <string name="coach_break_down_ai">Break Down with AI</string>
+    <string name="coach_active_plan_title">TODAY\'S AI FOCUS PLAN</string>
+    <string name="coach_active_plan_status">%1$d / %2$d focus tasks completed</string>
+    <string name="coach_prompt_empty_today">Ready to plan your day with AI Coach?</string>
     <string-array name="coach_vibe_labels">
         <item>Cheerful Cheerleader</item>
         <item>Direct &amp; Laser-Focused</item>

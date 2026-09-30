@@ -192,6 +192,21 @@ public final class CoachEngine {
         int mins=snapshot.optInt("available_minutes",30);
         JSONArray suggestions=new JSONArray();
         if(!rest) {
+            String breakdownTask=snapshot.optString("breakdown_task","").trim();
+            if(!breakdownTask.isEmpty()) {
+                String task=clip(breakdownTask,120);
+                suggestions.put(new JSONObject().put("title","Define the first small action for " + task)
+                        .put("project_id",0).put("estimated_minutes",15)
+                        .put("reason","Start by making the next action clear and concrete."));
+                suggestions.put(new JSONObject().put("title","Do one 15-minute piece of " + task)
+                        .put("project_id",0).put("estimated_minutes",15)
+                        .put("reason","A short focused block makes the task easier to begin."));
+                suggestions.put(new JSONObject().put("title","Review progress and write the next step for " + task)
+                        .put("project_id",0).put("estimated_minutes",15)
+                        .put("reason","Close the loop so the task is ready for the next session."));
+                return new JSONObject().put("message",context.getString(R.string.coach_local_message))
+                        .put("suggestions",suggestions);
+            }
             JSONArray projects=snapshot.optJSONArray("projects");
             if(projects!=null && projects.length()>0) {
                 List<JSONObject> selected=new ArrayList<>();

@@ -18,6 +18,8 @@ import android.widget.TextView;
 import com.ismailmushraf.bujo.MainActivity;
 import com.ismailmushraf.bujo.R;
 import com.ismailmushraf.bujo.adapters.EntryAdapter;
+import com.ismailmushraf.bujo.coach.CoachEngine;
+import com.ismailmushraf.bujo.coach.CoachStore;
 import com.ismailmushraf.bujo.db.DatabaseManager;
 import com.ismailmushraf.bujo.models.Entry;
 import com.ismailmushraf.bujo.models.Project;
@@ -32,6 +34,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DailyLogFragment extends Fragment {
 
@@ -43,6 +47,10 @@ public class DailyLogFragment extends Fragment {
     private EntryUIHelper uiHelper;
     private int loadGeneration;
     private int displayedDayToken;
+    private View activePlanCard;
+    private TextView activePlanProgress;
+    private int activePlanGeneration;
+    private static final Pattern PLAN_TASK_PATTERN = Pattern.compile("^\\s*\\d+\\.\\s+(.+?)\\s*$");
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -52,6 +60,9 @@ public class DailyLogFragment extends Fragment {
         updateDateTitle();
 
         listView = (ListView) root.findViewById(R.id.lv_daily_bullets);
+        activePlanCard = root.findViewById(R.id.coach_active_plan_card);
+        activePlanProgress = root.findViewById(R.id.coach_active_plan_progress);
+        activePlanCard.setOnClickListener(v -> CoachWizardDialog.show(getParentFragmentManager()));
         final EditText etNewEntry = (EditText) root.findViewById(R.id.et_new_entry);
 
         dbManager = new DatabaseManager(getActivity());
@@ -66,6 +77,7 @@ public class DailyLogFragment extends Fragment {
         });
 
         loadEntries();
+        refreshActiveFocusPlan();
         updateCompletionRatio();
 
         listView.setOnItemClickListener(null);
@@ -119,6 +131,7 @@ public class DailyLogFragment extends Fragment {
             updateDateTitle();
             if (dbManager != null) {
                 loadEntries();
+                refreshActiveFocusPlan();
             }
             if (getActivity() instanceof MainActivity) {
                 ((MainActivity) getActivity()).runDailyAuditAfterDayChange();
@@ -333,6 +346,58 @@ public class DailyLogFragment extends Fragment {
             listView.setSelectionFromTop(index, top);
         }
         updateCompletionRatio();
+        refreshActiveFocusPlan();
+    }
+
+    /** Reads the private Coach plan independently from the journal and updates its compact progress card. */
+    private void refreshActiveFocusPlan() {
+        if (!isAdded() || activePlanCard == null) return;
+        final int request = ++activePlanGeneration;
+        final android.content.Context context = requireContext().getApplicationContext();
+        AppExecutors.getInstance().diskIO().execute(() -> {
+            String plan = "";
+            try (CoachStore store = new CoachStore(context)) {
+                plan = store.activePlan(CoachEngine.today());
+            } catch (RuntimeException ignored) { }
+            final String activePlan = plan;
+            AppExecutors.getInstance().mainThread().execute(() -> {
+                if (!isAdded() || request != activePlanGeneration) return;
+                renderActiveFocusPlan(activePlan);
+            });
+        });
+    }
+
+    private void renderActiveFocusPlan(String plan) {
+        List<String> focusTasks = new ArrayList<>();
+        if (plan != null) {
+            String[] lines = plan.split("\\r?\\n");
+            for (String line : lines) {
+                Matcher matcher = PLAN_TASK_PATTERN.matcher(line);
+                if (matcher.matches()) focusTasks.add(matcher.group(1).trim());
+            }
+        }
+        if (focusTasks.isEmpty()) {
+            activePlanCard.setVisibility(View.GONE);
+            return;
+        }
+
+        Set<String> completedTitles = new HashSet<>();
+        if (entries != null) {
+            for (Object item : entries) {
+                if (!(item instanceof Entry)) continue;
+                Entry entry = (Entry) item;
+                if (entry.getParentId() == 0 && "*".equals(entry.getSignifier()) && entry.isCompleted()
+                        && entry.getContent() != null) {
+                    completedTitles.add(entry.getContent().trim().toLowerCase(Locale.getDefault()));
+                }
+            }
+        }
+        int completed = 0;
+        for (String task : focusTasks) {
+            if (completedTitles.contains(task.toLowerCase(Locale.getDefault()))) completed++;
+        }
+        activePlanProgress.setText(completed + "/" + focusTasks.size() + " focus tasks completed");
+        activePlanCard.setVisibility(View.VISIBLE);
     }
 
     /** Refresh immediately after Coach creates selected tasks for today. */
