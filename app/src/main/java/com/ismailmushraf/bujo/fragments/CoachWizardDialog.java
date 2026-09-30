@@ -35,6 +35,13 @@ public final class CoachWizardDialog extends DialogFragment {
     private int breakdownProjectId;
     private String breakdownProjectTag;
     private long breakdownDeadline;
+    private int scheduleStartMinutes;
+    private int scheduleEndMinutes;
+    private int chatQuestion;
+    private boolean refiningPlan;
+    private String feeling = "";
+    private String reflection = "";
+    private String gratitude = "";
     private CoachStore.Record latestRecord;
     private String latestPlan = "";
 
@@ -86,12 +93,9 @@ public final class CoachWizardDialog extends DialogFragment {
         });
         root.findViewById(R.id.coach_wizard_add_step3).setOnClickListener(v -> addSelected());
 
-        root.findViewById(R.id.coach_refine_simpler).setOnClickListener(v -> refine("Focus on simpler, shorter tasks under 10 minutes."));
-        root.findViewById(R.id.coach_refine_work).setOnClickListener(v -> refine("Prioritize work project tasks."));
-        root.findViewById(R.id.coach_refine_low_effort).setOnClickListener(v -> refine("Focus on low effort, low energy tasks."));
+        root.findViewById(R.id.coach_refine_simpler).setOnClickListener(v -> beginRefinement());
 
-        bindChipGroup(root.findViewById(R.id.coach_wizard_mood), R.id.mood_ok);
-        bindChipGroup(root.findViewById(R.id.coach_wizard_energy), R.id.energy_medium);
+        setupScheduleControls();
 
         if (!breakdownTask.isEmpty()) {
             step = 2;
@@ -104,58 +108,168 @@ public final class CoachWizardDialog extends DialogFragment {
             root.findViewById(R.id.coach_refine_low_effort).setVisibility(View.GONE);
         }
         render();
+        if (breakdownTask.isEmpty()) showQuestion();
         if (!breakdownTask.isEmpty()) root.post(this::submitBreakdown);
         return d;
     }
 
-    private void bindChipGroup(LinearLayout group, int defaultSelectedId) {
-        if (group == null) return;
-        View initialSelected = group.findViewById(defaultSelectedId);
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-            child.setOnClickListener(v -> selectChip(group, v));
-        }
-        selectChip(group, initialSelected != null ? initialSelected : group.getChildAt(0));
-    }
-
-    private void selectChip(LinearLayout group, View selected) {
-        int textColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text);
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-            boolean isSelected = child == selected;
-            child.setSelected(isSelected);
-            if (child instanceof TextView)
-                ((TextView) child).setTextColor(isSelected ? android.graphics.Color.WHITE : textColor);
-        }
-    }
-
     private void next() {
-        if (step < 1) {
-            step++;
-            render();
+        if (!breakdownTask.isEmpty()) return;
+        String answer = text(R.id.coach_chat_reply);
+        if (chatQuestion == 0) feeling = answer;
+        else if (chatQuestion == 1) reflection = answer;
+        else if (chatQuestion == 2) gratitude = answer;
+        else if (chatQuestion == 4) {
+            if (answer.isEmpty()) {
+                Toast.makeText(requireContext(), "Tell Nova what you would like to change.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            addUserBubble(answer);
+            submitCheckin(answer);
             return;
         }
-        submitCheckin(null);
+        if (chatQuestion == 3) {
+            int minutes = scheduleEndMinutes - scheduleStartMinutes;
+            if (minutes < 0 || minutes > 960) {
+                Toast.makeText(requireContext(), R.string.coach_invalid_schedule, Toast.LENGTH_SHORT).show();
+                return;
+            }
+            addUserBubble(formatScheduleTime(scheduleStartMinutes) + " to " + formatScheduleTime(scheduleEndMinutes));
+            submitCheckin(null);
+            return;
+        }
+        addUserBubble(answer.isEmpty() ? "I’d rather skip this for now." : answer);
+        chatQuestion++;
+        showQuestion();
+    }
+
+    private void showQuestion() {
+        LinearLayout chips = root.findViewById(R.id.coach_chat_chips);
+        EditText reply = root.findViewById(R.id.coach_chat_reply);
+        View schedule = root.findViewById(R.id.coach_chat_schedule);
+        TextView next = root.findViewById(R.id.coach_wizard_next_step1);
+        chips.removeAllViews();
+        reply.setText("");
+        reply.setVisibility(View.VISIBLE);
+        schedule.setVisibility(View.GONE);
+
+        if (chatQuestion == 0) {
+            addNovaBubble("Good morning. Before we plan anything, how are you feeling about today?");
+            reply.setHint("Or tell Nova in your own words…");
+            addAnswerChip(chips, "Calm");
+            addAnswerChip(chips, "Focused");
+            addAnswerChip(chips, "Overwhelmed");
+            next.setText("Next");
+        } else if (chatQuestion == 1) {
+            addNovaBubble("Is anything taking up space in your mind today?");
+            reply.setHint("Share only what feels useful…");
+            addAnswerChip(chips, "Skip");
+            next.setText("Next");
+        } else if (chatQuestion == 2) {
+            addNovaBubble("Before we continue, what are you grateful for today? You can share one thing or a few.");
+            reply.setHint("I’m grateful for…");
+            addAnswerChip(chips, "Skip");
+            next.setText("Next");
+        } else if (chatQuestion == 3) {
+            addNovaBubble("When would you like to start, and when are you done for the day? I’ll plan only within that window.");
+            reply.setVisibility(View.GONE);
+            schedule.setVisibility(View.VISIBLE);
+            next.setText("Plan my day");
+        } else {
+            addNovaBubble("What would you like to change about this plan?");
+            reply.setHint("For example: fewer tasks, more work, or lower effort…");
+            next.setText("Refine plan");
+        }
+        scrollChatToBottom();
+    }
+
+    private void addAnswerChip(LinearLayout parent, String answer) {
+        TextView chip = new TextView(requireContext());
+        chip.setText(answer);
+        chip.setTextSize(12);
+        chip.setTextColor(android.graphics.Color.WHITE);
+        chip.setGravity(Gravity.CENTER);
+        chip.setBackgroundResource(R.drawable.shape_chip_selected);
+        int horizontal = dp(10);
+        chip.setPadding(horizontal, dp(6), horizontal, dp(6));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.setMargins(dp(4), 0, 0, 0);
+        parent.addView(chip, params);
+        chip.setOnClickListener(v -> {
+            ((EditText) root.findViewById(R.id.coach_chat_reply)).setText(answer.equals("Skip") ? "" : answer);
+            next();
+        });
+    }
+
+    private void addNovaBubble(String message) {
+        TextView bubble = new TextView(requireContext());
+        bubble.setText(message);
+        bubble.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text));
+        bubble.setTextSize(15);
+        bubble.setBackgroundResource(R.drawable.shape_coach_bubble);
+        bubble.setPadding(dp(12), dp(10), dp(12), dp(10));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.START;
+        params.setMargins(0, 0, dp(32), dp(10));
+        ((LinearLayout) root.findViewById(R.id.coach_chat_messages)).addView(bubble, params);
+    }
+
+    private void addUserBubble(String answer) {
+        TextView bubble = new TextView(requireContext());
+        bubble.setText(answer);
+        bubble.setTextColor(android.graphics.Color.WHITE);
+        bubble.setTextSize(14);
+        bubble.setBackgroundResource(R.drawable.shape_chip_selected);
+        bubble.setPadding(dp(12), dp(9), dp(12), dp(9));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        params.gravity = Gravity.END;
+        params.setMargins(dp(32), 0, 0, dp(14));
+        ((LinearLayout) root.findViewById(R.id.coach_chat_messages)).addView(bubble, params);
+    }
+
+    private void scrollChatToBottom() {
+        ScrollView scroll = root.findViewById(R.id.coach_chat_scroll);
+        scroll.post(() -> scroll.fullScroll(View.FOCUS_DOWN));
+    }
+
+    private int dp(int value) {
+        return (int) (value * getResources().getDisplayMetrics().density + .5f);
+    }
+
+    private void beginRefinement() {
+        refiningPlan = true;
+        chatQuestion = 4;
+        step = 0;
+        root.findViewById(R.id.coach_wizard_next_step1).setEnabled(true);
+        ((LinearLayout) root.findViewById(R.id.coach_chat_messages)).removeAllViews();
+        render();
+        showQuestion();
     }
 
     private void submitCheckin(String refinementNote) {
-        int minutes;
-        try {
-            minutes = Integer.parseInt(((EditText) root.findViewById(R.id.coach_wizard_minutes)).getText().toString());
-        } catch (Exception e) {
-            minutes = -1;
-        }
+        int minutes = scheduleEndMinutes - scheduleStartMinutes;
         if (minutes < 0 || minutes > 960) {
-            ((EditText) root.findViewById(R.id.coach_wizard_minutes)).setError(getString(R.string.coach_invalid_minutes));
+            Toast.makeText(requireContext(), R.string.coach_invalid_schedule, Toast.LENGTH_SHORT).show();
             return;
         }
         try {
+            JSONArray gratitudeItems = new JSONArray();
+            if (!gratitude.isEmpty()) gratitudeItems.put(gratitude);
             JSONObject input = new JSONObject()
                     .put("kind", "day planning")
-                    .put("mood", choice(R.id.coach_wizard_mood))
-                    .put("energy", choice(R.id.coach_wizard_energy))
+                    // Retain these fields so existing check-in history remains readable.
+                    .put("mood", feeling)
+                    .put("energy", "Not specified")
+                    .put("feeling", feeling)
                     .put("available_minutes", minutes)
-                    .put("note", ((EditText) root.findViewById(R.id.coach_wizard_note)).getText().toString());
+                    .put("schedule_start", formatScheduleTime(scheduleStartMinutes))
+                    .put("schedule_end", formatScheduleTime(scheduleEndMinutes))
+                    .put("reflection", reflection)
+                    .put("gratitude", gratitudeItems)
+                    .put("note", reflection);
             if (refinementNote != null && !refinementNote.trim().isEmpty()) {
                 input.put("refinement_note", refinementNote);
             }
@@ -163,6 +277,42 @@ public final class CoachWizardDialog extends DialogFragment {
         } catch (Exception e) {
             error();
         }
+    }
+
+    private void setupScheduleControls() {
+        Calendar now = Calendar.getInstance();
+        int currentMinute = now.get(Calendar.HOUR_OF_DAY) * 60 + now.get(Calendar.MINUTE);
+        scheduleStartMinutes = Math.max(6 * 60, Math.min(currentMinute, 20 * 60));
+        scheduleEndMinutes = 20 * 60;
+        updateScheduleLabels();
+        root.findViewById(R.id.coach_wizard_start_time).setOnClickListener(v -> showTimePicker(true));
+        root.findViewById(R.id.coach_wizard_end_time).setOnClickListener(v -> showTimePicker(false));
+    }
+
+    private void showTimePicker(boolean start) {
+        int selected = start ? scheduleStartMinutes : scheduleEndMinutes;
+        new android.app.TimePickerDialog(requireContext(), (view, hour, minute) -> {
+            if (start) scheduleStartMinutes = hour * 60 + minute;
+            else scheduleEndMinutes = hour * 60 + minute;
+            updateScheduleLabels();
+        }, selected / 60, selected % 60, false).show();
+    }
+
+    private void updateScheduleLabels() {
+        ((TextView) root.findViewById(R.id.coach_wizard_start_time)).setText("Start · " + formatScheduleTime(scheduleStartMinutes));
+        ((TextView) root.findViewById(R.id.coach_wizard_end_time)).setText("Done · " + formatScheduleTime(scheduleEndMinutes));
+    }
+
+    private String formatScheduleTime(int minutes) {
+        int hour24 = minutes / 60;
+        int hour12 = hour24 % 12;
+        if (hour12 == 0) hour12 = 12;
+        return String.format(Locale.getDefault(), "%d:%02d %s", hour12, minutes % 60,
+                hour24 < 12 ? "AM" : "PM");
+    }
+
+    private String text(int viewId) {
+        return ((EditText) root.findViewById(viewId)).getText().toString().trim();
     }
 
     /** Sends only the selected task and fixed micro-action constraints; no check-in is required. */
@@ -207,13 +357,9 @@ public final class CoachWizardDialog extends DialogFragment {
                 return;
             }
             ((TextView) root.findViewById(R.id.nova_status)).setText("Nova is thinking…");
-            root.findViewById(R.id.coach_wizard_next_step2).setEnabled(false);
+            root.findViewById(R.id.coach_wizard_next_step1).setEnabled(false);
             setRefineButtonsEnabled(false);
         } catch (Exception e) { error(); }
-    }
-
-    private void refine(String note) {
-        submitCheckin(note);
     }
 
     private void setRefineButtonsEnabled(boolean enabled) {
@@ -222,25 +368,21 @@ public final class CoachWizardDialog extends DialogFragment {
         root.findViewById(R.id.coach_refine_low_effort).setEnabled(enabled);
     }
 
-    private String choice(int id) {
-        LinearLayout group = root.findViewById(id);
-        for (int i = 0; i < group.getChildCount(); i++) {
-            View child = group.getChildAt(i);
-            if (child.isSelected() && child instanceof TextView)
-                return ((TextView) child).getText().toString();
-        }
-        return "";
-    }
-
     private void error() {
         if (!isAdded()) return;
         ((TextView) root.findViewById(R.id.nova_status)).setText("Nova needs a moment to reconnect");
-        root.findViewById(R.id.coach_wizard_next_step2).setEnabled(true);
+        root.findViewById(R.id.coach_wizard_next_step1).setEnabled(true);
         setRefineButtonsEnabled(true);
     }
 
     private void showResults(String message, int minutes) {
         step = 2;
+        Button refine = root.findViewById(R.id.coach_refine_simpler);
+        // This is now the single visible Refine action. Re-enable it explicitly after a
+        // completed request instead of inheriting the old three-button request state.
+        refine.setEnabled(true);
+        refine.setClickable(true);
+        refine.setOnClickListener(v -> beginRefinement());
         animateTypewriter(message);
 
         LinearLayout list = root.findViewById(R.id.coach_wizard_suggestions);
@@ -399,9 +541,9 @@ public final class CoachWizardDialog extends DialogFragment {
         if (!breakdownTask.isEmpty()) {
             statusView.setText(step == 2 ? "Turning one task into clear next steps" : "Your AI Coach");
         } else if (step == 0) {
-            statusView.setText("Let’s check in before we plan");
+            statusView.setText(refiningPlan ? "Let’s tune your plan" : "Let’s check in before we plan");
         } else if (step == 1) {
-            statusView.setText("Tell me what time you have today");
+            statusView.setText("Let’s make room for your real day");
         } else {
             statusView.setText("Your focused plan is ready");
         }
