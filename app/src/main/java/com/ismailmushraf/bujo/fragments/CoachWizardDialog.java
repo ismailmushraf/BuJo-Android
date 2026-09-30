@@ -71,6 +71,9 @@ public final class CoachWizardDialog extends DialogFragment {
         breakdownDeadline = args == null ? 0 : args.getLong(ARG_BREAKDOWN_DEADLINE);
         root = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_coach_wizard, null);
         Dialog d = new android.app.AlertDialog.Builder(requireContext(), R.style.BujoDialog).setView(root).create();
+        // A plan can be in progress; leaving is always an explicit Cancel action.
+        setCancelable(false);
+        d.setCanceledOnTouchOutside(false);
 
         root.findViewById(R.id.coach_wizard_cancel_step1).setOnClickListener(v -> dismiss());
         root.findViewById(R.id.coach_wizard_cancel_step2).setOnClickListener(v -> dismiss());
@@ -199,15 +202,11 @@ public final class CoachWizardDialog extends DialogFragment {
                     if (!breakdownTask.isEmpty()) root.findViewById(R.id.coach_wizard_add_step3).setEnabled(true);
                 } catch (Exception e) { error(); }
             })) {
-                TextView status = root.findViewById(R.id.coach_wizard_status);
-                status.setText(R.string.coach_busy);
-                status.setVisibility(View.VISIBLE);
+                ((TextView) root.findViewById(R.id.nova_status)).setText("Nova is already working. Please wait a moment.");
                 setRefineButtonsEnabled(true);
                 return;
             }
-            TextView status = root.findViewById(R.id.coach_wizard_status);
-            status.setText(refinementNote != null ? R.string.coach_refining : R.string.coach_working);
-            status.setVisibility(View.VISIBLE);
+            ((TextView) root.findViewById(R.id.nova_status)).setText("Nova is thinking…");
             root.findViewById(R.id.coach_wizard_next_step2).setEnabled(false);
             setRefineButtonsEnabled(false);
         } catch (Exception e) { error(); }
@@ -235,16 +234,13 @@ public final class CoachWizardDialog extends DialogFragment {
 
     private void error() {
         if (!isAdded()) return;
-        TextView status = root.findViewById(R.id.coach_wizard_status);
-        status.setText(CoachEngine.get(requireContext()).notice());
-        status.setVisibility(View.VISIBLE);
+        ((TextView) root.findViewById(R.id.nova_status)).setText("Nova needs a moment to reconnect");
         root.findViewById(R.id.coach_wizard_next_step2).setEnabled(true);
         setRefineButtonsEnabled(true);
     }
 
     private void showResults(String message, int minutes) {
         step = 2;
-        root.findViewById(R.id.coach_wizard_status).setVisibility(View.GONE);
         animateTypewriter(message);
 
         LinearLayout list = root.findViewById(R.id.coach_wizard_suggestions);
@@ -398,15 +394,23 @@ public final class CoachWizardDialog extends DialogFragment {
 
     private void render() {
         TextView titleView = root.findViewById(R.id.coach_wizard_title);
+        TextView statusView = root.findViewById(R.id.nova_status);
+        titleView.setText("NOVA");
         if (!breakdownTask.isEmpty()) {
-            titleView.setText("BREAK DOWN TASK");
+            statusView.setText(step == 2 ? "Turning one task into clear next steps" : "Your AI Coach");
         } else if (step == 0) {
-            titleView.setText(R.string.coach_header_step1);
+            statusView.setText("Let’s check in before we plan");
         } else if (step == 1) {
-            titleView.setText(R.string.coach_header_step2);
+            statusView.setText("Tell me what time you have today");
         } else {
-            titleView.setText(R.string.coach_header_step3);
+            statusView.setText("Your focused plan is ready");
         }
+
+        int activeColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bb10_blue);
+        int inactiveColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_divider);
+        int[] progressIds = {R.id.coach_progress_1, R.id.coach_progress_2, R.id.coach_progress_3};
+        for (int i = 0; i < progressIds.length; i++)
+            root.findViewById(progressIds[i]).setBackgroundColor(i <= step ? activeColor : inactiveColor);
 
         int[] ids = {R.id.coach_step_mood, R.id.coach_step_time, R.id.coach_step_results};
         for (int i = 0; i < ids.length; i++) {

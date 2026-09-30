@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -79,6 +80,13 @@ public class ProjectDetailFragment extends Fragment {
         }
 
         lvUncompleted = root.findViewById(R.id.lv_uncompleted);
+        // ListView only draws dividers between adapter rows. A zero-height footer gives the
+        // final task the same one-pixel bottom border without introducing extra space.
+        View finalTaskDivider = new View(requireContext());
+        finalTaskDivider.setLayoutParams(new AbsListView.LayoutParams(
+                AbsListView.LayoutParams.MATCH_PARENT, 0));
+        lvUncompleted.addFooterView(finalTaskDivider, null, false);
+        lvUncompleted.setFooterDividersEnabled(true);
         final EditText etNewEntry = root.findViewById(R.id.et_new_entry);
 
         dbManager = new DatabaseManager(getActivity());
