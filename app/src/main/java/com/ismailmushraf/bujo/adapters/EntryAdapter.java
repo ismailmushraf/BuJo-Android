@@ -38,7 +38,6 @@ public class EntryAdapter extends ArrayAdapter<Object> {
     private final int colorText;
     private final int colorTextSecondary;
     private final Date reusableDate = new Date();
-    private final com.ismailmushraf.bujo.utils.CustomStrikethroughSpan strikethroughSpan;
 
     public EntryAdapter(Context context, List<Object> entries, boolean showTags, boolean isDailyLog) {
         super(context, 0, entries);
@@ -46,7 +45,6 @@ public class EntryAdapter extends ArrayAdapter<Object> {
         this.isDailyLog = isDailyLog;
         this.colorText = context.getResources().getColor(R.color.bujo_text);
         this.colorTextSecondary = context.getResources().getColor(R.color.bujo_text_secondary);
-        this.strikethroughSpan = new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(colorTextSecondary, context.getResources().getColor(R.color.bb10_folder_red));
     }
 
     public EntryAdapter(Context context, List<Object> entries, boolean showTags) {
@@ -194,9 +192,14 @@ public class EntryAdapter extends ArrayAdapter<Object> {
 
         String content = entry.getContent() != null ? entry.getContent() : "";
         if (entry.isCompleted()) {
-            android.text.SpannableString spannable = new android.text.SpannableString(content);
-            spannable.setSpan(strikethroughSpan, 0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            holder.tvContent.setText(spannable);
+            android.text.SpannableString styledContent = new android.text.SpannableString(content);
+            styledContent.setSpan(new android.text.style.ForegroundColorSpan(colorTextSecondary),
+                    0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            styledContent.setSpan(new com.ismailmushraf.bujo.utils.RedStrikethroughLineSpan(
+                    getContext().getResources().getColor(R.color.bb10_folder_red)),
+                    0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+            holder.tvContent.setText(styledContent);
         } else {
             holder.tvContent.setPaintFlags(holder.tvContent.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
             holder.tvContent.setText(content);

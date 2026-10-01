@@ -5,6 +5,7 @@
     <string name="ui_reset_44c57a" formatted="false">Reset</string>
     <string name="ui_workouts_ccb58b" formatted="false">Workouts</string>
     <string name="ui_settings_c7f73b" formatted="false">Settings</string>
+    <string name="ui_calendar_61f7ad" formatted="false">Calendar</string>
     <string name="ui_schedule_event_cf0765" formatted="false">SCHEDULE EVENT</string>
     <string name="ui_event_name_8269fa" formatted="false">Event Name</string>
     <string name="ui_description_optional_f1da5c" formatted="false">Description (Optional)</string>

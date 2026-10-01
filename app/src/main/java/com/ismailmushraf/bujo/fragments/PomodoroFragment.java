@@ -44,8 +44,7 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
             PomodoroService.PomodoroBinder binder = (PomodoroService.PomodoroBinder) service;
             pomodoroService = binder.getService();
             isBound = true;
-            pomodoroService.setTickListener(PomodoroFragment.this);
-            updateUIFromService();
+            attachTimerListenerIfVisible();
         }
 
         @Override
@@ -210,7 +209,7 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
     }
 
     private void updateFabInMainActivity(boolean isRunning, boolean isPaused, boolean isFocus) {
-        if (getActivity() instanceof MainActivity) {
+        if (isVisible() && getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).updateFabForPomodoro(isRunning, isPaused, isFocus);
         }
     }
@@ -234,7 +233,7 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
 
     @Override
     public void onTick(long millisUntilFinished, boolean isFocus) {
-        if (getActivity() == null) return;
+        if (!isVisible() || getActivity() == null) return;
         getActivity().runOnUiThread(() -> {
             int minutes = (int) (millisUntilFinished / 1000) / 60;
             int seconds = (int) (millisUntilFinished / 1000) % 60;
@@ -245,7 +244,7 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
 
     @Override
     public void onFinish() {
-        if (getActivity() == null) return;
+        if (!isVisible() || getActivity() == null) return;
         getActivity().runOnUiThread(() -> {
             boolean wasFocus = tvModeLabel.getText().toString().equals("FOCUS");
             tvModeLabel.setText(wasFocus ? "BREAK" : "FOCUS");
@@ -265,12 +264,38 @@ public class PomodoroFragment extends Fragment implements PomodoroService.OnTime
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // Covers the initial screen creation when the service binds before this fragment is drawn.
+        attachTimerListenerIfVisible();
+    }
+
+    @Override
     public void onStop() {
+        detachTimerListener();
         super.onStop();
         if (isBound && getActivity() != null) {
             getActivity().unbindService(connection);
             isBound = false;
         }
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) detachTimerListener();
+        else attachTimerListenerIfVisible();
+    }
+
+    private void attachTimerListenerIfVisible() {
+        if (isBound && pomodoroService != null && !isHidden()) {
+            pomodoroService.setTickListener(this);
+            updateUIFromService();
+        }
+    }
+
+    private void detachTimerListener() {
+        if (pomodoroService != null) pomodoroService.clearTickListener(this);
     }
 
     @Override

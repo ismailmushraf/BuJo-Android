@@ -177,9 +177,9 @@ public class MainActivity extends AppCompatActivity {
             btnWorkouts.setOnClickListener(v -> showRootFragment(new com.ismailmushraf.bujo.fragments.WorkoutFragment(), "root_workouts"));
         }
 
-        View btnSettings = findViewById(R.id.btn_bb10_settings);
-        if (btnSettings != null) {
-            btnSettings.setOnClickListener(v -> showRootFragment(new SettingsFragment(), "root_settings"));
+        View btnCalendar = findViewById(R.id.btn_bb10_calendar);
+        if (btnCalendar != null) {
+            btnCalendar.setOnClickListener(v -> showRootFragment(new FutureLogFragment(), "root_calendar"));
         }
 
         getSupportFragmentManager().addOnBackStackChangedListener(new androidx.fragment.app.FragmentManager.OnBackStackChangedListener() {
@@ -207,12 +207,14 @@ public class MainActivity extends AppCompatActivity {
                 String startup = com.ismailmushraf.bujo.utils.AppPreferences.getStartupScreen(this);
 
                 int startupIndex = 1; // Default to Today
-                if ("Inbox".equals(startup)) {
+                if ("Calendar".equals(startup)) {
+                    showRootFragment(new FutureLogFragment(), "root_calendar");
+                } else if ("Inbox".equals(startup)) {
                     startupIndex = 0;
-                } else if ("Calendar".equals(startup)) {
-                    startupIndex = 2;
+                    selectItem(startupIndex);
+                } else {
+                    selectItem(startupIndex);
                 }
-                selectItem(startupIndex);
             }
         }
     }
@@ -307,9 +309,9 @@ public class MainActivity extends AppCompatActivity {
         drawerItemsList.clear();
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Inbox", R.drawable.ic_inbox));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Today", R.drawable.ic_today));
-        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Calendar", R.drawable.ic_calendar));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Focus Timer", R.drawable.ic_bb10_timer));
         drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Logbook", R.drawable.ic_bb10_logbook));
+        drawerItemsList.add(new DrawerItem(DrawerItem.TYPE_ITEM, "Settings", R.drawable.ic_bb10_gear));
         drawerAdapter.notifyDataSetChanged();
     }
 
@@ -332,8 +334,8 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new InboxFragment(); rootTag = "root_inbox";
             } else if ("Today".equals(item.title)) {
                 fragment = new DailyLogFragment(); rootTag = "root_today";
-            } else if ("Calendar".equals(item.title)) {
-                fragment = new FutureLogFragment(); rootTag = "root_calendar";
+            } else if ("Settings".equals(item.title)) {
+                fragment = new SettingsFragment(); rootTag = "root_settings";
             } else if ("Logbook".equals(item.title)) {
                 fragment = new MigratedItemsFragment(); rootTag = "root_logbook";
             } else if ("Focus Timer".equals(item.title)) {
@@ -692,7 +694,7 @@ public class MainActivity extends AppCompatActivity {
         View btnProjects = findViewById(R.id.btn_bb10_projects);
         View btnHabits = findViewById(R.id.btn_bb10_habits);
         View btnWorkouts = findViewById(R.id.btn_bb10_workouts);
-        View btnSettings = findViewById(R.id.btn_bb10_settings);
+        View btnCalendar = findViewById(R.id.btn_bb10_calendar);
         TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
         boolean timerScreen = fragment instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment;
         for (int id : new int[]{R.id.btn_bb10_reset, R.id.space_bb10_pomodoro_1,
@@ -728,7 +730,7 @@ public class MainActivity extends AppCompatActivity {
         if (btnProjects != null) btnProjects.setVisibility(primaryOnlyNavVisibility);
         if (btnHabits != null) btnHabits.setVisibility(primaryOnlyNavVisibility);
         if (btnWorkouts != null) btnWorkouts.setVisibility(primaryOnlyNavVisibility);
-        if (btnSettings != null) btnSettings.setVisibility(primaryOnlyNavVisibility);
+        if (btnCalendar != null) btnCalendar.setVisibility(primaryOnlyNavVisibility);
 
         if (fragment instanceof com.ismailmushraf.bujo.fragments.SettingsFragment ||
             fragment instanceof com.ismailmushraf.bujo.fragments.FutureLogFragment ||
@@ -795,6 +797,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void updateFabForPomodoro(boolean isRunning, boolean isPaused, boolean isFocus) {
+        // The timer service can finish or bind after its cached fragment is hidden. It must
+        // never overwrite the controls belonging to the page the user is actually viewing.
+        if (!(getVisibleFragment() instanceof com.ismailmushraf.bujo.fragments.PomodoroFragment)) {
+            return;
+        }
         ImageView fab = findViewById(R.id.bb10_fab);
         TextView tvFabText = findViewById(R.id.tv_bb10_fab_text);
         View btnResetBar = findViewById(R.id.btn_bb10_reset);

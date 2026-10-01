@@ -228,9 +228,9 @@
                     android:textColor="@color/bujo_text" />
             </LinearLayout>
 
-            <!-- Settings Button -->
+            <!-- Calendar Button -->
             <LinearLayout
-                android:id="@+id/btn_bb10_settings"
+                android:id="@+id/btn_bb10_calendar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -246,13 +246,13 @@
                     android:layout_width="18dp"
                     android:layout_height="18dp"
                     android:layout_marginBottom="2dp"
-                    android:src="@drawable/ic_bb10_gear"
+                    android:src="@drawable/ic_calendar"
                     app:tint="@color/bujo_text"  android:contentDescription="@null" android:importantForAccessibility="no" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/ui_settings_c7f73b"
+                    android:text="@string/ui_calendar_61f7ad"
                     android:textSize="10sp"
                     android:singleLine="true"
                     android:maxLines="1"

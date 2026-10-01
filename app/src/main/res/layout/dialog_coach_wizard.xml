@@ -52,8 +52,7 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
             <View android:id="@+id/coach_progress_1" android:layout_width="0dp" android:layout_height="4dp" android:layout_weight="1" android:layout_marginEnd="2dp" android:background="@color/bb10_blue" />
-            <View android:id="@+id/coach_progress_2" android:layout_width="0dp" android:layout_height="4dp" android:layout_weight="1" android:layout_marginEnd="2dp" android:background="@color/bujo_divider" />
-            <View android:id="@+id/coach_progress_3" android:layout_width="0dp" android:layout_height="4dp" android:layout_weight="1" android:background="@color/bujo_divider" />
+            <View android:id="@+id/coach_progress_2" android:layout_width="0dp" android:layout_height="4dp" android:layout_weight="1" android:background="@color/bujo_divider" />
         </LinearLayout>
     </LinearLayout>
 
@@ -89,7 +88,7 @@
                 android:id="@+id/coach_chat_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/surface"
+                android:background="@color/bb10_bottom_bar_bg"
                 android:orientation="vertical"
                 android:padding="10dp">
 
@@ -100,16 +99,23 @@
                     android:gravity="end"
                     android:orientation="horizontal" />
 
-                <EditText
-                    style="@style/Widget.BuJo.TextInput.Multiline"
-                    android:id="@+id/coach_chat_reply"
+                <LinearLayout
+                    style="@style/Widget.BuJo.TextInput.Container"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:layout_marginTop="8dp"
-                    android:gravity="top"
-                    android:hint="Write a reply for Nova…"
-                    android:inputType="textCapSentences|textMultiLine"
-                    android:maxLength="1000" />
+                    android:layout_height="48dp"
+                    android:layout_marginTop="8dp">
+
+                    <EditText
+                        style="@style/Widget.BuJo.TextInput"
+                        android:id="@+id/coach_chat_reply"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="Write a reply for Nova…"
+                        android:imeOptions="actionDone"
+                        android:inputType="textCapSentences"
+                        android:maxLength="1000"
+                        android:singleLine="true" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/coach_chat_schedule"

@@ -65,6 +65,7 @@ public class FutureLogFragment extends Fragment {
     private int calendarTextColor;
     private int calendarMutedTextColor;
     private int defaultIndicatorColor;
+    private int unfiledIndicatorColor;
     private int indicatorSizePx;
     private int indicatorMarginPx;
     private float transitionDistancePx;
@@ -90,6 +91,7 @@ public class FutureLogFragment extends Fragment {
         calendarTextColor = getResources().getColor(R.color.bujo_text);
         calendarMutedTextColor = getResources().getColor(R.color.bujo_text_secondary);
         defaultIndicatorColor = getResources().getColor(R.color.bb10_blue);
+        unfiledIndicatorColor = getResources().getColor(R.color.bujo_divider);
         float density = getResources().getDisplayMetrics().density;
         indicatorSizePx = (int) (5 * density);
         indicatorMarginPx = (int) (1.5f * density);
@@ -324,7 +326,9 @@ public class FutureLogFragment extends Fragment {
                     }
                     if (colors.size() < 3) {
                         Integer projectColor = projectColors.get(entry.getProjectId());
-                        colors.add(projectColor != null ? projectColor : defaultIndicatorColor);
+                        colors.add(entry.getProjectId() == 0
+                                ? unfiledIndicatorColor
+                                : (projectColor != null ? projectColor : defaultIndicatorColor));
                     }
                 }
                 loaded = new CalendarLoadData(entries, indicators);
@@ -458,14 +462,19 @@ public class FutureLogFragment extends Fragment {
 
                 String content = entry.getContent() != null ? entry.getContent() : "";
                 if (entry.isCompleted()) {
-                    android.text.SpannableString spannable = new android.text.SpannableString(content);
-                    spannable.setSpan(new com.ismailmushraf.bujo.utils.CustomStrikethroughSpan(
-                            getContext().getResources().getColor(R.color.bujo_text_secondary),
+                    android.text.SpannableString styledContent = new android.text.SpannableString(content);
+                    styledContent.setSpan(new android.text.style.ForegroundColorSpan(
+                            getContext().getResources().getColor(R.color.bujo_text_secondary)),
+                            0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    styledContent.setSpan(new com.ismailmushraf.bujo.utils.RedStrikethroughLineSpan(
                             getContext().getResources().getColor(R.color.bb10_folder_red)),
                             0, content.length(), android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    tvTaskTitle.setText(spannable);
+                    tvTaskTitle.setPaintFlags(tvTaskTitle.getPaintFlags()
+                            & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                    tvTaskTitle.setText(styledContent);
                 } else {
                     tvTaskTitle.setPaintFlags(tvTaskTitle.getPaintFlags() & (~android.graphics.Paint.STRIKE_THRU_TEXT_FLAG));
+                    tvTaskTitle.setTextColor(getContext().getResources().getColor(R.color.bujo_text));
                     tvTaskTitle.setText(content);
                 }
 

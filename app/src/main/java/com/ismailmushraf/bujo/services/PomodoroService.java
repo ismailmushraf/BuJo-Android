@@ -90,6 +90,11 @@ public class PomodoroService extends Service {
         this.tickListener = listener;
     }
 
+    /** Detaches a screen without accidentally removing a newer screen's listener. */
+    public void clearTickListener(OnTimerTickListener listener) {
+        if (this.tickListener == listener) this.tickListener = null;
+    }
+
     public void setDurations(int focusMins, int breakMins) {
         this.focusDuration = focusMins;
         this.breakDuration = breakMins;

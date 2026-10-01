@@ -148,6 +148,7 @@ public final class CoachWizardDialog extends DialogFragment {
         EditText reply = root.findViewById(R.id.coach_chat_reply);
         View schedule = root.findViewById(R.id.coach_chat_schedule);
         TextView next = root.findViewById(R.id.coach_wizard_next_step1);
+        setPrimaryActionLoading(false);
         chips.removeAllViews();
         reply.setText("");
         reply.setVisibility(View.VISIBLE);
@@ -219,9 +220,9 @@ public final class CoachWizardDialog extends DialogFragment {
     private void addUserBubble(String answer) {
         TextView bubble = new TextView(requireContext());
         bubble.setText(answer);
-        bubble.setTextColor(android.graphics.Color.WHITE);
+        bubble.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_text));
         bubble.setTextSize(14);
-        bubble.setBackgroundResource(R.drawable.shape_chip_selected);
+        bubble.setBackgroundResource(R.drawable.shape_coach_bubble);
         bubble.setPadding(dp(12), dp(9), dp(12), dp(9));
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -243,7 +244,7 @@ public final class CoachWizardDialog extends DialogFragment {
         refiningPlan = true;
         chatQuestion = 4;
         step = 0;
-        root.findViewById(R.id.coach_wizard_next_step1).setEnabled(true);
+        setPrimaryActionLoading(false);
         ((LinearLayout) root.findViewById(R.id.coach_chat_messages)).removeAllViews();
         render();
         showQuestion();
@@ -353,11 +354,12 @@ public final class CoachWizardDialog extends DialogFragment {
                 } catch (Exception e) { error(); }
             })) {
                 ((TextView) root.findViewById(R.id.nova_status)).setText("Nova is already working. Please wait a moment.");
+                setPrimaryActionLoading(false);
                 setRefineButtonsEnabled(true);
                 return;
             }
             ((TextView) root.findViewById(R.id.nova_status)).setText("Nova is thinking…");
-            root.findViewById(R.id.coach_wizard_next_step1).setEnabled(false);
+            setPrimaryActionLoading(true);
             setRefineButtonsEnabled(false);
         } catch (Exception e) { error(); }
     }
@@ -371,12 +373,13 @@ public final class CoachWizardDialog extends DialogFragment {
     private void error() {
         if (!isAdded()) return;
         ((TextView) root.findViewById(R.id.nova_status)).setText("Nova needs a moment to reconnect");
-        root.findViewById(R.id.coach_wizard_next_step1).setEnabled(true);
+        setPrimaryActionLoading(false);
         setRefineButtonsEnabled(true);
     }
 
     private void showResults(String message, int minutes) {
         step = 2;
+        setPrimaryActionLoading(false);
         Button refine = root.findViewById(R.id.coach_refine_simpler);
         // This is now the single visible Refine action. Re-enable it explicitly after a
         // completed request instead of inheriting the old three-button request state.
@@ -550,9 +553,11 @@ public final class CoachWizardDialog extends DialogFragment {
 
         int activeColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bb10_blue);
         int inactiveColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.bujo_divider);
-        int[] progressIds = {R.id.coach_progress_1, R.id.coach_progress_2, R.id.coach_progress_3};
+        // Nova has two visible stages: the check-in conversation and the resulting plan.
+        int[] progressIds = {R.id.coach_progress_1, R.id.coach_progress_2};
+        int activeStage = step == 2 ? 1 : 0;
         for (int i = 0; i < progressIds.length; i++)
-            root.findViewById(progressIds[i]).setBackgroundColor(i <= step ? activeColor : inactiveColor);
+            root.findViewById(progressIds[i]).setBackgroundColor(i <= activeStage ? activeColor : inactiveColor);
 
         int[] ids = {R.id.coach_step_mood, R.id.coach_step_time, R.id.coach_step_results};
         for (int i = 0; i < ids.length; i++) {
@@ -562,6 +567,13 @@ public final class CoachWizardDialog extends DialogFragment {
         root.findViewById(R.id.coach_footer_step1).setVisibility(step == 0 ? View.VISIBLE : View.GONE);
         root.findViewById(R.id.coach_footer_step2).setVisibility(step == 1 ? View.VISIBLE : View.GONE);
         root.findViewById(R.id.coach_footer_step3).setVisibility(step == 2 ? View.VISIBLE : View.GONE);
+    }
+
+    private void setPrimaryActionLoading(boolean loading) {
+        View action = root.findViewById(R.id.coach_wizard_next_step1);
+        action.setEnabled(!loading);
+        action.setClickable(!loading);
+        action.setAlpha(loading ? 0.45f : 1f);
     }
 
     @Override
